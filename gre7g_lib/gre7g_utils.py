@@ -345,11 +345,6 @@ class LambdaBase(ABC):
             status = HTTPStatus.BAD_REQUEST
             body = {"message": str(error)}
 
-        except Exception as error:
-            LOG.exception("Unhandled exception")
-            status = HTTPStatus.INTERNAL_SERVER_ERROR
-            body = {"message": str(error)}
-
         except DownloadedFile as file_details:
             with file_details.path.open("rb") as file_obj:
                 data = file_obj.read()
@@ -362,6 +357,11 @@ class LambdaBase(ABC):
                 },
                 "body": data,
             }
+
+        except Exception as error:
+            LOG.exception("Unhandled exception")
+            status = HTTPStatus.INTERNAL_SERVER_ERROR
+            body = {"message": str(error)}
 
         return {
             "statusCode": status,
