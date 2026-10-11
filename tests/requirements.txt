@@ -1,13 +1,13 @@
-awscrt==0.36.4
+awscrt==0.37.0
 aws_lambda_powertools==3.35.0
-black==26.5.1
-boto3==1.43.98
+black==26.10.1
+boto3==1.43.111
 botocore-stubs==1.43.67
-mypy==2.3.1
+mypy==2.4.0
 openapi-core==0.23.1
 pip_audit==2.10.1
 pip-requirements-parser @ git+https://github.com/gre7g/pip-requirements-parser.git
 PyYAML==6.0.3
 requests==2.34.2
-types-boto3-dynamodb==1.43.64
+types-boto3-dynamodb==1.43.106
 types-PyYAML==6.0.12.20260906

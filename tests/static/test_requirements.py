@@ -2,7 +2,7 @@
 
 import logging
 from pathlib import Path
-from pip_requirements_parser import RequirementsFile, InstallRequirement
+from pip_requirements_parser import RequirementsFile
 from shutil import which
 from subprocess import check_output
 from unittest import TestCase
