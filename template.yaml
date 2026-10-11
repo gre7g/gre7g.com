@@ -1,0 +1,332 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  EnableDeletionProtection:
+    Type: String
+    Default: "false"
+    AllowedValues: ["true", "false"]
+
+Conditions:
+  DeletionProtectionEnabled: !Equals [!Ref EnableDeletionProtection, "true"]
+
+Globals:
+  Function:
+    Runtime: python3.14
+    MemorySize: 128
+    Tracing: Active
+    Environment:
+      Variables:
+        POWERTOOLS_SERVICE_NAME: gre7g-site
+    Layers:
+      - !Sub arn:aws:lambda:${AWS::Region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:68
+
+Resources:
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    Properties:
+      UserPoolName: !Sub ${AWS::StackName}-user-pool
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Sub ${AWS::StackName}-auth
+      UserPoolId: !Ref UserPool
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    Properties:
+      ClientName: !Sub ${AWS::StackName}-user-pool-client
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      AllowedOAuthFlows:
+        - code
+      AllowedOAuthScopes:
+        - openid
+      AllowedOAuthFlowsUserPoolClient: true
+      CallbackURLs:
+        - https://%%CLOUDFRONT_DOMAIN%%
+      SupportedIdentityProviders:
+        - COGNITO
+
+  Api:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Auth:
+        DefaultAuthorizer: CognitoJWTAuthorizer
+        Authorizers:
+          CognitoJWTAuthorizer:
+            IdentitySource: "$request.header.Authorization"
+            JwtConfiguration:
+              issuer: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}"
+              audience:
+                - !Ref UserPoolClient
+
+  AuditLogTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
+    UpdateReplacePolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
+    Properties:
+      TableName: !Sub ${AWS::StackName}-audit-log
+      BillingMode: PAY_PER_REQUEST
+
+  ProductsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
+    UpdateReplacePolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
+    Properties:
+      TableName: !Sub ${AWS::StackName}-products
+      AttributeDefinitions:
+        - AttributeName: product_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: product_id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  CartsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
+    UpdateReplacePolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
+    Properties:
+      TableName: !Sub ${AWS::StackName}-carts
+      AttributeDefinitions:
+        - AttributeName: user_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: user_id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  OrdersTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
+    UpdateReplacePolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
+    Properties:
+      TableName: !Sub ${AWS::StackName}-orders
+      AttributeDefinitions:
+        - AttributeName: user_id
+          AttributeType: S
+        - AttributeName: order_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: user_id
+          KeyType: HASH
+        - AttributeName: order_id
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+
+  Lib:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: !Sub ${AWS::StackName}-lib
+      ContentUri: gre7g_lib
+      RetentionPolicy: Delete
+    Metadata:
+      BuildMethod: python3.14
+
+  CartFetchFunction:
+    Type: AWS::Serverless::Function
+    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    Properties:
+      CodeUri: src/api
+      Handler: cart_fetch.lambda_handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref CartsTable
+      Environment:
+        Variables:
+          CARTS_TABLE: !Ref CartsTable
+      Layers:
+        - !Ref Lib
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /api/v1/cart
+            Method: get
+            ApiId: !Ref Api
+
+  CartUpdateFunction:
+    Type: AWS::Serverless::Function
+    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    Properties:
+      CodeUri: src/api
+      Handler: cart_update.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CartsTable
+      Environment:
+        Variables:
+          CARTS_TABLE: !Ref CartsTable
+      Layers:
+        - !Ref Lib
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /api/v1/cart
+            Method: put
+            ApiId: !Ref Api
+
+  AssignOrderIdFunction:
+    Type: AWS::Serverless::Function
+    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    Properties:
+      CodeUri: src/api
+      Handler: assign_order_id.lambda_handler
+      Layers:
+        - !Ref Lib
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /api/v1/cart
+            Method: post
+            ApiId: !Ref Api
+
+  LogAuditEventFunction:
+    Type: AWS::Serverless::Function
+    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    Properties:
+      CodeUri: src/api
+      Handler: log_audit.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AuditLogTable
+      Environment:
+        Variables:
+          AUDIT_LOG_TABLE: !Ref AuditLogTable
+      Layers:
+        - !Ref Lib
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /api/v1/click_id
+            Method: post
+            ApiId: !Ref Api
+
+  DownloadFunction:
+    Type: AWS::Serverless::Function
+    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    Properties:
+      CodeUri: src/api
+      Handler: download.lambda_handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref OrdersTable
+      Environment:
+        Variables:
+          ORDERS_TABLE: !Ref OrdersTable
+      Layers:
+        - !Ref Lib
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /api/v1/download/{order_id}/{product_id}
+            Method: get
+            ApiId: !Ref Api
+
+  CreateGuestFunction:
+    Type: AWS::Serverless::Function
+    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    Properties:
+      CodeUri: src/api
+      Handler: create_guest.lambda_handler
+      Layers:
+        - !Ref Lib
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /api/v1/guest
+            Method: post
+            ApiId: !Ref Api
+
+  MergeGuestFunction:
+    Type: AWS::Serverless::Function
+    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    Properties:
+      CodeUri: src/api
+      Handler: merge_guest.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CartsTable
+      Environment:
+        Variables:
+          CARTS_TABLE: !Ref CartsTable
+      Layers:
+        - !Ref Lib
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /api/v1/guest
+            Method: put
+            ApiId: !Ref Api
+
+  GetOrdersFunction:
+    Type: AWS::Serverless::Function
+    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    Properties:
+      CodeUri: src/api
+      Handler: get_orders.lambda_handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref OrdersTable
+      Environment:
+        Variables:
+          ORDERS_TABLE: !Ref OrdersTable
+      Layers:
+        - !Ref Lib
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /api/v1/orders
+            Method: get
+            ApiId: !Ref Api
+
+  GetProductsFunction:
+    Type: AWS::Serverless::Function
+    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    Properties:
+      CodeUri: src/api
+      Handler: get_products.lambda_handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ProductsTable
+      Environment:
+        Variables:
+          PRODUCTS_TABLE: !Ref ProductsTable
+      Layers:
+        - !Ref Lib
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /api/v1/products
+            Method: get
+            ApiId: !Ref Api

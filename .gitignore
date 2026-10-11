@@ -1,0 +1,9 @@
+.aws-sam/
+.idea/
+.vitest/
+__pycache__/
+audit_log/
+dist/
+node_modules/
+scratch/
+package-lock.json

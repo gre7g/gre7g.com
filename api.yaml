@@ -1,0 +1,331 @@
+openapi: 3.0.1
+info:
+  title: Backend API
+  description: Lambda backend API for gre7g.com
+  version: 0.0.0
+
+components:
+  schemas:
+    error-message:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Any additional information about the error
+      additionalProperties: false
+      required:
+        - message
+
+    empty:
+      type: object
+      additionalProperties: false
+
+    product:
+      type: object
+      properties:
+        product_id:
+          type: string
+        name:
+          type: string
+        quantity:
+          type: number
+        cost_per:
+          type: number
+          description: |
+            CAUTION: This field is informational and should never be considered authoritative! The user could PUT any 
+            cost when they update their cart, but we MUST refer to authoritative price during check-out.
+        listing_path:
+          type: string
+          description: Informational only
+      additionalProperties: false
+      required:
+        - product_id
+        - name
+        - quantity
+        - cost_per
+        - listing_path
+
+    product_list:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/product"
+      additionalProperties: false
+      required:
+        - products
+
+    auth_token:
+      type: object
+      properties:
+        auth_token:
+          type: string
+      additionalProperties: false
+      required:
+        - auth_token
+
+  responses:
+    # Note: I much prefer this "NNN-explanation" style naming for common responses. It's much more clear for engineers
+    # who haven't memorized the status codes beyond 200, 404, and 500 (such as myself). However, if we eventually need
+    # to event buses or mailboxes, some stuff will have to change in this file, and the named error tags are one of
+    # them. Sadly, if AWS SAM needs to inspect this file, it will insist that they are simply "400", "401", etc. It will
+    # also insist that identifiers like owner_id are changed to ownerId. This seems ridiculous to me, and I'd much
+    # prefer they were consistent with how the identifiers are named in the Python code (i.e. according to Python
+    # standards), but there's no arguing with code, is there?
+    "400-bad-request":
+      description: Request was malformed or parameters were in some way unexpected.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error-message"
+
+    "401-unauthorized":
+      description: Request did not provide sufficient authorization to access resource.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error-message"
+
+    "403-forbidden":
+      description: User lacks sufficient privileges to access this resource.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error-message"
+
+    "500-internal-server-error":
+      description: One of the application's scripts threw an uncaught error.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error-message"
+
+paths:
+  /api/v1/cart:
+    get:
+      summary: View shopping cart
+      description: Get a list of all items in shopping cart
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/product_list"
+        "401":
+          $ref: "#/components/responses/401-unauthorized"
+        "403":
+          $ref: "#/components/responses/403-forbidden"
+        "500":
+          $ref: "#/components/responses/500-internal-server-error"
+
+    put:
+      summary: Update shopping cart
+      description: Set the shopping cart contents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/product_list"
+      responses:
+        "200":
+          description: Successful update
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/empty"
+        "401":
+          $ref: "#/components/responses/401-unauthorized"
+        "403":
+          $ref: "#/components/responses/403-forbidden"
+        "500":
+          $ref: "#/components/responses/500-internal-server-error"
+
+    post:
+      summary: Assign order_id
+      description: Begin the purchase process by assigning an order_id to the items in the cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/empty"
+      responses:
+        "200":
+          description: Successful assignment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  order_id:
+                    type: string
+                additionalProperties: false
+                required:
+                  - order_id
+        "401":
+          $ref: "#/components/responses/401-unauthorized"
+        "403":
+          $ref: "#/components/responses/403-forbidden"
+        "500":
+          $ref: "#/components/responses/500-internal-server-error"
+
+  /api/v1/click_id:
+    post:
+      summary: Log a click_id
+      description: Save a click_id into the database for future analysis
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                click_id:
+                  type: string
+              additionalProperties: false
+              required:
+                - click_id
+      responses:
+        "200":
+          description: Successful log
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/empty"
+        "500":
+          $ref: "#/components/responses/500-internal-server-error"
+
+  /api/v1/download/{order_id}/{product_id}:
+    get:
+      summary: Download a file
+      description: Request a digital download from a previous purchase
+      parameters:
+        - in: path
+          name: order_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: product_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful download
+        "401":
+          $ref: "#/components/responses/401-unauthorized"
+        "403":
+          $ref: "#/components/responses/403-forbidden"
+        "500":
+          $ref: "#/components/responses/500-internal-server-error"
+
+  /api/v1/guest:
+    post:
+      summary: Create a guest authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/empty"
+      responses:
+        "200":
+          description: Successful authorization
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/auth_token"
+        "500":
+          $ref: "#/components/responses/500-internal-server-error"
+
+    put:
+      summary: Merge guest authorization into an existing account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/auth_token"
+      responses:
+        "200":
+          description: Successful merge
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/empty"
+        "500":
+          $ref: "#/components/responses/500-internal-server-error"
+
+  /api/v1/orders:
+    get:
+      summary: Get orders
+      description: Get a list of all previous orders
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: string
+                        products:
+                          $ref: "#/components/schemas/product_list"
+                        status:
+                          type: string
+                        downloads:
+                          type: object
+                          additionalProperties:
+                            type: boolean
+                        gross_cost:
+                          type: number
+                        discounts:
+                          type: number
+                        net_cost:
+                          type: number
+                      additionalProperties: false
+                      required:
+                        - timestamp
+                        - products
+                        - status
+                        - downloaded
+                        - gross_cost
+                        - discounts
+                        - net_cost
+                additionalProperties: false
+                required:
+                  - orders
+        "401":
+          $ref: "#/components/responses/401-unauthorized"
+        "403":
+          $ref: "#/components/responses/403-forbidden"
+        "500":
+          $ref: "#/components/responses/500-internal-server-error"
+
+  /api/v1/products:
+    get:
+      summary: View wares
+      description: Get a list of all items available for purchase
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/product_list"
+        "401":
+          $ref: "#/components/responses/401-unauthorized"
+        "403":
+          $ref: "#/components/responses/403-forbidden"
+        "500":
+          $ref: "#/components/responses/500-internal-server-error"
