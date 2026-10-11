@@ -1,0 +1,11 @@
+[tool.black]
+line-length = 120
+
+[tool.pytest.ini_options]
+addopts = ["--tb=short"]
+log_cli = true
+log_cli_level = "DEBUG"
+
+[tool.mypy]
+exclude = ["boto3_hack", "integration_base"]
+disallow_untyped_defs = true

@@ -287,21 +287,24 @@ paths:
                           type: object
                           additionalProperties:
                             type: boolean
-                        gross_cost:
+                        subtotal_cost:
                           type: number
-                        discounts:
+                        discount:
                           type: number
-                        net_cost:
+                        shipping_cost:
+                          type: number
+                        total_cost:
                           type: number
                       additionalProperties: false
                       required:
                         - timestamp
                         - products
                         - status
-                        - downloaded
-                        - gross_cost
-                        - discounts
-                        - net_cost
+                        - downloads
+                        - subtotal_cost
+                        - discount
+                        - shipping_cost
+                        - total_cost
                 additionalProperties: false
                 required:
                   - orders
