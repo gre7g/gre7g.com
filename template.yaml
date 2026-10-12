@@ -330,3 +330,99 @@ Resources:
             Path: /api/v1/products
             Method: get
             ApiId: !Ref Api
+
+  StaticBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AWS::StackName}-static
+
+  StaticBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref StaticBucket
+      PolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub ${StaticBucket.Arn}/*
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}
+
+  CloudFrontOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub ${AWS::StackName}-oac
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        DefaultRootObject: index.html
+        Origins:
+          - Id: S3Origin
+            DomainName: !GetAtt StaticBucket.RegionalDomainName
+            OriginAccessControlId: !Ref CloudFrontOAC
+            S3OriginConfig: {}
+          - Id: ApiOrigin
+            DomainName: !Sub ${Api}.execute-api.${AWS::Region}.amazonaws.com
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+        CustomErrorResponses:
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+        CacheBehaviors:
+          - PathPattern: /api/*
+            TargetOriginId: ApiOrigin
+            ViewerProtocolPolicy: https-only
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac
+
+Outputs:
+  APIEndpoint:
+    Description: Used by integration tests
+    Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com"
+
+  CloudFrontDistribution:
+    Description: Cache mechanism
+    Value: !Ref CloudFrontDistribution
+
+  CognitoHostName:
+    Description: Used by the HTML script
+    Value: !Sub "${AWS::StackName}-auth.auth.${AWS::Region}.amazoncognito.com"
+
+  CognitoLoginURL:
+    Description: Used by the HTML script
+    Value: !Sub "https://${AWS::StackName}-auth.auth.${AWS::Region}.amazoncognito.com/login?client_id=${UserPoolClient}&response_type=code&scope=openid&redirect_uri=https://${CloudFrontDistribution.DomainName}"
+
+  WebsiteURL:
+    Description: Used in manual testing
+    Value: !Sub "https://${CloudFrontDistribution.DomainName}"
+
+  AuditLogTableName:
+    Description: Used by integration tests
+    Value: !Ref AuditLogTable
+
+  ProductsTableName:
+    Description: Used by integration tests
+    Value: !Ref ProductsTable
+
+  CartsTableName:
+    Description: Used by integration tests
+    Value: !Ref CartsTable
+
+  OrdersTableName:
+    Description: Used by integration tests
+    Value: !Ref OrdersTable

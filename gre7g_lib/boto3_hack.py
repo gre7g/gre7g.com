@@ -238,13 +238,7 @@ class HackBoto:
                     if user_id and user_id.startswith("Bearer "):
                         user_id = user_id[7:]
                     user = self.users.get(user_id)
-                    if user is None:
-                        return {
-                            "statusCode": HTTPStatus.UNAUTHORIZED,
-                            "headers": {"content-type": "application/json"},
-                            "body": json.dumps({"message": "Unauthorized"}),
-                        }
-                    else:
+                    if user:
                         event["requestContext"] = {"authorizer": {"jwt": {"claims": {"sub": user_id}}}}
                         groups = self.users[UserId(user_id)]
                         if groups:

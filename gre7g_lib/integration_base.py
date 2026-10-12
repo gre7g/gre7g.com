@@ -55,24 +55,25 @@ class BaseTestCase(TestCase):
 
     # Sam outputs
     api_endpoint: ClassVar[str]
+    audit_log_table_name: ClassVar[str]
+    carts_table_name: ClassVar[str]
     cloud_front_distribution: ClassVar[str]
     cognito_host_name: ClassVar[str]
     cognito_login_url: ClassVar[str]
-    last_update_table_name: ClassVar[str]
-    list_table_name: ClassVar[str]
-    user_acl_table_name: ClassVar[str]
+    orders_table_name: ClassVar[str]
+    products_table_name: ClassVar[str]
     user_pool: ClassVar[str]
     user_pool_client: ClassVar[str]
     website_url: ClassVar[str]
 
     # Database tables
-    last_update_table: ClassVar[Any]
-    list_table: ClassVar[Any]
-    user_acl_table: ClassVar[Any]
+    audit_log_table: ClassVar[Any]
+    carts_table: ClassVar[Any]
+    orders_table: ClassVar[Any]
+    products_table: ClassVar[Any]
 
     # Users
     regular_user: ClassVar[CognitoUser]
-    admin_user: ClassVar[CognitoUser]
 
     @staticmethod
     def copy_outputs_to_members(stack_name: str) -> None:
@@ -164,9 +165,10 @@ class BaseTestCase(TestCase):
                 BaseTestCase.api_endpoint = f"http://localhost:{SERVER_PORT}"
                 BaseTestCase.regular_user = Mock(id_token=REG_USER_ID, user_id=REG_USER_ID)
                 BaseTestCase.admin_user = Mock(id_token=ADMIN_USER_ID, user_id=ADMIN_USER_ID)
-                BaseTestCase.last_update_table_name = "LastUpdateTable"
-                BaseTestCase.list_table_name = "ListTable"
-                BaseTestCase.user_acl_table_name = "UserACLTable"
+                BaseTestCase.audit_log_table_name = "AuditLogTable"
+                BaseTestCase.carts_table_name = "CartsTable"
+                BaseTestCase.products_table_name = "ProductsTable"
+                BaseTestCase.orders_table_name = "OrdersTable"
             else:
                 self.copy_outputs_to_members(STACK_NAME)
                 BaseTestCase.regular_user, BaseTestCase.admin_user = CognitoUser.create_users(
@@ -175,9 +177,10 @@ class BaseTestCase(TestCase):
 
             self.setup_openapi(path / "api.yaml")
             dynamodb = boto3.resource("dynamodb")
-            BaseTestCase.user_acl_table = dynamodb.Table(self.user_acl_table_name)
-            BaseTestCase.list_table = dynamodb.Table(self.list_table_name)
-            BaseTestCase.last_update_table = dynamodb.Table(self.last_update_table_name)
+            BaseTestCase.audit_log_table = dynamodb.Table(self.audit_log_table_name)
+            BaseTestCase.carts_table = dynamodb.Table(self.carts_table_name)
+            BaseTestCase.orders_table = dynamodb.Table(self.orders_table_name)
+            BaseTestCase.products_table = dynamodb.Table(self.products_table_name)
 
     @staticmethod
     @contextmanager

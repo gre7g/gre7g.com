@@ -18,4 +18,4 @@ class TestCreateGuest(BaseTestCase):
         assert response.status_code == HTTPStatus.OK
         result = response.json()
         assert len(result) == 1
-        assert result["order_id"] and isinstance(result["order_id"], str)
+        assert result["auth_token"] and isinstance(result["auth_token"], str)
