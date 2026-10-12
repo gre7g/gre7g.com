@@ -1,0 +1,19 @@
+{
+    "type": "module",
+    "dependencies": {
+        "aws-amplify": "^6.20.0",
+        "jquery": "^4.0.0"
+    },
+    "devDependencies": {
+        "@types/jquery": "^4.0.1",
+        "@vitest/browser-playwright": "^5.0.1",
+        "playwright": "^1.63.0",
+        "prettier": "3.9.9",
+        "typescript": "^7.0.2",
+        "vite": "^8.3.0",
+        "vitest": "^5.0.1"
+    },
+    "scripts": {
+        "test": "vitest run"
+    }
+}

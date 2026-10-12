@@ -159,7 +159,7 @@ class HackBoto:
             match value["Type"]:
                 case "AWS::DynamoDB::Table":
                     # Find the table keys
-                    keys = [attribute["AttributeName"] for attribute in properties["KeySchema"]]
+                    keys = [attribute["AttributeName"] for attribute in properties.get("KeySchema", [])]
 
                     # Create the table
                     self.tables[key] = Table(keys)
@@ -173,7 +173,7 @@ class HackBoto:
 
                     # Find environment variables
                     api_props = properties["Events"]["ApiEvent"]["Properties"]
-                    env_vars = properties["Environment"]["Variables"]
+                    env_vars = properties.get("Environment", {}).get("Variables", {})
                     function = Function(
                         properties["CodeUri"],
                         properties["Handler"],

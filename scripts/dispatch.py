@@ -27,7 +27,7 @@ LOG_LEVELS = {
     1: [logging.INFO, "INFO"],
     2: [logging.DEBUG, "DEBUG"],
 }
-STACK_NAME_TEMPLATE = "todo-list-%s"
+STACK_NAME_TEMPLATE = "gre7g-com-%s"
 ROOT_PATH = Path(__file__).parents[1]
 YAML_PATH = ROOT_PATH / "audit_log" / "save_state.yaml"
 VERSION = 1
@@ -37,16 +37,20 @@ ASSETS_PATH = DIST_PATH / "assets"
 TEST_PATH = ROOT_PATH / "tests"
 INTEGRATION_PATH = TEST_PATH / "integration"
 STATIC_TEST_PATH = TEST_PATH / "static"
-LIB_PATH = ROOT_PATH / "todo_lib"
+LIB_PATH = ROOT_PATH / "gre7g_lib"
 STATIC_PATH = ROOT_PATH / "static"
 TEMPLATE_YAML = ROOT_PATH / "template.yaml"
 VITE_CONFIG_PATH = ROOT_PATH / "vite.config.ts"
 CONFIG_FILENAME = "config.json"
-TESTER = ["pytest"] if pytest else ["unittest", "discover"]
+UNIT_TESTER = ["unittest", "discover"]
 DELETE_OLDER = timedelta(days=30)
 WEB_PORT = 8080
 SEARCH_MINIFY = re.compile(r"^\s*minify: (\w+)", re.M)
 SEARCH_PRETTIER_EXT = re.compile(r"\.(ts|html|json)$", re.M)
+
+# Globals
+G_PY_TESTER = ["pytest"]
+G_TESTER = G_PY_TESTER if pytest else UNIT_TESTER
 
 # Libraries
 paths = [str(LIB_PATH), str(ROOT_PATH)]
@@ -55,7 +59,7 @@ os.environ["PYTHONPATH"] = os.pathsep.join(paths)
 
 from audit import configure_audit_log, SourceHash, AUDIT_LOG
 from boto3_hack import HackBoto
-from list_utils import User, TodoList, LastUpdate, UserId, ListId, ListEntry, ItemId, ListIdAndPriv, Privilege
+from gre7g_utils import UserId
 from outputs import get_outputs_dict
 from users import REG_USER_ID, ADMIN_USER_ID, ADMIN_GROUP_NAME, CognitoUser, USER_EMAIL
 from web_server import WebBrowser
@@ -89,36 +93,36 @@ def compile_ts(minify: bool = True) -> None:
 def setup_sample_data(dest_dict: dict) -> None:
     """Create some sample data in the databases for webserver mode"""
     # Databases
-    dynamodb = boto3.resource("dynamodb")
-    outputs = dest_dict["outputs"]
-    user_acl_table = dynamodb.Table(outputs["user_acl_table_name"])
-    list_table = dynamodb.Table(outputs["list_table_name"])
-    last_update_table = dynamodb.Table(outputs["last_update_table_name"])
-
-    # New data
-    user_id = UserId(REG_USER_ID)
-    list_id = ListId("list1_id")
-    items = [
-        ListEntry("eggs", user_id, item_id=ItemId("item1_id")),
-        ListEntry("milk", user_id, True, ItemId("item2_id")),
-        ListEntry("bacon", user_id, item_id=ItemId("item3_id")),
-    ]
-    todo_list = TodoList("Groceries", [user_id], list_id, items)
-    user = User(user_id, lists={list_id: ListIdAndPriv(list_id, Privilege.ADMIN)})
-    timestamp1 = LastUpdate(user_id)
-    timestamp2 = LastUpdate(list_id)
-
-    # Write data to databases
-    user_acl_table.SECRET_OVERRIDE = True  # We might not have permission, but this is test infrastructure
-    user.put(user_acl_table)
-    user_acl_table.SECRET_OVERRIDE = False
-    list_table.SECRET_OVERRIDE = True
-    todo_list.put(list_table)
-    list_table.SECRET_OVERRIDE = False
-    last_update_table.SECRET_OVERRIDE = True
-    timestamp1.put(last_update_table)
-    timestamp2.put(last_update_table)
-    last_update_table.SECRET_OVERRIDE = False
+    # dynamodb = boto3.resource("dynamodb")
+    # outputs = dest_dict["outputs"]
+    # user_acl_table = dynamodb.Table(outputs["user_acl_table_name"])
+    # list_table = dynamodb.Table(outputs["list_table_name"])
+    # last_update_table = dynamodb.Table(outputs["last_update_table_name"])
+    #
+    # # New data
+    # user_id = UserId(REG_USER_ID)
+    # list_id = ListId("list1_id")
+    # items = [
+    #     ListEntry("eggs", user_id, item_id=ItemId("item1_id")),
+    #     ListEntry("milk", user_id, True, ItemId("item2_id")),
+    #     ListEntry("bacon", user_id, item_id=ItemId("item3_id")),
+    # ]
+    # todo_list = TodoList("Groceries", [user_id], list_id, items)
+    # user = User(user_id, lists={list_id: ListIdAndPriv(list_id, Privilege.ADMIN)})
+    # timestamp1 = LastUpdate(user_id)
+    # timestamp2 = LastUpdate(list_id)
+    #
+    # # Write data to databases
+    # user_acl_table.SECRET_OVERRIDE = True  # We might not have permission, but this is test infrastructure
+    # user.put(user_acl_table)
+    # user_acl_table.SECRET_OVERRIDE = False
+    # list_table.SECRET_OVERRIDE = True
+    # todo_list.put(list_table)
+    # list_table.SECRET_OVERRIDE = False
+    # last_update_table.SECRET_OVERRIDE = True
+    # timestamp1.put(last_update_table)
+    # timestamp2.put(last_update_table)
+    # last_update_table.SECRET_OVERRIDE = False
 
 
 @dataclass
@@ -138,7 +142,7 @@ class Dispatch:
     npx_path: str | None = which("npx")
 
     name_set: str = ""  # Current dev name e.g. "gre7g"
-    stack_name: str = ""  # Current stack name e.g. "todo-list-gre7g" or "todo-list-PROD"
+    stack_name: str = ""  # Current stack name e.g. "gre7g-com-gre7g" or "gre7g-com-PROD"
     git_describe: str = ""
     hash_str: str = ""
     stdout: Mock = field(default_factory=Mock)
@@ -341,7 +345,7 @@ class Dispatch:
 
     def static_tests(self) -> None:
         """Run the static tests"""
-        args = [sys.executable, "-m"] + TESTER + [str(STATIC_TEST_PATH), "--log-cli-level", self.log_level_name]
+        args = [sys.executable, "-m"] + G_TESTER + [str(STATIC_TEST_PATH)]
         self.check_call(args)
 
         assert self.npx_path
@@ -357,7 +361,7 @@ class Dispatch:
 
     def integration_tests(self, stack_name: str) -> bool:
         """Run the integration tests"""
-        args = [sys.executable, "-m"] + TESTER + [str(INTEGRATION_PATH), "--log-cli-level", self.log_level_name]
+        args = [sys.executable, "-m"] + G_TESTER + [str(INTEGRATION_PATH)]
         return self.call(args, env=os.environ | {"STACK-NAME": stack_name}) == 0
 
     @staticmethod
@@ -383,7 +387,7 @@ class Dispatch:
                 self.name_set = "BRIEF"
                 self.typescript_tests()
                 self.check_call(
-                    [sys.executable, "-m"] + TESTER + [str(INTEGRATION_PATH), "--log-cli-level", self.log_level_name],
+                    [sys.executable, "-m"] + G_TESTER + [str(INTEGRATION_PATH)],
                     env=os.environ | {"STACK-NAME": "BRIEF"},
                 )
 
@@ -391,7 +395,7 @@ class Dispatch:
                 self.name_set = "LOCAL"
                 self.typescript_tests()
                 self.check_call(
-                    [sys.executable, "-m"] + TESTER + [str(TEST_PATH), "--log-cli-level", self.log_level_name],
+                    [sys.executable, "-m"] + G_TESTER + [str(TEST_PATH)],
                     env=os.environ | {"STACK-NAME": "LOCAL"},
                 )
 
@@ -503,6 +507,7 @@ def main():
     for mouthy_log in ["boto3", "botocore", "urllib3"]:
         logging.getLogger(mouthy_log).setLevel(logging.WARNING)
     configure_audit_log(log_level <= logging.INFO)
+    G_PY_TESTER.extend(["--log-cli-level", level_name])
 
     # Sanitize incompatible combinations of options
     if args.command not in ["up", "down", "regular", "admin", "webserver", None]:

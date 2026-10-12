@@ -12,7 +12,7 @@ LOG = logging.getLogger(__name__)
 ROOT_PATH = Path(__file__).parents[2]
 ROOT_REQUIREMENTS = ROOT_PATH / "requirements.txt"
 SRC_API_REQUIREMENTS = ROOT_PATH / "src" / "api" / "requirements.txt"
-LIB_REQUIREMENTS = ROOT_PATH / "todo_lib" / "requirements.txt"
+LIB_REQUIREMENTS = ROOT_PATH / "gre7g_lib" / "requirements.txt"
 TEST_REQUIREMENTS = ROOT_PATH / "tests" / "requirements.txt"
 DEV_REQUIREMENTS = ROOT_PATH / "dev-requirements.txt"
 
