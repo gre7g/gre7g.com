@@ -243,7 +243,8 @@ paths:
           $ref: "#/components/responses/500-internal-server-error"
 
     put:
-      summary: Merge guest authorization into an existing account
+      summary: Merge guest authorization
+      description: User has logged in, so merge any cart items into their account cart
       requestBody:
         required: true
         content:

@@ -303,7 +303,7 @@ class LambdaBase(ABC):
 
     path_parameters: dict = field(default_factory=dict)
     user_id: UserId | None = None
-    guest_id: str | None = None
+    guest_id: UserId | None = None
 
     AUTH_REQUIRED = AuthenticationRequired.NONE
 
