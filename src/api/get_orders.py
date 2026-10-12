@@ -21,7 +21,7 @@ class GetOrders(LambdaBase):
         assert self.orders_table
 
         response = self.orders_table.query(KeyConditionExpression=Key("user_id").eq(self.user_id))
-        orders = [Order.from_dict(order["version"], order).to_dict() for order in response["Items"]]
+        orders = [Order.from_dict(order).to_dict() for order in response["Items"]]
 
         return {"orders": orders}
 

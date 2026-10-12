@@ -58,8 +58,9 @@ class Upgradeable:
     """Base class for a table row with a version number"""
 
     @classmethod
-    def upgrade(cls, version: int, value_dict: dict[str, Any]) -> dict[str, Any]:
+    def upgrade(cls, value_dict: dict[str, Any]) -> dict[str, Any]:
         """Upgrade a table row to the current version"""
+        version = value_dict["version"]
         assert version <= TABLE_VERSION, "Data is from a future version"
         while version < TABLE_VERSION:
             upgrader = f"upgrade_{version}_to_{version + 1}"
@@ -87,9 +88,9 @@ class AuditLog(Upgradeable):
     version: int = TABLE_VERSION
 
     @classmethod
-    def from_dict(cls, version: int, value_dict: dict[str, Any]) -> Self:
+    def from_dict(cls, value_dict: dict[str, Any]) -> Self:
         """Generate an object from a dict"""
-        value_dict = cls.upgrade(version, value_dict)
+        value_dict = cls.upgrade(value_dict)
         timestamp = value_dict["timestamp"]
         content = value_dict["content"]
         assert isinstance(timestamp, str)
@@ -114,13 +115,13 @@ class Product(Upgradeable):
     quantity: int
     cost_per: float
     listing_path: str
-    product_id: ProductId = field(default_factory=uuid1)
+    product_id: ProductId = field(default_factory=lambda: ProductId(uuid1().hex))
     version: int = TABLE_VERSION
 
     @classmethod
-    def from_dict(cls, version: int, value_dict: dict[str, Any]) -> Self:
+    def from_dict(cls, value_dict: dict[str, Any]) -> Self:
         """Generate an object from a dict"""
-        value_dict = cls.upgrade(version, value_dict)
+        value_dict = cls.upgrade(value_dict)
         name = value_dict["name"]
         quantity = value_dict["quantity"]
         cost_per = value_dict["cost_per"]
@@ -154,8 +155,7 @@ class Product(Upgradeable):
         assert products_table
         response = products_table.get_item(Key={"product_id": product_id})
         value_dict = response["Item"]
-        version = int(value_dict["version"])  # type: ignore [arg-type]
-        return cls.from_dict(version, value_dict)
+        return cls.from_dict(value_dict)
 
 
 @dataclass
@@ -167,9 +167,9 @@ class Cart(Upgradeable):
     version: int = TABLE_VERSION
 
     @classmethod
-    def from_dict(cls, version: int, value_dict: dict[str, Any]) -> Self:
+    def from_dict(cls, value_dict: dict[str, Any]) -> Self:
         """Generate an object from a dict"""
-        value_dict = cls.upgrade(version, value_dict)
+        value_dict = cls.upgrade(value_dict)
         user_id = value_dict["user_id"]
         products = value_dict["products"]
         assert isinstance(user_id, str)
@@ -197,8 +197,7 @@ class Cart(Upgradeable):
         response = carts_table.get_item(Key={"user_id": user_id})
         try:
             value_dict = response["Item"]
-            version = int(value_dict["version"])  # type: ignore [arg-type]
-            cart = cls.from_dict(version, value_dict)
+            cart = cls.from_dict(value_dict)
         except:
             cart = cls(user_id)
         return cart
@@ -214,16 +213,16 @@ class Order(Upgradeable):
     discount: float
     shipping_cost: float
     total_cost: float
-    order_id: OrderId = field(default_factory=uuid1)
+    order_id: OrderId = field(default_factory=lambda: OrderId(uuid1().hex))
     downloads: dict[str, bool] = field(default_factory=dict)
     timestamp: Timestamp = field(default_factory=lambda: Timestamp(datetime.now(UTC).isoformat()))
     status: OrderStatus = OrderStatus.PLACED
     version: int = TABLE_VERSION
 
     @classmethod
-    def from_dict(cls, version: int, value_dict: dict[str, Any]) -> Self:
+    def from_dict(cls, value_dict: dict[str, Any]) -> Self:
         """Generate an object from a dict"""
-        value_dict = cls.upgrade(version, value_dict)
+        value_dict = cls.upgrade(value_dict)
         user_id = value_dict["user_id"]
         products = value_dict["products"]
         subtotal_cost = value_dict["subtotal_cost"]
@@ -244,7 +243,7 @@ class Order(Upgradeable):
         assert isinstance(downloads, dict)
         assert isinstance(timestamp, str)
         assert isinstance(status, str)
-        product_list = [product.from_dict(version, product) for product in products]
+        product_list = [product.from_dict(product) for product in products]
         return cls(
             UserId(user_id),
             product_list,
@@ -288,8 +287,7 @@ class Order(Upgradeable):
         assert order_table
         response = order_table.get_item(Key={"user_id": user_id, "order_id": order_id})
         value_dict = response["Item"]
-        version = int(value_dict["version"])  # type: ignore [arg-type]
-        return cls.from_dict(version, value_dict)
+        return cls.from_dict(value_dict)
 
 
 @dataclass

@@ -18,9 +18,10 @@ class CartUpdate(LambdaBase):
 
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Update shopping cart"""
-        assert self.carts_table
-
         user_id = self.user_id or self.guest_id
+
+        assert user_id
+        assert self.carts_table
 
         body = json.loads(event["body"])
         products = body["products"]

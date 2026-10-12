@@ -19,6 +19,7 @@ class Download(LambdaBase):
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Download a file"""
         assert self.orders_table
+        assert self.user_id
 
         order_id = self.path_parameters["order_id"]
         product_id = self.path_parameters["product_id"]

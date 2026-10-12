@@ -18,6 +18,8 @@ class MergeGuest(LambdaBase):
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Merge guest authorization"""
         assert self.carts_table
+        assert self.user_id
+        assert self.guest_id
 
         cart = Cart.get(self.carts_table, self.user_id)
         new_product_ids = {product.product_id for product in cart.products}

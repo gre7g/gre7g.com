@@ -17,9 +17,10 @@ class CartFetch(LambdaBase):
 
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """View shopping cart"""
-        assert self.carts_table
-
         user_id = self.user_id or self.guest_id
+
+        assert user_id
+        assert self.carts_table
 
         cart = Cart.get(self.carts_table, user_id)
 

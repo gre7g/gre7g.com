@@ -1,5 +1,4 @@
 from argparse import ArgumentParser, Namespace
-import boto3
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 import json
@@ -349,8 +348,9 @@ class Dispatch:
         self.check_call(args)
 
         assert self.npx_path
-        result = check_output([self.npx_path, "prettier", str(ROOT_PATH), "--check"], text=True)
-        warnings = [line for line in result.splitlines() if SEARCH_PRETTIER_EXT.search(line)]
+        process = Popen([self.npx_path, "prettier", str(ROOT_PATH), "--check"], text=True, stdout=PIPE, stderr=PIPE)
+        _, stderr = process.communicate()
+        warnings = [line for line in stderr.splitlines() if SEARCH_PRETTIER_EXT.search(line)]
         if warnings:
             print("\n".join(warnings))
             assert False
