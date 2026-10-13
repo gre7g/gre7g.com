@@ -15,8 +15,6 @@ Globals:
     Runtime: python3.14
     MemorySize: 128
     Tracing: Active
-    LoggingConfig:
-      LogFormat: JSON
     Environment:
       Variables:
         POWERTOOLS_SERVICE_NAME: gre7g-site
@@ -178,16 +176,8 @@ Resources:
     Metadata:
       BuildMethod: python3.14
 
-  CartFetchLogGroup:
-    Type: AWS::Logs::LogGroup
-    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-cart-fetch
-
   CartFetchFunction:
     Type: AWS::Serverless::Function
-    DependsOn: CartFetchLogGroup
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
@@ -210,16 +200,8 @@ Resources:
             Method: get
             ApiId: !Ref Api
 
-  CartUpdateLogGroup:
-    Type: AWS::Logs::LogGroup
-    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-cart-update
-
   CartUpdateFunction:
     Type: AWS::Serverless::Function
-    DependsOn: CartUpdateLogGroup
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
@@ -242,16 +224,8 @@ Resources:
             Method: put
             ApiId: !Ref Api
 
-  AssignOrderIdLogGroup:
-    Type: AWS::Logs::LogGroup
-    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-assign-order-id
-
   AssignOrderIdFunction:
     Type: AWS::Serverless::Function
-    DependsOn: AssignOrderIdLogGroup
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
@@ -268,16 +242,8 @@ Resources:
             Method: post
             ApiId: !Ref Api
 
-  LogAuditEventLogGroup:
-    Type: AWS::Logs::LogGroup
-    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-log-audit-event
-
   LogAuditEventFunction:
     Type: AWS::Serverless::Function
-    DependsOn: LogAuditEventLogGroup
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
@@ -297,16 +263,8 @@ Resources:
             Method: post
             ApiId: !Ref Api
 
-  DownloadLogGroup:
-    Type: AWS::Logs::LogGroup
-    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-download
-
   DownloadFunction:
     Type: AWS::Serverless::Function
-    DependsOn: DownloadLogGroup
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
@@ -329,16 +287,8 @@ Resources:
             Method: get
             ApiId: !Ref Api
 
-  CreateGuestLogGroup:
-    Type: AWS::Logs::LogGroup
-    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-create-guest
-
   CreateGuestFunction:
     Type: AWS::Serverless::Function
-    DependsOn: CreateGuestLogGroup
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
@@ -355,16 +305,8 @@ Resources:
             Method: post
             ApiId: !Ref Api
 
-  MergeGuestLogGroup:
-    Type: AWS::Logs::LogGroup
-    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-merge-guest
-
   MergeGuestFunction:
     Type: AWS::Serverless::Function
-    DependsOn: MergeGuestLogGroup
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
@@ -387,16 +329,8 @@ Resources:
             Method: put
             ApiId: !Ref Api
 
-  GetOrdersLogGroup:
-    Type: AWS::Logs::LogGroup
-    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-get-orders
-
   GetOrdersFunction:
     Type: AWS::Serverless::Function
-    DependsOn: GetOrdersLogGroup
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
@@ -419,16 +353,8 @@ Resources:
             Method: get
             ApiId: !Ref Api
 
-  GetProductsLogGroup:
-    Type: AWS::Logs::LogGroup
-    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-get-products
-
   GetProductsFunction:
     Type: AWS::Serverless::Function
-    DependsOn: GetProductsLogGroup
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
