@@ -3,6 +3,7 @@
 from abc import ABC, abstractmethod
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.typing import LambdaContext
+from base64 import b64decode
 import boto3
 from botocore.exceptions import ClientError
 from dataclasses import dataclass, field
@@ -310,12 +311,23 @@ class LambdaBase(ABC):
         """Overload this function with your handler code"""
         raise NotImplementedError
 
+    def extract_user_id(self, event: dict[str, Any]) -> None:
+        """Decode user sub from JWT bearer token if present, without verifying signature"""
+        token = (event.get("headers") or {}).get("authorization", "")
+        try:
+            if token.startswith("Bearer "):
+                payload_b64 = token.split(".")[1]
+                payload_b64 += "=" * (-len(payload_b64) % 4)
+                claims = json.loads(b64decode(payload_b64))
+                self.user_id = UserId(claims["sub"])
+        except Exception:
+            pass
+
     def wrapper(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Wrapper around the handler than takes care of parameters, privileges, and error handling"""
         try:
             self.path_parameters = event.get("pathParameters") or {}
-            claims = event.get("requestContext", {}).get("authorizer", {}).get("jwt", {}).get("claims", {})
-            self.user_id = claims.get("sub")
+            self.extract_user_id(event)
             self.guest_id = event.get("headers", {}).get("X-Guest-ID")
 
             if (self.AUTH_REQUIRED == AuthenticationRequired.ACTIVE_USER) and not self.user_id:
