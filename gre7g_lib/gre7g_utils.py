@@ -31,6 +31,10 @@ TABLE_VERSION = 1
 MAX_ITEMS_PER_BATCH = 100
 
 
+def currency(value: float) -> Decimal:
+    return Decimal("%0.2f" % value)
+
+
 class AuthenticationRequired(StrEnum):
     """Authentication required at the lambda level"""
 
@@ -140,7 +144,7 @@ class Product(Upgradeable):
         return {
             "name": self.name,
             "quantity": self.quantity,
-            "cost_per": Decimal(self.cost_per),
+            "cost_per": currency(self.cost_per),
             "listing_path": self.listing_path,
             "product_id": self.product_id,
             "version": TABLE_VERSION,
@@ -265,10 +269,10 @@ class Order(Upgradeable):
         return {
             "user_id": self.user_id,
             "products": products,
-            "subtotal_cost": Decimal(self.subtotal_cost),
-            "discount": Decimal(self.discount),
-            "shipping_cost": Decimal(self.shipping_cost),
-            "total_cost": Decimal(self.total_cost),
+            "subtotal_cost": currency(self.subtotal_cost),
+            "discount": currency(self.discount),
+            "shipping_cost": currency(self.shipping_cost),
+            "total_cost": currency(self.total_cost),
             "order_id": self.order_id,
             "downloads": self.downloads,
             "timestamp": self.timestamp,
@@ -327,7 +331,7 @@ class LambdaBase(ABC):
         try:
             self.path_parameters = event.get("pathParameters") or {}
             self.extract_user_id(event)
-            self.guest_id = event.get("headers", {}).get("X-Guest-ID")
+            self.guest_id = event.get("headers", {}).get("x-guest-id")
 
             if (self.AUTH_REQUIRED == AuthenticationRequired.ACTIVE_USER) and not self.user_id:
                 raise PermissionError()

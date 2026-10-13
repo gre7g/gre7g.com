@@ -102,10 +102,9 @@ class BaseTestCase(TestCase):
         url = f"{self.api_endpoint}/{sub_url.lstrip('/')}"
         kwargs.setdefault("headers", {}).update({"Content-Type": "application/json"})
         if auth_user:
-            bearer = b64encode(json.dumps({"sub": auth_user.id_token}).encode("ascii")).decode("ascii").rstrip("=")
-            kwargs["headers"].update({"authorization": f"Bearer something.{bearer}.something"})
+            kwargs["headers"].update({"authorization": f"Bearer {auth_user.id_token}"})
         if guest_user:
-            kwargs["headers"].update({"X-Guest-ID": guest_user})
+            kwargs["headers"].update({"x-guest-id": guest_user})
         if STACK_NAME == RUN_BRIEF:
             content = json.dumps(kwargs.get("json", {}))
             result = boto3.resource.call_func(
@@ -167,8 +166,10 @@ class BaseTestCase(TestCase):
                 if STACK_NAME == RUN_LOCALLY:
                     WebBrowser(SERVER_PORT).launch_daemon()
                 BaseTestCase.api_endpoint = f"http://localhost:{SERVER_PORT}"
-                BaseTestCase.regular_user = Mock(id_token=REG_USER_ID, user_id=REG_USER_ID)
-                BaseTestCase.admin_user = Mock(id_token=ADMIN_USER_ID, user_id=ADMIN_USER_ID)
+                bearer = b64encode(json.dumps({"sub": REG_USER_ID}).encode("ascii")).decode("ascii").rstrip("=")
+                BaseTestCase.regular_user = Mock(id_token=f"something.{bearer}.something", user_id=REG_USER_ID)
+                # bearer = b64encode(json.dumps({"sub": ADMIN_USER_ID}).encode("ascii")).decode("ascii").rstrip("=")
+                # BaseTestCase.admin_user = Mock(id_token=f"something.{bearer}.something", user_id=ADMIN_USER_ID)
                 BaseTestCase.audit_log_name = "AuditLog"
                 BaseTestCase.carts_table_name = "CartsTable"
                 BaseTestCase.products_table_name = "ProductsTable"

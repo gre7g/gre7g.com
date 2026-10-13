@@ -1,10 +1,9 @@
 """Test viewing the shopping cart"""
 
-import boto3
 from http import HTTPStatus
 import logging
 
-from gre7g_utils import Cart, Product, ProductId, UserId, TABLE_VERSION
+from gre7g_utils import Cart, UserId, TABLE_VERSION
 from integration_base import BaseTestCase
 
 # Constants:
@@ -34,17 +33,11 @@ class TestCartFetch(BaseTestCase):
 
     def setUp(self):
         super().setUp()
-        dynamodb = boto3.resource("dynamodb")
         user_id = UserId(self.regular_user.user_id)
-        carts_table = dynamodb.Table("CartsTable")
-        products = [
-            Product("Skeleton Crew", 1, 13.99, "books/skeleton-crew", ProductId("kc1")),
-            Product("Long Way Home", 1, 18.49, "books/long-way-home", ProductId("lwh")),
-        ]
         cart = Cart.from_dict({"user_id": user_id, "version": TABLE_VERSION} | PRODUCTS)
-        carts_table.SECRET_OVERRIDE = True  # We might not have permission, but this is test infrastructure
-        cart.put(carts_table)
-        carts_table.SECRET_OVERRIDE = False
+        self.carts_table.SECRET_OVERRIDE = True  # We might not have permission, but this is test infrastructure
+        cart.put(self.carts_table)
+        self.carts_table.SECRET_OVERRIDE = False
 
     def test_no_id(self):
         """Should fail if there's no user ID and no guest ID"""
