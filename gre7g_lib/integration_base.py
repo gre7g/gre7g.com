@@ -103,7 +103,7 @@ class BaseTestCase(TestCase):
         kwargs.setdefault("headers", {}).update({"Content-Type": "application/json"})
         if auth_user:
             bearer = b64encode(json.dumps({"sub": auth_user.id_token}).encode("ascii")).decode("ascii").rstrip("=")
-            kwargs["headers"].update({"Authorization": f"Bearer something.{bearer}.something"})
+            kwargs["headers"].update({"authorization": f"Bearer something.{bearer}.something"})
         if guest_user:
             kwargs["headers"].update({"X-Guest-ID": guest_user})
         if STACK_NAME == RUN_BRIEF:

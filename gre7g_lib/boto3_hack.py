@@ -233,7 +233,7 @@ class HackBoto:
                         event["pathParameters"] = match.groupdict()
                     self.apply_policies(function)
 
-                    user_id = headers.get("Authorization")
+                    user_id = headers.get("authorization")
                     if user_id and user_id.startswith("Bearer "):
                         user_id = user_id[7:]
                     user = self.users.get(user_id)

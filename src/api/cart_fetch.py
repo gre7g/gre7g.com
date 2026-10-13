@@ -26,13 +26,16 @@ class CartFetch(LambdaBase):
 
         cart = Cart.get(self.carts_table, user_id)
 
-        products = [{
-            "name": product.name,
-            "quantity": product.quantity,
-            "cost_per": product.cost_per,
-            "listing_path": product.listing_path,
-            "product_id": product.product_id,
-        } for product in cart.products]
+        products = [
+            {
+                "name": product.name,
+                "quantity": product.quantity,
+                "cost_per": product.cost_per,
+                "listing_path": product.listing_path,
+                "product_id": product.product_id,
+            }
+            for product in cart.products
+        ]
         return {"products": products}
 
 
