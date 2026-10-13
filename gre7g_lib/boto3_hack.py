@@ -218,7 +218,7 @@ class HackBoto:
 
     def call_func(self, path: str, method: str, headers, body: str, params: dict | str = "") -> dict:
         """Execute a lambda function from a web server request"""
-        event = {"body": body}
+        event = {"body": body, "headers": headers}
 
         if isinstance(params, dict):
             event["rawQueryString"] = urlencode(params, doseq=True)

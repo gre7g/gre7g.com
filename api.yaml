@@ -113,10 +113,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/product_list"
-        "401":
-          $ref: "#/components/responses/401-unauthorized"
-        "403":
-          $ref: "#/components/responses/403-forbidden"
+        "400":
+          $ref: "#/components/responses/400-bad-request"
         "500":
           $ref: "#/components/responses/500-internal-server-error"
 

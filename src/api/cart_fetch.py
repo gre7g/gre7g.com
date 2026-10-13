@@ -18,13 +18,22 @@ class CartFetch(LambdaBase):
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """View shopping cart"""
         user_id = self.user_id or self.guest_id
+        if not user_id:
+            raise KeyError()
 
         assert user_id
         assert self.carts_table
 
         cart = Cart.get(self.carts_table, user_id)
 
-        return {"products": cart.to_dict()}
+        products = [{
+            "name": product.name,
+            "quantity": product.quantity,
+            "cost_per": product.cost_per,
+            "listing_path": product.listing_path,
+            "product_id": product.product_id,
+        } for product in cart.products]
+        return {"products": products}
 
 
 lambda_handler = CartFetch.lambda_handler()

@@ -1,4 +1,5 @@
 from argparse import ArgumentParser, Namespace
+import boto3
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 import json
@@ -58,7 +59,7 @@ os.environ["PYTHONPATH"] = os.pathsep.join(paths)
 
 from audit import configure_audit_log, SourceHash, AUDIT_LOG
 from boto3_hack import HackBoto
-from gre7g_utils import UserId
+from gre7g_utils import UserId, Cart, Product, ProductId
 from outputs import get_outputs_dict
 from users import REG_USER_ID, ADMIN_USER_ID, ADMIN_GROUP_NAME, CognitoUser, USER_EMAIL
 from web_server import WebBrowser
@@ -92,14 +93,19 @@ def compile_ts(minify: bool = True) -> None:
 def setup_sample_data(dest_dict: dict) -> None:
     """Create some sample data in the databases for webserver mode"""
     # Databases
-    # dynamodb = boto3.resource("dynamodb")
-    # outputs = dest_dict["outputs"]
-    # user_acl_table = dynamodb.Table(outputs["user_acl_table_name"])
+    dynamodb = boto3.resource("dynamodb")
+    outputs = dest_dict["outputs"]
+    carts_table = dynamodb.Table(outputs["carts_table_name"])
     # list_table = dynamodb.Table(outputs["list_table_name"])
     # last_update_table = dynamodb.Table(outputs["last_update_table_name"])
-    #
-    # # New data
-    # user_id = UserId(REG_USER_ID)
+
+    # New data
+    user_id = UserId(REG_USER_ID)
+    products = [
+        Product("Skeleton Crew", 1, 13.99, "books/skeleton-crew", ProductId("kc1")),
+        Product("Long Way Home", 1, 18.49, "books/long-way-home", ProductId("lwh")),
+    ]
+    cart = Cart(user_id, products)
     # list_id = ListId("list1_id")
     # items = [
     #     ListEntry("eggs", user_id, item_id=ItemId("item1_id")),
@@ -110,11 +116,11 @@ def setup_sample_data(dest_dict: dict) -> None:
     # user = User(user_id, lists={list_id: ListIdAndPriv(list_id, Privilege.ADMIN)})
     # timestamp1 = LastUpdate(user_id)
     # timestamp2 = LastUpdate(list_id)
-    #
-    # # Write data to databases
-    # user_acl_table.SECRET_OVERRIDE = True  # We might not have permission, but this is test infrastructure
-    # user.put(user_acl_table)
-    # user_acl_table.SECRET_OVERRIDE = False
+
+    # Write data to databases
+    carts_table.SECRET_OVERRIDE = True  # We might not have permission, but this is test infrastructure
+    cart.put(carts_table)
+    carts_table.SECRET_OVERRIDE = False
     # list_table.SECRET_OVERRIDE = True
     # todo_list.put(list_table)
     # list_table.SECRET_OVERRIDE = False
@@ -536,9 +542,9 @@ def main():
         setup_sample_data(
             {
                 "outputs": {
-                    "last_update_table_name": "LastUpdateTable",
-                    "list_table_name": "ListTable",
-                    "user_acl_table_name": "UserACLTable",
+                    "carts_table_name": "CartsTable",
+                    "orders_table_name": "OrdersTable",
+                    "products_table_name": "ProductsTable",
                 }
             }
         )

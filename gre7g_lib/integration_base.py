@@ -1,5 +1,6 @@
 """Base class for integration tests"""
 
+from base64 import b64encode
 import boto3
 from contextlib import contextmanager
 from enum import Enum, auto
@@ -93,15 +94,18 @@ class BaseTestCase(TestCase):
         method: str,
         sub_url: str,
         auth_user: CognitoUser | None = None,
+        guest_user: str | None = None,
         validate: Validate = Validate.RQ_AND_RS,
         **kwargs,
     ) -> requests.Response:
         """Make a request to the API under test"""
         url = f"{self.api_endpoint}/{sub_url.lstrip('/')}"
+        kwargs.setdefault("headers", {}).update({"Content-Type": "application/json"})
         if auth_user:
-            kwargs.setdefault("headers", {}).update(
-                {"Authorization": auth_user.id_token, "Content-Type": "application/json"}
-            )
+            bearer = b64encode(json.dumps({"sub": auth_user.id_token}).encode("ascii")).decode("ascii").rstrip("=")
+            kwargs["headers"].update({"Authorization": f"Bearer something.{bearer}.something"})
+        if guest_user:
+            kwargs["headers"].update({"X-Guest-ID": guest_user})
         if STACK_NAME == RUN_BRIEF:
             content = json.dumps(kwargs.get("json", {}))
             result = boto3.resource.call_func(

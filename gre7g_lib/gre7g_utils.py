@@ -61,7 +61,7 @@ class Upgradeable:
     @classmethod
     def upgrade(cls, value_dict: dict[str, Any]) -> dict[str, Any]:
         """Upgrade a table row to the current version"""
-        version = value_dict["version"]
+        version = value_dict.get("version", TABLE_VERSION)
         assert version <= TABLE_VERSION, "Data is from a future version"
         while version < TABLE_VERSION:
             upgrader = f"upgrade_{version}_to_{version + 1}"
@@ -172,18 +172,16 @@ class Cart(Upgradeable):
         """Generate an object from a dict"""
         value_dict = cls.upgrade(value_dict)
         user_id = value_dict["user_id"]
-        products = value_dict["products"]
+        products = [Product.from_dict(product) for product in value_dict["products"]]
         assert isinstance(user_id, str)
         assert isinstance(products, list)
-        for product in products:
-            del product["version"]
         return cls(UserId(user_id), products)
 
     def to_dict(self) -> dict[str, Any]:
         """Convert the object to a dict"""
         return {
             "user_id": self.user_id,
-            "products": self.products,
+            "products": [product.to_dict() for product in self.products],
             "version": TABLE_VERSION,
         }
 
@@ -313,6 +311,7 @@ class LambdaBase(ABC):
 
     def extract_user_id(self, event: dict[str, Any]) -> None:
         """Decode user sub from JWT bearer token if present, without verifying signature"""
+        self.user_id = None
         token = (event.get("headers") or {}).get("authorization", "")
         try:
             if token.startswith("Bearer "):
