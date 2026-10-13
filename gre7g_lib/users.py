@@ -83,7 +83,7 @@ class CognitoUser:
         self.refresh_token = result["RefreshToken"]
 
     @classmethod
-    def create_users(cls, user_pool: str, user_pool_client: str) -> tuple[RegularUser, AdminUser]:
+    def create_users(cls, user_pool: str, user_pool_client: str) -> RegularUser:  # tuple[RegularUser, AdminUser]:
         """Create a privileged user and a regular user"""
         cognito = boto3.client("cognito-idp")
 
@@ -95,13 +95,13 @@ class CognitoUser:
         regular_user.create_user()
         regular_user.authenticate()
 
-        admin_user = CognitoUser(user_pool, user_pool_client, ADMIN_EMAIL)
-        try:
-            admin_user.delete()
-        except cognito.exceptions.UserNotFoundException:
-            pass
-        admin_user.create_user()
-        admin_user.add_admin()
-        admin_user.authenticate()
+        # admin_user = CognitoUser(user_pool, user_pool_client, ADMIN_EMAIL)
+        # try:
+        #     admin_user.delete()
+        # except cognito.exceptions.UserNotFoundException:
+        #     pass
+        # admin_user.create_user()
+        # admin_user.add_admin()
+        # admin_user.authenticate()
 
-        return RegularUser(regular_user), AdminUser(admin_user)
+        return RegularUser(regular_user)  # , AdminUser(admin_user)

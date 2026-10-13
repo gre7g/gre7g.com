@@ -55,7 +55,7 @@ class BaseTestCase(TestCase):
 
     # Sam outputs
     api_endpoint: ClassVar[str]
-    audit_log_table_name: ClassVar[str]
+    audit_log_name: ClassVar[str]
     carts_table_name: ClassVar[str]
     cloud_front_distribution: ClassVar[str]
     cognito_host_name: ClassVar[str]
@@ -67,7 +67,7 @@ class BaseTestCase(TestCase):
     website_url: ClassVar[str]
 
     # Database tables
-    audit_log_table: ClassVar[Any]
+    # audit_log: ClassVar[Any]
     carts_table: ClassVar[Any]
     orders_table: ClassVar[Any]
     products_table: ClassVar[Any]
@@ -165,19 +165,18 @@ class BaseTestCase(TestCase):
                 BaseTestCase.api_endpoint = f"http://localhost:{SERVER_PORT}"
                 BaseTestCase.regular_user = Mock(id_token=REG_USER_ID, user_id=REG_USER_ID)
                 BaseTestCase.admin_user = Mock(id_token=ADMIN_USER_ID, user_id=ADMIN_USER_ID)
-                BaseTestCase.audit_log_table_name = "AuditLogTable"
+                BaseTestCase.audit_log_name = "AuditLog"
                 BaseTestCase.carts_table_name = "CartsTable"
                 BaseTestCase.products_table_name = "ProductsTable"
                 BaseTestCase.orders_table_name = "OrdersTable"
             else:
                 self.copy_outputs_to_members(STACK_NAME)
-                BaseTestCase.regular_user, BaseTestCase.admin_user = CognitoUser.create_users(
-                    self.user_pool, self.user_pool_client
-                )
+                # BaseTestCase.regular_user, BaseTestCase.admin_user = CognitoUser.create_users(
+                BaseTestCase.regular_user = CognitoUser.create_users(self.user_pool, self.user_pool_client)
 
             self.setup_openapi(path / "api.yaml")
             dynamodb = boto3.resource("dynamodb")
-            BaseTestCase.audit_log_table = dynamodb.Table(self.audit_log_table_name)
+            # BaseTestCase.audit_log = dynamodb.Table(self.audit_log_name)
             BaseTestCase.carts_table = dynamodb.Table(self.carts_table_name)
             BaseTestCase.orders_table = dynamodb.Table(self.orders_table_name)
             BaseTestCase.products_table = dynamodb.Table(self.products_table_name)

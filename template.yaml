@@ -73,13 +73,54 @@ Resources:
               audience:
                 - !Ref UserPoolClient
 
-  AuditLogTable:
-    Type: AWS::DynamoDB::Table
+  CloudTrailS3Bucket:
+    Type: AWS::S3::Bucket
     DeletionPolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
     UpdateReplacePolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
     Properties:
-      TableName: !Sub ${AWS::StackName}-audit-log
-      BillingMode: PAY_PER_REQUEST
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  CloudTrailS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    DeletionPolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
+    UpdateReplacePolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
+    Properties:
+      Bucket: !Ref CloudTrailS3Bucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: AWSCloudTrailAclCheck
+            Effect: Allow
+            Principal:
+              Service: cloudtrail.amazonaws.com
+            Action: s3:GetBucketAcl
+            Resource: !GetAtt CloudTrailS3Bucket.Arn
+          - Sid: AWSCloudTrailWrite
+            Effect: Allow
+            Principal:
+              Service: cloudtrail.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub "${CloudTrailS3Bucket.Arn}/AWSLogs/${AWS::AccountId}/*"
+            Condition:
+              StringEquals:
+                s3:x-amz-acl: bucket-owner-full-control
+
+  AuditLog:
+    Type: AWS::CloudTrail::Trail
+    DeletionPolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
+    UpdateReplacePolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
+    DependsOn:
+      - CloudTrailS3BucketPolicy
+    Properties:
+      TrailName: !Sub ${AWS::StackName}-audit-log
+      S3BucketName: !Ref CloudTrailS3Bucket
+      IsLogging: true
+      IsMultiRegionTrail: true
+      IncludeGlobalServiceEvents: true
+      EnableLogFileValidation: true
 
   ProductsTable:
     Type: AWS::DynamoDB::Table
@@ -206,12 +247,9 @@ Resources:
     Properties:
       CodeUri: src/api
       Handler: log_audit.lambda_handler
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref AuditLogTable
       Environment:
         Variables:
-          AUDIT_LOG_TABLE: !Ref AuditLogTable
+          AUDIT_LOG: !Ref AuditLog
       Layers:
         - !Ref Lib
       Events:
@@ -411,9 +449,9 @@ Outputs:
     Description: Used in manual testing
     Value: !Sub "https://${CloudFrontDistribution.DomainName}"
 
-  AuditLogTableName:
+  AuditLogName:
     Description: Used by integration tests
-    Value: !Ref AuditLogTable
+    Value: !Sub ${AWS::StackName}-audit-log
 
   ProductsTableName:
     Description: Used by integration tests
@@ -426,3 +464,15 @@ Outputs:
   OrdersTableName:
     Description: Used by integration tests
     Value: !Ref OrdersTable
+
+  StaticBucket:
+    Description: Used by dispatch script
+    Value: !Ref StaticBucket
+
+  UserPool:
+    Description: Used by integration tests
+    Value: !Ref UserPool
+
+  UserPoolClient:
+    Description: Used by integration tests
+    Value: !Ref UserPoolClient
