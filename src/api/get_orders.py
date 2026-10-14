@@ -19,10 +19,12 @@ class GetOrders(LambdaBase):
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Get orders"""
         assert self.orders_table
+        if not self.user_id:
+            raise KeyError()
 
         response = self.orders_table.query(KeyConditionExpression=Key("user_id").eq(self.user_id))
-        orders = [Order.from_dict(order).to_dict() for order in response["Items"]]
 
+        orders = [Order.from_dict(item).to_client_dict() for item in response["Items"]]
         return {"orders": orders}
 
 

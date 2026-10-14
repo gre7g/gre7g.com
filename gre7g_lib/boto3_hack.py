@@ -107,6 +107,11 @@ class Table:
             raise ClientError({"Error": {"Code": "AccessDeniedException", "Message": "Permission Denied"}}, "put_item")
         self.records[self._key(Item)] = Item
 
+    def query(self, KeyConditionExpression):
+        """Query a database"""
+        # Not sure it's worth the hassle to try and implement this, so let's just return everything
+        return {"Items": list(self.records.values())}
+
 
 @dataclass
 class Function:

@@ -25,18 +25,7 @@ class CartFetch(LambdaBase):
         assert self.carts_table
 
         cart = Cart.get(self.carts_table, user_id)
-
-        products = [
-            {
-                "name": product.name,
-                "quantity": product.quantity,
-                "cost_per": product.cost_per,
-                "listing_path": product.listing_path,
-                "product_id": product.product_id,
-            }
-            for product in cart.products
-        ]
-        return {"products": products}
+        return {"products": cart.to_client_dict()["products"]}
 
 
 lambda_handler = CartFetch.lambda_handler()

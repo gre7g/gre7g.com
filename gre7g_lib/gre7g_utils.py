@@ -139,6 +139,16 @@ class Product(Upgradeable):
         assert isinstance(product_id, str)
         return cls(name, int(quantity), float(cost_per), listing_path, ProductId(product_id))
 
+    def to_client_dict(self) -> dict[str, Any]:
+        """Convert the object to a client version's dict"""
+        return {
+            "name": self.name,
+            "quantity": self.quantity,
+            "cost_per": float(self.cost_per),
+            "listing_path": self.listing_path,
+            "product_id": self.product_id,
+        }
+
     def to_dict(self) -> dict[str, Any]:
         """Convert the object to a dict"""
         return {
@@ -180,6 +190,13 @@ class Cart(Upgradeable):
         assert isinstance(user_id, str)
         assert isinstance(products, list)
         return cls(UserId(user_id), products)
+
+    def to_client_dict(self) -> dict[str, Any]:
+        """Convert the object to a client version's dict"""
+        return {
+            "user_id": self.user_id,
+            "products": [product.to_client_dict() for product in self.products],
+        }
 
     def to_dict(self) -> dict[str, Any]:
         """Convert the object to a dict"""
@@ -246,7 +263,7 @@ class Order(Upgradeable):
         assert isinstance(downloads, dict)
         assert isinstance(timestamp, str)
         assert isinstance(status, str)
-        product_list = [product.from_dict(product) for product in products]
+        product_list = [Product.from_dict(product) for product in products]
         return cls(
             UserId(user_id),
             product_list,
@@ -261,14 +278,25 @@ class Order(Upgradeable):
             TABLE_VERSION,
         )
 
+    def to_client_dict(self) -> dict[str, Any]:
+        """Convert the object to a client version's dict"""
+        return {
+            "products": [product.to_client_dict() for product in self.products],
+            "subtotal_cost": float(self.subtotal_cost),
+            "discount": float(self.discount),
+            "shipping_cost": float(self.shipping_cost),
+            "total_cost": float(self.total_cost),
+            "order_id": self.order_id,
+            "downloads": self.downloads,
+            "timestamp": self.timestamp,
+            "status": self.status.value,
+        }
+
     def to_dict(self) -> dict[str, Any]:
         """Convert the object to a dict"""
-        products = [product.to_dict() for product in self.products]
-        for product in products:
-            del product["version"]
         return {
             "user_id": self.user_id,
-            "products": products,
+            "products": [product.to_client_dict() for product in self.products],
             "subtotal_cost": currency(self.subtotal_cost),
             "discount": currency(self.discount),
             "shipping_cost": currency(self.shipping_cost),
@@ -276,7 +304,7 @@ class Order(Upgradeable):
             "order_id": self.order_id,
             "downloads": self.downloads,
             "timestamp": self.timestamp,
-            "status": self.status.name,
+            "status": self.status.value,
             "version": TABLE_VERSION,
         }
 
