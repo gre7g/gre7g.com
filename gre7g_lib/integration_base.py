@@ -166,9 +166,7 @@ class BaseTestCase(TestCase):
                 if STACK_NAME == RUN_LOCALLY:
                     WebBrowser(SERVER_PORT).launch_daemon()
                 BaseTestCase.api_endpoint = f"http://localhost:{SERVER_PORT}"
-                bearer = b64encode(json.dumps({"sub": REG_USER_ID}).encode("ascii")).decode("ascii").rstrip("=")
                 BaseTestCase.regular_user = Mock(id_token=REG_USER_ID, user_id=REG_USER_ID)
-                # bearer = b64encode(json.dumps({"sub": ADMIN_USER_ID}).encode("ascii")).decode("ascii").rstrip("=")
                 # BaseTestCase.admin_user = Mock(id_token=ADMIN_USER_ID, user_id=ADMIN_USER_ID)
                 BaseTestCase.audit_log_name = "AuditLog"
                 BaseTestCase.carts_table_name = "CartsTable"
