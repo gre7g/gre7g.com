@@ -119,6 +119,10 @@ class Table:
         # Not sure it's worth the hassle to try and implement this, so let's just return everything
         return {"Items": list(self.records.values())}
 
+    def scan(self):
+        """Scan all records in a database"""
+        return {"Items": list(self.records.values())}
+
 
 @dataclass
 class Function:

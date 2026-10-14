@@ -20,7 +20,7 @@ class GetProducts(LambdaBase):
         assert self.products_table
 
         response = self.products_table.scan()
-        products = [Product.from_dict(product).to_dict() for product in response["Items"]]
+        products = [Product.from_dict(product).to_client_dict() for product in response["Items"]]
 
         return {"products": products}
 
