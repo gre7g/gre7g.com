@@ -274,10 +274,14 @@ paths:
                     items:
                       type: object
                       properties:
+                        order_id:
+                          type: string
                         timestamp:
                           type: string
                         products:
-                          $ref: "#/components/schemas/product_list"
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/product"
                         status:
                           type: string
                         downloads:

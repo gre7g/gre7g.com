@@ -296,7 +296,7 @@ class Order(Upgradeable):
         """Convert the object to a dict"""
         return {
             "user_id": self.user_id,
-            "products": [product.to_client_dict() for product in self.products],
+            "products": [product.to_dict() for product in self.products],
             "subtotal_cost": currency(self.subtotal_cost),
             "discount": currency(self.discount),
             "shipping_cost": currency(self.shipping_cost),
