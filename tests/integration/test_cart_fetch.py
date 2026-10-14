@@ -74,10 +74,9 @@ class TestCartFetch(BaseTestCase):
 
     def test_empty_cart(self) -> None:
         """Should return an empty cart"""
-        with self.create_records(self.item_data()):
-            response = self.get(
-                "/api/v1/cart",
-                guest_user="some-guest-id",
-            )
-            assert response.status_code == HTTPStatus.OK
-            assert response.json() == {"products": []}
+        response = self.get(
+            "/api/v1/cart",
+            guest_user="some-guest-id",
+        )
+        assert response.status_code == HTTPStatus.OK
+        assert response.json() == {"products": []}

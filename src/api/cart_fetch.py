@@ -17,7 +17,6 @@ class CartFetch(LambdaBase):
 
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """View shopping cart"""
-        LOG.info("handler", extra={"event": event, "user_id": self.user_id, "guest_id": self.guest_id})
         user_id = self.user_id or self.guest_id
         if not user_id:
             raise KeyError()

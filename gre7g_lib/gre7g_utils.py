@@ -65,7 +65,7 @@ class Upgradeable:
     @classmethod
     def upgrade(cls, value_dict: dict[str, Any]) -> dict[str, Any]:
         """Upgrade a table row to the current version"""
-        version = value_dict.get("version", TABLE_VERSION)
+        version = int(value_dict.get("version", TABLE_VERSION))
         assert version <= TABLE_VERSION, "Data is from a future version"
         while version < TABLE_VERSION:
             upgrader = f"upgrade_{version}_to_{version + 1}"
@@ -133,11 +133,11 @@ class Product(Upgradeable):
         listing_path = value_dict["listing_path"]
         product_id = value_dict["product_id"]
         assert isinstance(name, str)
-        assert isinstance(quantity, int)
+        assert isinstance(quantity, int | Decimal)
         assert isinstance(cost_per, float | Decimal)
         assert isinstance(listing_path, str)
         assert isinstance(product_id, str)
-        return cls(name, quantity, float(cost_per), listing_path, ProductId(product_id))
+        return cls(name, int(quantity), float(cost_per), listing_path, ProductId(product_id))
 
     def to_dict(self) -> dict[str, Any]:
         """Convert the object to a dict"""
