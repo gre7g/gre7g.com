@@ -7,6 +7,7 @@ from decimal import Decimal
 from http import HTTPStatus
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from importlib import import_module
+import jwt
 import logging
 import os
 from pathlib import Path
@@ -14,6 +15,7 @@ import re
 from time import sleep
 from threading import Thread
 from typing import NewType, ClassVar
+from unittest.mock import Mock
 from urllib.parse import urlencode, urlsplit
 import yaml
 
@@ -32,6 +34,11 @@ PARAMETERS = re.compile(r"\{(\w+)}")
 RW_POLICY = "DynamoDBCrudPolicy"
 RO_POLICY = "DynamoDBReadPolicy"
 DELAY_SERVER_START = 0.2
+
+
+def hack_jwt_decode(token, key, algorithms, issuer, options) -> dict[str, str]:
+    """Bypasses JWT verification and decoding"""
+    return {"sub": token}
 
 
 class RequestHandler(BaseHTTPRequestHandler):
@@ -189,6 +196,8 @@ class HackBoto:
                     self.functions.append(function)
 
         boto3.resource = self
+        jwt.decode = hack_jwt_decode
+        jwt.PyJWKClient = Mock()
 
     def __call__(self, resource: str):
         """Dynamodb is the only supported resource"""
