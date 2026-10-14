@@ -11,6 +11,7 @@ from subprocess import Popen, PIPE, check_output, check_call
 import sys
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+from time import monotonic
 import yaml
 from unittest.mock import Mock
 
@@ -554,7 +555,11 @@ def main():
         dispatch = Dispatch(args, level_name)
         if log_level < logging.WARNING:
             dispatch.stdout = sys.stdout
-        sys.exit(dispatch.main())
+        start_time = monotonic()
+        exit_code = dispatch.main()
+        elapsed = monotonic() - start_time
+        LOG.info("elapsed: %0.3f seconds", elapsed)
+        sys.exit(exit_code)
 
 
 if __name__ == "__main__":

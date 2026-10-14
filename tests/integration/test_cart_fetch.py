@@ -61,8 +61,8 @@ class TestCartFetch(BaseTestCase):
             assert response.status_code == HTTPStatus.OK
             assert response.json() == PRODUCTS
 
-    def test_happy_path(self) -> None:
-        """Should assign an order ID"""
+    def test_user(self) -> None:
+        """Should use the user ID"""
         with self.create_records(self.item_data()):
             response = self.get(
                 "/api/v1/cart",

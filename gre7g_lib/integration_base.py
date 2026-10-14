@@ -100,7 +100,7 @@ class BaseTestCase(TestCase):
     ) -> requests.Response:
         """Make a request to the API under test"""
         url = f"{self.api_endpoint}/{sub_url.lstrip('/')}"
-        kwargs.setdefault("headers", {}).update({"Content-Type": "application/json"})
+        kwargs.setdefault("headers", {"Content-Type": "application/json"})
         if auth_user:
             kwargs["headers"].update({"authorization": f"Bearer {auth_user.id_token}"})
         if guest_user:
