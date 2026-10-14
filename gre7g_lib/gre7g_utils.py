@@ -12,6 +12,7 @@ from decimal import Decimal
 from enum import auto, StrEnum
 from http import HTTPStatus
 import json
+import jwt
 import logging
 import os
 from pathlib import Path
@@ -29,6 +30,7 @@ Timestamp = NewType("Timestamp", str)
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)
 TABLE_VERSION = 1
 MAX_ITEMS_PER_BATCH = 100
+SIGN_ALGORITHMS = ["RS256", "RS384", "RS512", "ES256", "ES384", "ES512"]
 
 
 def currency(value: float) -> Decimal:
@@ -344,15 +346,24 @@ class LambdaBase(ABC):
     def extract_user_id(self, event: dict[str, Any]) -> None:
         """Decode user sub from JWT bearer token if present, without verifying signature"""
         self.user_id = None
-        token = (event.get("headers") or {}).get("authorization", "")
+        auth_header = (event.get("headers") or {}).get("authorization", "")
         try:
-            if token.startswith("Bearer "):
-                payload_b64 = token.split(".")[1]
-                payload_b64 += "=" * (-len(payload_b64) % 4)
-                claims = json.loads(b64decode(payload_b64))
+            if auth_header.startswith("Bearer "):
+                token = auth_header[7:]
+                uri = os.environ.get("JWKS_URI")
+                assert uri
+                jwks_client = jwt.PyJWKClient(uri)
+                signing_key = jwks_client.get_signing_key_from_jwt(token)
+                claims = jwt.decode(
+                    token,
+                    signing_key.key,
+                    algorithms=SIGN_ALGORITHMS,
+                    issuer=os.environ.get("JWT_ISSUER"),
+                    options={"verify_aud": False},
+                )
                 self.user_id = UserId(claims["sub"])
         except Exception:
-            pass
+            LOG.exception("failed to authenticate bearer token")
 
     def wrapper(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Wrapper around the handler than takes care of parameters, privileges, and error handling"""

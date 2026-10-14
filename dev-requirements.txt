@@ -1,5 +1,7 @@
 aws_lambda_powertools==3.35.0
 black==26.10.1
-boto3==1.43.111
-boto3-stubs==1.43.111
+boto3==1.43.113
+boto3-stubs==1.43.113
+cryptography==50.0.2
+PyJWT==2.15.1
 types-boto3-dynamodb==1.43.106

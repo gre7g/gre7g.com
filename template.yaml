@@ -189,6 +189,7 @@ Resources:
             TableName: !Ref CartsTable
       Environment:
         Variables:
+          JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           CARTS_TABLE: !Ref CartsTable
       Layers:
         - !Ref Lib
@@ -213,6 +214,7 @@ Resources:
             TableName: !Ref CartsTable
       Environment:
         Variables:
+          JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           CARTS_TABLE: !Ref CartsTable
       Layers:
         - !Ref Lib
@@ -232,6 +234,9 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-assign-order-id
       CodeUri: src/api
       Handler: assign_order_id.lambda_handler
+      Environment:
+        Variables:
+          JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
       Layers:
         - !Ref Lib
       Events:
@@ -252,6 +257,7 @@ Resources:
       Handler: log_audit.lambda_handler
       Environment:
         Variables:
+          JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           AUDIT_LOG: !Ref AuditLog
       Layers:
         - !Ref Lib
@@ -276,6 +282,7 @@ Resources:
             TableName: !Ref OrdersTable
       Environment:
         Variables:
+          JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           ORDERS_TABLE: !Ref OrdersTable
       Layers:
         - !Ref Lib
@@ -295,6 +302,9 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-create-guest
       CodeUri: src/api
       Handler: create_guest.lambda_handler
+      Environment:
+        Variables:
+          JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
       Layers:
         - !Ref Lib
       Events:
@@ -318,6 +328,7 @@ Resources:
             TableName: !Ref CartsTable
       Environment:
         Variables:
+          JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           CARTS_TABLE: !Ref CartsTable
       Layers:
         - !Ref Lib
@@ -342,6 +353,7 @@ Resources:
             TableName: !Ref OrdersTable
       Environment:
         Variables:
+          JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           ORDERS_TABLE: !Ref OrdersTable
       Layers:
         - !Ref Lib
@@ -366,6 +378,7 @@ Resources:
             TableName: !Ref ProductsTable
       Environment:
         Variables:
+          JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           PRODUCTS_TABLE: !Ref ProductsTable
       Layers:
         - !Ref Lib
