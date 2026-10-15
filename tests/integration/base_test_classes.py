@@ -23,12 +23,35 @@ class BaseTestCase(integration_base.BaseTestCase):
         "listing_path": "books/long-way-home",
         "product_id": "lwh",
     }
+    PRODUCT3 = Product("Small World", 1, 15.99, "books/small-world", ProductId("kc2"))
+    P_DICT3 = {
+        "name": "Small World",
+        "quantity": 1,
+        "cost_per": 15.99,
+        "listing_path": "books/small-world",
+        "product_id": "kc2",
+    }
+    PRODUCT4 = Product("Long Way Home", 2, 18.49, "books/long-way-home", ProductId("lwh"))
+    P_DICT4 = {
+        "name": "Long Way Home",
+        "quantity": 2,
+        "cost_per": 18.49,
+        "listing_path": "books/long-way-home",
+        "product_id": "lwh",
+    }
 
     def cart_data(self):
         """Return some cart data"""
         return (
             Cart(UserId(self.regular_user.user_id), [self.PRODUCT1, self.PRODUCT2]),
             {"products": [self.P_DICT1, self.P_DICT2]},
+        )
+
+    def guest_cart_data(self):
+        """Return some cart additional data"""
+        return (
+            Cart(UserId("guest1_id"), [self.PRODUCT3, self.PRODUCT4]),
+            {"products": [self.P_DICT3, self.P_DICT4]},
         )
 
     def order_data(self):

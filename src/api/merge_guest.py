@@ -18,17 +18,19 @@ class MergeGuest(LambdaBase):
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Merge guest authorization"""
         assert self.carts_table
-        assert self.user_id
-        assert self.guest_id
+        if (self.user_id is None) or (self.guest_id is None) or (self.guest_id == self.user_id):
+            raise KeyError()
 
-        cart = Cart.get(self.carts_table, self.user_id)
+        cart = Cart.get(self.carts_table, self.guest_id)
         new_product_ids = {product.product_id for product in cart.products}
 
-        for product in Cart.get(self.carts_table, self.guest_id).products:
-            if product.product_id not in new_product_ids:
-                cart.products.append(product)
+        for old_product in Cart.get(self.carts_table, self.user_id).products:
+            if old_product.product_id not in new_product_ids:
+                cart.products.append(old_product)
 
+        cart.user_id = self.user_id
         cart.put(self.carts_table)
+        self.carts_table.delete_item(Key={"user_id": self.guest_id})
 
         return {}
 
