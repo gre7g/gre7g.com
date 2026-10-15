@@ -83,45 +83,6 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
 
-  AuditLogPolicy:
-    Type: AWS::S3::BucketPolicy
-    DeletionPolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
-    UpdateReplacePolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
-    Properties:
-      Bucket: !Ref AuditLogStorage
-      PolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Sid: AWSCloudTrailAclCheck
-            Effect: Allow
-            Principal:
-              Service: cloudtrail.amazonaws.com
-            Action: s3:GetBucketAcl
-            Resource: !GetAtt AuditLogStorage.Arn
-          - Sid: AWSCloudTrailWrite
-            Effect: Allow
-            Principal:
-              Service: cloudtrail.amazonaws.com
-            Action: s3:PutObject
-            Resource: !Sub "${AuditLogStorage.Arn}/AWSLogs/${AWS::AccountId}/*"
-            Condition:
-              StringEquals:
-                s3:x-amz-acl: bucket-owner-full-control
-
-  AuditLog:
-    Type: AWS::CloudTrail::Trail
-    DeletionPolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
-    UpdateReplacePolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
-    DependsOn:
-      - AuditLogPolicy
-    Properties:
-      TrailName: !Sub ${AWS::StackName}-audit-log
-      S3BucketName: !Ref AuditLogStorage
-      IsLogging: true
-      IsMultiRegionTrail: true
-      IncludeGlobalServiceEvents: true
-      EnableLogFileValidation: true
-
   ProductsTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: !If [ DeletionProtectionEnabled, Retain, Delete ]
@@ -256,10 +217,13 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-log-audit-event
       CodeUri: src/api
       Handler: log_audit.lambda_handler
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref AuditLogStorage
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
-          AUDIT_LOG: !Ref AuditLog
+          AUDIT_LOG_STORAGE: !Ref AuditLogStorage
       Layers:
         - !Ref Lib
       Events:

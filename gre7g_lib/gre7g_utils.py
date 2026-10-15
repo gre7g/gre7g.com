@@ -3,7 +3,6 @@
 from abc import ABC, abstractmethod
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.typing import LambdaContext
-from base64 import b64decode
 import boto3
 from botocore.exceptions import ClientError
 from dataclasses import dataclass, field
@@ -56,6 +55,12 @@ class OrderStatus(StrEnum):
     SHIPPED = auto()
 
 
+class AuditLogEvent(StrEnum):
+    """Audit log event types"""
+
+    REGISTER_CLICK = auto()
+
+
 class DownloadedFile(Exception):
     """Skip the normal handling and return this file for downloading"""
 
@@ -87,34 +92,6 @@ class Upgradeable:
         """Put object into table"""
         assert db_table
         db_table.put_item(Item=self.to_dict())
-
-
-@dataclass
-class AuditLog(Upgradeable):
-    """A log of important events we don't want to lose"""
-
-    content: dict[str, Any]
-    timestamp: Timestamp = field(default_factory=lambda: Timestamp(datetime.now(UTC).isoformat()))
-    version: int = TABLE_VERSION
-
-    @classmethod
-    def from_dict(cls, value_dict: dict[str, Any]) -> Self:
-        """Generate an object from a dict"""
-        value_dict = cls.upgrade(value_dict)
-        timestamp = value_dict["timestamp"]
-        content = value_dict["content"]
-        assert isinstance(timestamp, str)
-        assert isinstance(content, dict)
-        return cls(content, Timestamp(timestamp))
-
-    def to_dict(self) -> dict[str, Any]:
-        """Convert the object to a dict"""
-        content = json.loads(json.dumps(self.content), parse_float=Decimal)
-        return {
-            "content": content,
-            "timestamp": self.timestamp,
-            "version": TABLE_VERSION,
-        }
 
 
 @dataclass
@@ -457,3 +434,13 @@ class LambdaBase(ABC):
         except:
             LOG.exception("loading object failed")
             return None
+
+    def audit_log(self, event: AuditLogEvent, **kwargs: Any) -> None:
+        """Log an event to the audit log"""
+        now = datetime.now(UTC)
+        data = {"timestamp": now.isoformat(), "event": event.value, "user_id": self.user_id, "guest_id": self.guest_id}
+        boto3.client("s3").put_object(
+            Bucket=os.environ["AUDIT_LOG_STORAGE"],
+            Key=f"custom/{now.strftime('%Y-%m')}/{uuid1().hex}.json",
+            Body=json.dumps(data | kwargs),
+        )

@@ -256,7 +256,7 @@ class Dispatch:
         self.patch_cognito(dest_dict)
         self.sync_static_files(dest_dict)
         self.copy_config(dest_dict)
-        self.invalidate_cache(dest_dict.get("outputs", {}).get("cloud_front_distribution"))
+        self.invalidate_cache(dest_dict.get("outputs", {}).get("web_distribution"))
 
     def record_deployment(self, dest_dict: dict) -> None:
         """Save some deployment details"""
