@@ -42,7 +42,10 @@ class AuthenticationRequired(StrEnum):
 
     # Basic rights
     NONE = auto()
-    ACTIVE_USER = auto()
+    GUEST = auto()
+    USER = auto()
+    GUEST_OR_USER = auto()
+    GUEST_AND_USER = auto()
 
 
 class OrderStatus(StrEnum):
@@ -372,8 +375,23 @@ class LambdaBase(ABC):
             self.extract_user_id(event)
             self.guest_id = event.get("headers", {}).get("x-guest-id")
 
-            if (self.AUTH_REQUIRED == AuthenticationRequired.ACTIVE_USER) and not self.user_id:
-                raise PermissionError()
+            match self.AUTH_REQUIRED:
+                case AuthenticationRequired.NONE:
+                    pass
+                case AuthenticationRequired.GUEST:
+                    if not self.guest_id:
+                        raise PermissionError()
+                case AuthenticationRequired.USER:
+                    if not self.user_id:
+                        raise PermissionError()
+                case AuthenticationRequired.GUEST_OR_USER:
+                    if not (self.guest_id or self.user_id):
+                        raise PermissionError()
+                case AuthenticationRequired.GUEST_AND_USER:
+                    if not (self.guest_id and self.user_id):
+                        raise PermissionError()
+                case _:
+                    raise Exception("unknown authentication requirement")
 
             status = HTTPStatus.OK
             body = self.handler(event=event, context=context)

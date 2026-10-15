@@ -7,7 +7,7 @@ import logging
 import os
 from typing import Any
 
-from gre7g_utils import LambdaBase, Order
+from gre7g_utils import LambdaBase, Order, AuthenticationRequired
 
 # Constants:
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)
@@ -16,11 +16,12 @@ LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.get
 class GetOrders(LambdaBase):
     """Get orders"""
 
+    AUTH_REQUIRED = AuthenticationRequired.USER
+
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Get orders"""
         assert self.orders_table
-        if not self.user_id:
-            raise KeyError()
+        assert self.user_id
 
         response = self.orders_table.query(KeyConditionExpression=Key("user_id").eq(self.user_id))
 

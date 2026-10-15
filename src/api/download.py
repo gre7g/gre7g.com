@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 from typing import Any
 
-from gre7g_utils import LambdaBase, DownloadedFile, Order
+from gre7g_utils import LambdaBase, DownloadedFile, Order, AuthenticationRequired
 
 # Constants:
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)
@@ -15,6 +15,8 @@ LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.get
 
 class Download(LambdaBase):
     """Download a file"""
+
+    AUTH_REQUIRED = AuthenticationRequired.USER
 
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Download a file"""

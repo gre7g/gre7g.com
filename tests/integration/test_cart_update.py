@@ -17,7 +17,7 @@ class TestCartUpdate(BaseTestCase):
         """Should fail if there's no user ID and no guest ID"""
         cart, cart_dict = self.cart_data()
         response = self.put("/api/v1/cart", json=cart_dict)
-        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.status_code == HTTPStatus.FORBIDDEN
 
     def test_guest(self):
         """Should use the guest ID"""

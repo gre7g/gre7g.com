@@ -20,13 +20,13 @@ class TestCartMerge(BaseTestCase):
             auth_user=self.regular_user,
             json={},
         )
-        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.status_code == HTTPStatus.FORBIDDEN
         response = self.put(
             "/api/v1/guest",
             guest_user=self.regular_user.user_id,
             json={},
         )
-        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.status_code == HTTPStatus.FORBIDDEN
 
     def test_bad_id(self):
         """Should fail when guest and user ID are identical"""

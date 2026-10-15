@@ -104,8 +104,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/product_list"
-        "400":
-          $ref: "#/components/responses/400-bad-request"
+        "403":
+          $ref: "#/components/responses/403-forbidden"
         "500":
           $ref: "#/components/responses/500-internal-server-error"
 
@@ -125,8 +125,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/empty"
-        "400":
-          $ref: "#/components/responses/400-bad-request"
+        "403":
+          $ref: "#/components/responses/403-forbidden"
         "500":
           $ref: "#/components/responses/500-internal-server-error"
 
@@ -249,6 +249,8 @@ paths:
                 $ref: "#/components/schemas/empty"
         "400":
           $ref: "#/components/responses/400-bad-request"
+        "403":
+          $ref: "#/components/responses/403-forbidden"
         "500":
           $ref: "#/components/responses/500-internal-server-error"
 
@@ -304,8 +306,8 @@ paths:
                 additionalProperties: false
                 required:
                   - orders
-        "400":
-          $ref: "#/components/responses/400-bad-request"
+        "403":
+          $ref: "#/components/responses/403-forbidden"
         "500":
           $ref: "#/components/responses/500-internal-server-error"
 

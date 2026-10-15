@@ -13,7 +13,7 @@ class TestGetOrders(BaseTestCase):
     def test_no_id(self):
         """Should fail if there's no user ID"""
         response = self.get("/api/v1/orders")
-        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.status_code == HTTPStatus.FORBIDDEN
 
     def test_user(self) -> None:
         """Should fetch all orders"""

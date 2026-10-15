@@ -15,7 +15,7 @@ class TestCartFetch(BaseTestCase):
     def test_no_id(self):
         """Should fail if there's no user ID and no guest ID"""
         response = self.get("/api/v1/cart")
-        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.status_code == HTTPStatus.FORBIDDEN
 
     def test_guest(self):
         """Should use the guest ID"""

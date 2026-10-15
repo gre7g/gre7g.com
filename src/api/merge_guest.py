@@ -6,7 +6,7 @@ import logging
 import os
 from typing import Any
 
-from gre7g_utils import LambdaBase, Cart, UserId
+from gre7g_utils import LambdaBase, Cart, AuthenticationRequired
 
 # Constants:
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)
@@ -15,10 +15,14 @@ LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.get
 class MergeGuest(LambdaBase):
     """Merge guest authorization"""
 
+    AUTH_REQUIRED = AuthenticationRequired.GUEST_AND_USER
+
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Merge guest authorization"""
         assert self.carts_table
-        if (self.user_id is None) or (self.guest_id is None) or (self.guest_id == self.user_id):
+        assert self.user_id
+        assert self.guest_id
+        if self.guest_id == self.user_id:
             raise KeyError()
 
         cart = Cart.get(self.carts_table, self.guest_id)
