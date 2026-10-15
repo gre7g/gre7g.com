@@ -233,7 +233,7 @@ class Dispatch:
     def delete(self, dest_dict: dict) -> None:
         """Delete the dev stack"""
         assert self.sam_path, "unable to find AWS sam"
-        bucket = dest_dict.get("outputs", {}).get("static_bucket")
+        bucket = dest_dict.get("outputs", {}).get("web_file_storage")
         self.login_call([self.aws_path, "s3", "rm", f"s3://{bucket}", "--recursive"])
         self.check_call([self.sam_path, "delete", "--stack-name", self.stack_name])
 
@@ -326,7 +326,7 @@ class Dispatch:
 
     def sync_static_files(self, dest_dict: dict) -> None:
         """Copy all images, stylesheets, scripts, and HTML to the S3 bucket"""
-        bucket = dest_dict.get("outputs", {}).get("static_bucket")
+        bucket = dest_dict.get("outputs", {}).get("web_file_storage")
         self.check_call([self.aws_path, "s3", "cp", str(INDEX_PATH), f"s3://{bucket}/index.html"])
         self.check_call([self.aws_path, "s3", "sync", str(STATIC_PATH), f"s3://{bucket}"])
         self.check_call([self.aws_path, "s3", "sync", str(ASSETS_PATH), f"s3://{bucket}/assets/"])
@@ -340,7 +340,7 @@ class Dispatch:
             temp_file.close()
 
             # Copy the file to S3
-            bucket = outputs.get("static_bucket")
+            bucket = outputs.get("web_file_storage")
             self.check_call([self.aws_path, "s3", "cp", temp_file.name, f"s3://{bucket}/{CONFIG_FILENAME}"])
 
     def invalidate_cache(self, distribution: str) -> None:
