@@ -289,12 +289,6 @@ paths:
                           type: array
                           items:
                             $ref: "#/components/schemas/product"
-                        status:
-                          type: string
-                        downloads:
-                          type: object
-                          additionalProperties:
-                            type: boolean
                         subtotal_cost:
                           type: number
                         discount:
@@ -307,8 +301,6 @@ paths:
                       required:
                         - timestamp
                         - products
-                        - status
-                        - downloads
                         - subtotal_cost
                         - discount
                         - shipping_cost
