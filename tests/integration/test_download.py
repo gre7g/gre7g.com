@@ -4,7 +4,6 @@ from http import HTTPStatus
 import logging
 
 from .base_test_classes import BaseTestCase
-from gre7g_utils import AuditLogEvent
 
 # Constants:
 LOG = logging.getLogger(__name__)
@@ -16,7 +15,7 @@ class TestDownload(BaseTestCase):
     def test_happy_path(self) -> None:
         """Should produce an URL for downloading the file"""
         response = self.get(
-            "/api/v1/download/order1_id}/product1_id",
+            "/api/v1/download/order1_id/product1_id",
             auth_user=self.regular_user,
         )
         assert response.status_code == HTTPStatus.OK

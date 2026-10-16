@@ -235,6 +235,10 @@ class HackBoto:
         for key_dict in Delete["Objects"]:
             del self.s3_objects[key_dict["Key"]]
 
+    def generate_presigned_url(self, ClientMethod: str, Params: dict[str, Any], ExpiresIn: int) -> str:
+        """Generate a mock presigned URL for downloading a mock file"""
+        return f"https://example.com/{Params['Key']}?auth_id=1234567890"
+
     def batch_get_item(self, RequestItems: dict) -> dict:
         """Execute a batch of item fetches"""
         result = {"UnprocessedKeys": [], "Responses": {}}
