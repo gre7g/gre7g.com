@@ -22,6 +22,8 @@ class BaseTestCase(integration_base.BaseTestCase):
         "cost_per": 13.99,
         "listing_path": "books/skeleton-crew",
         "product_id": "kc1",
+        "downloads": [],
+        "status": "available",
     }
     PRODUCT2 = Product("Long Way Home", 1, 18.49, "books/long-way-home", ProductId("lwh"))
     P_DICT2 = {
@@ -30,6 +32,8 @@ class BaseTestCase(integration_base.BaseTestCase):
         "cost_per": 18.49,
         "listing_path": "books/long-way-home",
         "product_id": "lwh",
+        "downloads": [],
+        "status": "available",
     }
     PRODUCT3 = Product("Small World", 1, 15.99, "books/small-world", ProductId("kc2"))
     P_DICT3 = {
@@ -38,6 +42,8 @@ class BaseTestCase(integration_base.BaseTestCase):
         "cost_per": 15.99,
         "listing_path": "books/small-world",
         "product_id": "kc2",
+        "downloads": [],
+        "status": "available",
     }
     PRODUCT4 = Product("Long Way Home", 2, 18.49, "books/long-way-home", ProductId("lwh"))
     P_DICT4 = {
@@ -46,6 +52,8 @@ class BaseTestCase(integration_base.BaseTestCase):
         "cost_per": 18.49,
         "listing_path": "books/long-way-home",
         "product_id": "lwh",
+        "downloads": [],
+        "status": "available",
     }
 
     def cart_data(self):
@@ -72,7 +80,6 @@ class BaseTestCase(integration_base.BaseTestCase):
             5.00,
             18.99,
             OrderId("order1_id"),
-            {},
             Timestamp("recently"),
         )
         order2 = Order(
@@ -83,7 +90,6 @@ class BaseTestCase(integration_base.BaseTestCase):
             5.00,
             21.49,
             OrderId("order2_id"),
-            {},
             Timestamp("long ago"),
         )
         order_dict = {
@@ -95,9 +101,7 @@ class BaseTestCase(integration_base.BaseTestCase):
                     "shipping_cost": 5.00,
                     "total_cost": 18.99,
                     "order_id": "order1_id",
-                    "downloads": {},
                     "timestamp": "recently",
-                    "status": "placed",
                 },
                 {
                     "products": [self.P_DICT2],
@@ -106,9 +110,7 @@ class BaseTestCase(integration_base.BaseTestCase):
                     "shipping_cost": 5.00,
                     "total_cost": 21.49,
                     "order_id": "order2_id",
-                    "downloads": {},
                     "timestamp": "long ago",
-                    "status": "placed",
                 },
             ]
         }

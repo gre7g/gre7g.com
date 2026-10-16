@@ -11,10 +11,10 @@ LOG = logging.getLogger(__name__)
 
 
 class TestLogAudit(BaseTestCase):
-    """Test viewing the shopping cart"""
+    """Test adding an audit event"""
 
     def test_happy_path(self) -> None:
-        """Should use the user ID"""
+        """Test adding an audit event"""
         response = self.post(
             "/api/v1/click_id",
             auth_user=self.regular_user,

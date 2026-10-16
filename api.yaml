@@ -37,6 +37,14 @@ components:
         listing_path:
           type: string
           description: Informational only
+        downloads:
+          type: array
+          description: Filenames for digital downloads associated with this item
+          items:
+            type: string
+        status:
+          type: string
+          description: available, sold_out, ordered, canceled, shipped, partial, downloaded, or refunded
       additionalProperties: false
       required:
         - product_id
@@ -44,6 +52,8 @@ components:
         - quantity
         - cost_per
         - listing_path
+        - downloads
+        - status
 
     product_list:
       type: object

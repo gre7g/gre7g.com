@@ -184,7 +184,8 @@ class HackBoto:
                     policies = Policies()
                     for item in properties.get("Policies", []):
                         policy = next(iter(item))
-                        policies.append((PolicyName(policy), TableName(item[policy]["TableName"])))
+                        if "TableName" in item[policy]:  # Not all policies are for dynamodb tables
+                            policies.append((PolicyName(policy), TableName(item[policy]["TableName"])))
 
                     # Find environment variables
                     api_props = properties["Events"]["ApiEvent"]["Properties"]

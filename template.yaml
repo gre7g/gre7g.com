@@ -246,6 +246,8 @@ Resources:
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref OrdersTable
+        - S3ReadPolicy:
+            BucketName: gre7g-com-downloads
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"

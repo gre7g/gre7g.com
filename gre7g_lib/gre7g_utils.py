@@ -47,25 +47,23 @@ class AuthenticationRequired(StrEnum):
     GUEST_AND_USER = auto()
 
 
-class OrderStatus(StrEnum):
-    """Order statuses"""
+class ProductStatus(StrEnum):
+    """Item statuses"""
 
-    PLACED = auto()
+    AVAILABLE = auto()
+    SOLD_OUT = auto()
+    ORDERED = auto()
     CANCELED = auto()
     SHIPPED = auto()
+    PARTIAL = auto()
+    DOWNLOADED = auto()
+    REFUNDED = auto()
 
 
 class AuditLogEvent(StrEnum):
     """Audit log event types"""
 
     REGISTER_CLICK = auto()
-
-
-class DownloadedFile(Exception):
-    """Skip the normal handling and return this file for downloading"""
-
-    def __init__(self, filename: str, path: Path, content_type: str = "application/zip") -> None:
-        self.filename, self.path, self.content_type = filename, path, content_type
 
 
 @dataclass
@@ -103,6 +101,8 @@ class Product(Upgradeable):
     cost_per: float
     listing_path: str
     product_id: ProductId = field(default_factory=lambda: ProductId(uuid1().hex))
+    downloads: list[str] = field(default_factory=list)
+    status: ProductStatus = ProductStatus.AVAILABLE
     version: int = TABLE_VERSION
 
     @classmethod
@@ -114,11 +114,15 @@ class Product(Upgradeable):
         cost_per = value_dict["cost_per"]
         listing_path = value_dict["listing_path"]
         product_id = value_dict["product_id"]
+        downloads = value_dict["downloads"]
+        status = value_dict["status"]
         assert isinstance(name, str)
         assert isinstance(quantity, int | Decimal)
         assert isinstance(cost_per, float | Decimal)
         assert isinstance(listing_path, str)
         assert isinstance(product_id, str)
+        assert isinstance(downloads, list)
+        assert isinstance(status, str)
         return cls(name, int(quantity), float(cost_per), listing_path, ProductId(product_id))
 
     def to_client_dict(self) -> dict[str, Any]:
@@ -129,6 +133,8 @@ class Product(Upgradeable):
             "cost_per": float(self.cost_per),
             "listing_path": self.listing_path,
             "product_id": self.product_id,
+            "downloads": self.downloads,
+            "status": self.status.value,
         }
 
     def to_dict(self) -> dict[str, Any]:
@@ -139,6 +145,8 @@ class Product(Upgradeable):
             "cost_per": currency(self.cost_per),
             "listing_path": self.listing_path,
             "product_id": self.product_id,
+            "downloads": self.downloads,
+            "status": self.status.value,
             "version": TABLE_VERSION,
         }
 
@@ -216,9 +224,7 @@ class Order(Upgradeable):
     shipping_cost: float
     total_cost: float
     order_id: OrderId = field(default_factory=lambda: OrderId(uuid1().hex))
-    downloads: dict[str, bool] = field(default_factory=dict)
     timestamp: Timestamp = field(default_factory=lambda: Timestamp(datetime.now(UTC).isoformat()))
-    status: OrderStatus = OrderStatus.PLACED
     version: int = TABLE_VERSION
 
     @classmethod
@@ -232,9 +238,7 @@ class Order(Upgradeable):
         shipping_cost = value_dict["shipping_cost"]
         total_cost = value_dict["total_cost"]
         order_id = value_dict["order_id"]
-        downloads = value_dict["downloads"]
         timestamp = value_dict["timestamp"]
-        status = value_dict["status"]
         assert isinstance(user_id, str)
         assert isinstance(products, list)
         assert isinstance(subtotal_cost, float | Decimal)
@@ -242,9 +246,7 @@ class Order(Upgradeable):
         assert isinstance(shipping_cost, float | Decimal)
         assert isinstance(total_cost, float | Decimal)
         assert isinstance(order_id, str)
-        assert isinstance(downloads, dict)
         assert isinstance(timestamp, str)
-        assert isinstance(status, str)
         product_list = [Product.from_dict(product) for product in products]
         return cls(
             UserId(user_id),
@@ -254,9 +256,7 @@ class Order(Upgradeable):
             float(shipping_cost),
             float(total_cost),
             OrderId(order_id),
-            downloads,
             Timestamp(timestamp),
-            OrderStatus(status),
             TABLE_VERSION,
         )
 
@@ -269,9 +269,7 @@ class Order(Upgradeable):
             "shipping_cost": float(self.shipping_cost),
             "total_cost": float(self.total_cost),
             "order_id": self.order_id,
-            "downloads": self.downloads,
             "timestamp": self.timestamp,
-            "status": self.status.value,
         }
 
     def to_dict(self) -> dict[str, Any]:
@@ -284,9 +282,7 @@ class Order(Upgradeable):
             "shipping_cost": currency(self.shipping_cost),
             "total_cost": currency(self.total_cost),
             "order_id": self.order_id,
-            "downloads": self.downloads,
             "timestamp": self.timestamp,
-            "status": self.status.value,
             "version": TABLE_VERSION,
         }
 
@@ -391,19 +387,6 @@ class LambdaBase(ABC):
             LOG.exception("key error")
             status = HTTPStatus.BAD_REQUEST
             body = {"message": str(error)}
-
-        except DownloadedFile as file_details:
-            with file_details.path.open("rb") as file_obj:
-                data = file_obj.read()
-            return {
-                "statusCode": HTTPStatus.OK,
-                "headers": {
-                    "content-type": file_details.content_type,
-                    "content-disposition": f'attachment; filename="{file_details.filename}"',
-                    "content-length": len(data),
-                },
-                "body": data,
-            }
 
         except Exception as error:
             LOG.exception("Unhandled exception")
