@@ -1,6 +1,5 @@
 """Base class for integration tests"""
 
-from base64 import b64encode
 import boto3
 from contextlib import contextmanager
 from enum import Enum, auto
@@ -12,7 +11,7 @@ import os
 from pathlib import Path
 import requests
 from typing import ClassVar, Generator, Any
-from unittest import TestCase
+from unittest import TestCase, skipIf
 from unittest.mock import Mock
 import yaml
 
@@ -28,6 +27,7 @@ RUN_LOCALLY = "LOCAL"
 RUN_BRIEF = "BRIEF"
 SERVER_PORT = 8000
 TEMPLATE_YAML = Path(__file__).parents[1] / "template.yaml"
+SKIP_LOCAL = skipIf(os.getenv("STACK-NAME") == RUN_LOCALLY, "Local simulation doesn't support this test")
 
 logging.basicConfig(level=logging.INFO)
 for mouthy_log in ["boto3", "botocore", "urllib3"]:
