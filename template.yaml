@@ -217,6 +217,7 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-log-audit-event
       CodeUri: src/api
       Handler: log_audit.lambda_handler
+      Timeout: 30  # Writing to s3 can take more than 3s
       Policies:
         - S3CrudPolicy:
             BucketName: !Ref AuditLogStorage
@@ -435,9 +436,9 @@ Outputs:
     Description: Used in manual testing
     Value: !Sub "https://${WebDistribution.DomainName}"
 
-  AuditLogName:
+  AuditLog:
     Description: Used by integration tests
-    Value: !Sub ${AWS::StackName}-audit-log
+    Value: !Ref AuditLogStorage
 
   ProductsTableName:
     Description: Used by integration tests

@@ -1,7 +1,15 @@
 """Base class for integration tests"""
 
+import boto3
+from datetime import datetime, UTC
+import json
+from typing import Any
+
 from gre7g_utils import Cart, UserId, Product, ProductId, Order, OrderId, Timestamp
 import integration_base
+
+# Types:
+AuditObj = dict[str, Any]
 
 
 class BaseTestCase(integration_base.BaseTestCase):
@@ -105,3 +113,29 @@ class BaseTestCase(integration_base.BaseTestCase):
             ]
         }
         return [order1, order2], order_dict
+
+    def get_all_audit_objects(self) -> dict[str, AuditObj]:
+        now = datetime.now(UTC)
+        s3 = boto3.client("s3")
+
+        # Get a list of keys
+        response = s3.list_objects_v2(Bucket=self.audit_log, Prefix=f"custom/{now.strftime('%Y-%m')}")
+        keys = [item["Key"] for item in response["Contents"]]
+
+        # Get objects
+        objects = {}
+        for key in keys:
+            body = s3.get_object(Bucket=self.audit_log, Key=key)["Body"]
+            objects[key] = json.loads(body.read())
+        return objects
+
+    @staticmethod
+    def obj_in_audit_objects(needle: AuditObj, haystack: dict[str, AuditObj]) -> bool:
+        for obj in haystack.values():
+            if all(obj.get(key) == value for key, value in needle.items()):
+                return True
+        return False
+
+    def delete_audit_objects(self, objects: dict[str, AuditObj]) -> None:
+        s3 = boto3.client("s3")
+        s3.delete_objects(Bucket=self.audit_log, Delete={"Objects": [{"Key": key} for key in objects]})
