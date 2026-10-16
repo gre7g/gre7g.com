@@ -123,7 +123,9 @@ class Product(Upgradeable):
         assert isinstance(product_id, str)
         assert isinstance(downloads, list)
         assert isinstance(status, str)
-        return cls(name, int(quantity), float(cost_per), listing_path, ProductId(product_id))
+        return cls(
+            name, int(quantity), float(cost_per), listing_path, ProductId(product_id), downloads, ProductStatus(status)
+        )
 
     def to_client_dict(self) -> dict[str, Any]:
         """Convert the object to a client version's dict"""

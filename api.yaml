@@ -191,7 +191,7 @@ paths:
         "500":
           $ref: "#/components/responses/500-internal-server-error"
 
-  /api/v1/download/{order_id}/{product_id}:
+  /api/v1/download/{order_id}:
     get:
       summary: Download a file
       description: Request a digital download from a previous purchase
@@ -201,14 +201,21 @@ paths:
           required: true
           schema:
             type: string
-        - in: path
-          name: product_id
-          required: true
-          schema:
-            type: string
       responses:
         "200":
           description: Successful download
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  files:
+                    type: object
+                    additionalProperties:
+                      type: string
+                additionalProperties: false
+                required:
+                  - files
         "401":
           $ref: "#/components/responses/401-unauthorized"
         "403":

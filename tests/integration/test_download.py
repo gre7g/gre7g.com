@@ -12,15 +12,25 @@ LOG = logging.getLogger(__name__)
 class TestDownload(BaseTestCase):
     """Should produce an URL for downloading the file"""
 
+    def test_missing_id(self):
+        """Should fail when user ID is missing"""
+        response = self.get(
+            "/api/v1/download/order2_id",
+        )
+        assert response.status_code == HTTPStatus.FORBIDDEN
+
     def test_happy_path(self) -> None:
         """Should produce an URL for downloading the file"""
-        response = self.get(
-            "/api/v1/download/order1_id/product1_id",
-            auth_user=self.regular_user,
-        )
-        assert response.status_code == HTTPStatus.OK
-
-        from pprint import pprint
-
-        pprint(response.json())
-        1 / 0
+        orders, order_dict = self.order_data()
+        with self.create_records([(self.orders_table, orders[0]), (self.orders_table, orders[1])]):
+            response = self.get(
+                "/api/v1/download/order2_id",
+                auth_user=self.regular_user,
+            )
+            assert response.status_code == HTTPStatus.OK
+            result = response.json()
+            assert len(result) == 1
+            assert len(result["files"]) == 1
+            url = result["files"]["test.zip"]
+            assert "test.zip" != url
+            assert "test.zip" in url

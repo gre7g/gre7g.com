@@ -35,14 +35,14 @@ class BaseTestCase(integration_base.BaseTestCase):
         "downloads": [],
         "status": "available",
     }
-    PRODUCT3 = Product("Small World", 1, 15.99, "books/small-world", ProductId("kc2"))
+    PRODUCT3 = Product("Small World", 1, 15.99, "books/small-world", ProductId("kc2"), ["test.zip"])
     P_DICT3 = {
         "name": "Small World",
         "quantity": 1,
         "cost_per": 15.99,
         "listing_path": "books/small-world",
         "product_id": "kc2",
-        "downloads": [],
+        "downloads": ["test.zip"],
         "status": "available",
     }
     PRODUCT4 = Product("Long Way Home", 2, 18.49, "books/long-way-home", ProductId("lwh"))
@@ -84,7 +84,7 @@ class BaseTestCase(integration_base.BaseTestCase):
         )
         order2 = Order(
             UserId(self.regular_user.user_id),
-            [self.PRODUCT2],
+            [self.PRODUCT3],
             18.49,
             -2.00,
             5.00,
@@ -104,7 +104,7 @@ class BaseTestCase(integration_base.BaseTestCase):
                     "timestamp": "recently",
                 },
                 {
-                    "products": [self.P_DICT2],
+                    "products": [self.P_DICT3],
                     "subtotal_cost": 18.49,
                     "discount": -2.00,
                     "shipping_cost": 5.00,
