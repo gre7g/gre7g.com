@@ -168,6 +168,7 @@ class BaseTestCase(TestCase):
                 BaseTestCase.api_endpoint = f"http://localhost:{SERVER_PORT}"
                 BaseTestCase.regular_user = Mock(id_token=REG_USER_ID, user_id=REG_USER_ID)
                 # BaseTestCase.admin_user = Mock(id_token=ADMIN_USER_ID, user_id=ADMIN_USER_ID)
+                BaseTestCase.audit_log = "AuditLog"
                 BaseTestCase.carts_table_name = "CartsTable"
                 BaseTestCase.products_table_name = "ProductsTable"
                 BaseTestCase.orders_table_name = "OrdersTable"

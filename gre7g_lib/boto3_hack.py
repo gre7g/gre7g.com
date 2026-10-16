@@ -14,7 +14,7 @@ from pathlib import Path
 import re
 from time import sleep
 from threading import Thread
-from typing import NewType, ClassVar
+from typing import NewType, ClassVar, Any
 from unittest.mock import Mock
 from urllib.parse import urlencode, urlsplit
 import yaml
@@ -151,6 +151,7 @@ class HackBoto:
     users: dict[UserId, list[GroupId]] = field(default_factory=dict)
     tables: dict[TableName, Table] = field(default_factory=dict)
     functions: list[Function] = field(default_factory=list)
+    s3_objects: dict[str, str] = field(default_factory=dict)
 
     @staticmethod
     def compile_path(path: str) -> re.Pattern[str]:
@@ -201,17 +202,38 @@ class HackBoto:
                     self.functions.append(function)
 
         boto3.resource = self
+        boto3.client = self
         jwt.decode = hack_jwt_decode
         jwt.PyJWKClient = Mock()
 
     def __call__(self, resource: str):
-        """Dynamodb is the only supported resource"""
-        assert resource == "dynamodb"
+        """Dynamodb and s3 are the only supported resources"""
+        assert resource in ["dynamodb", "s3"]
         return self
 
     def Table(self, name: TableName) -> Table:
         """Fetch a dynamodb table by name"""
         return self.tables[name]
+
+    def put_object(self, Bucket: str, Key: str, Body: str) -> None:
+        """Save an object in s3"""
+        self.s3_objects[Key] = Body
+
+    def list_objects_v2(self, Bucket: str, Prefix: str) -> dict[str, Any]:
+        """List all objects under the prefix"""
+        keys = [{"Key": key} for key in self.s3_objects if key.startswith(Prefix)]
+        return {"Contents": keys}
+
+    def get_object(self, Bucket: str, Key: str):
+        """Fetch an object from s3"""
+        body = Mock()
+        body.read.return_value = self.s3_objects[Key]
+        return {"Body": body}
+
+    def delete_objects(self, Bucket: str, Delete: dict[str, Any]) -> None:
+        """Delete objects from s3"""
+        for key_dict in Delete["Objects"]:
+            del self.s3_objects[key_dict["Key"]]
 
     def batch_get_item(self, RequestItems: dict) -> dict:
         """Execute a batch of item fetches"""
