@@ -7,7 +7,7 @@ import logging
 import os
 from typing import Any
 
-from gre7g_lib.gre7g_utils import LambdaBase, AuthenticationRequired, Order
+from gre7g_utils import LambdaBase, AuthenticationRequired, Order
 
 # Constants:
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)

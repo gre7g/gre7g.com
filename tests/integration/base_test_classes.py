@@ -5,7 +5,7 @@ from datetime import datetime, UTC
 import json
 from typing import Any
 
-from gre7g_lib.gre7g_utils import Cart, UserId, Product, ProductId, Order, OrderId, Timestamp
+from gre7g_utils import Cart, UserId, Product, ProductId, Order, OrderId, Timestamp
 import integration_base
 
 # Types:

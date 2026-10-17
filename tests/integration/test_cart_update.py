@@ -3,7 +3,7 @@
 from http import HTTPStatus
 import logging
 
-from gre7g_lib.gre7g_utils import Cart, UserId
+from gre7g_utils import Cart, UserId
 from .base_test_classes import BaseTestCase
 
 # Constants:
