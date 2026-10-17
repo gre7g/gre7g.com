@@ -45,6 +45,13 @@ components:
         status:
           type: string
           description: available, sold_out, ordered, canceled, shipped, partial, downloaded, or refunded
+        parent_id:
+          type: string
+          nullable: true
+        child_ids:
+          type: array
+          items:
+            type: string
       additionalProperties: false
       required:
         - product_id
