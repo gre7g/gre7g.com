@@ -5,7 +5,7 @@ from datetime import datetime, UTC
 import json
 from typing import Any
 
-from gre7g_utils import Cart, UserId, Product, ProductId, Order, OrderId, Timestamp
+from gre7g_lib.gre7g_utils import Cart, UserId, Product, ProductId, Order, OrderId, Timestamp
 import integration_base
 
 # Types:
@@ -24,6 +24,8 @@ class BaseTestCase(integration_base.BaseTestCase):
         "product_id": "kc1",
         "downloads": [],
         "status": "available",
+        "parent_id": None,
+        "child_ids": [],
     }
     PRODUCT2 = Product("Long Way Home", 1, 18.49, "books/long-way-home", ProductId("lwh"))
     P_DICT2 = {
@@ -34,6 +36,8 @@ class BaseTestCase(integration_base.BaseTestCase):
         "product_id": "lwh",
         "downloads": [],
         "status": "available",
+        "parent_id": None,
+        "child_ids": [],
     }
     PRODUCT3 = Product("Small World", 1, 15.99, "books/small-world", ProductId("kc2"), ["test.zip"])
     P_DICT3 = {
@@ -44,6 +48,8 @@ class BaseTestCase(integration_base.BaseTestCase):
         "product_id": "kc2",
         "downloads": ["test.zip"],
         "status": "available",
+        "parent_id": None,
+        "child_ids": [],
     }
     PRODUCT4 = Product("Long Way Home", 2, 18.49, "books/long-way-home", ProductId("lwh"))
     P_DICT4 = {
@@ -54,6 +60,8 @@ class BaseTestCase(integration_base.BaseTestCase):
         "product_id": "lwh",
         "downloads": [],
         "status": "available",
+        "parent_id": None,
+        "child_ids": [],
     }
 
     def cart_data(self):

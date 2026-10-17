@@ -58,12 +58,12 @@ paths = [str(LIB_PATH), str(ROOT_PATH)]
 sys.path.extend(paths)
 os.environ["PYTHONPATH"] = os.pathsep.join(paths)
 
-from audit import configure_audit_log, SourceHash, AUDIT_LOG
-from boto3_hack import HackBoto
-from gre7g_utils import UserId, Cart, Product, ProductId
-from outputs import get_outputs_dict
-from users import REG_USER_ID, ADMIN_USER_ID, ADMIN_GROUP_NAME, CognitoUser, USER_EMAIL
-from web_server import WebBrowser
+from gre7g_lib.audit import configure_audit_log, SourceHash, AUDIT_LOG
+from gre7g_lib.boto3_hack import HackBoto
+from gre7g_lib.gre7g_utils import UserId, Cart, Product, ProductId
+from gre7g_lib.outputs import get_outputs_dict
+from gre7g_lib.users import REG_USER_ID, ADMIN_USER_ID, ADMIN_GROUP_NAME, CognitoUser, USER_EMAIL
+from gre7g_lib.web_server import WebBrowser
 
 
 def compile_ts(minify: bool = True) -> None:

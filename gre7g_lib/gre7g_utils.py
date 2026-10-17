@@ -14,7 +14,6 @@ import json
 import jwt
 import logging
 import os
-from pathlib import Path
 from types_boto3_dynamodb.service_resource import Table as DynamoDBTable
 from typing import Any, Self, NewType, Callable
 from uuid import uuid1
@@ -103,6 +102,8 @@ class Product(Upgradeable):
     product_id: ProductId = field(default_factory=lambda: ProductId(uuid1().hex))
     downloads: list[str] = field(default_factory=list)
     status: ProductStatus = ProductStatus.AVAILABLE
+    parent_id: str | None = None
+    child_ids: list[str] = field(default_factory=list)
     version: int = TABLE_VERSION
 
     @classmethod
@@ -116,6 +117,8 @@ class Product(Upgradeable):
         product_id = value_dict["product_id"]
         downloads = value_dict["downloads"]
         status = value_dict["status"]
+        parent_id = value_dict["parent_id"]
+        child_ids = value_dict["child_ids"]
         assert isinstance(name, str)
         assert isinstance(quantity, int | Decimal)
         assert isinstance(cost_per, float | Decimal)
@@ -123,8 +126,18 @@ class Product(Upgradeable):
         assert isinstance(product_id, str)
         assert isinstance(downloads, list)
         assert isinstance(status, str)
+        assert isinstance(parent_id, str | None)
+        assert isinstance(child_ids, list)
         return cls(
-            name, int(quantity), float(cost_per), listing_path, ProductId(product_id), downloads, ProductStatus(status)
+            name,
+            int(quantity),
+            float(cost_per),
+            listing_path,
+            ProductId(product_id),
+            downloads,
+            ProductStatus(status),
+            parent_id,
+            child_ids,
         )
 
     def to_client_dict(self) -> dict[str, Any]:
@@ -137,20 +150,13 @@ class Product(Upgradeable):
             "product_id": self.product_id,
             "downloads": self.downloads,
             "status": self.status.value,
+            "parent_id": self.parent_id,
+            "child_ids": self.child_ids,
         }
 
     def to_dict(self) -> dict[str, Any]:
         """Convert the object to a dict"""
-        return {
-            "name": self.name,
-            "quantity": self.quantity,
-            "cost_per": currency(self.cost_per),
-            "listing_path": self.listing_path,
-            "product_id": self.product_id,
-            "downloads": self.downloads,
-            "status": self.status.value,
-            "version": TABLE_VERSION,
-        }
+        return self.to_client_dict() | {"cost_per": currency(self.cost_per), "version": TABLE_VERSION}
 
     def to_key(self) -> dict[str, Any]:
         """Return the table key as a dict"""

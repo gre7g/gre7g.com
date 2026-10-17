@@ -4,7 +4,7 @@ from http import HTTPStatus
 import logging
 
 from .base_test_classes import BaseTestCase
-from gre7g_utils import AuditLogEvent
+from gre7g_lib.gre7g_utils import AuditLogEvent
 
 # Constants:
 LOG = logging.getLogger(__name__)
