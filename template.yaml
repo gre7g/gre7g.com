@@ -171,6 +171,7 @@ Resources:
 
   CartUpdateFunction:
     Type: AWS::Serverless::Function
+    DependsOn: SecretKey
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
@@ -186,7 +187,7 @@ Resources:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           CARTS_TABLE: !Ref CartsTable
-          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}::}}"
+          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}}}"
       Layers:
         - !Ref Lib
       Events:
@@ -199,6 +200,7 @@ Resources:
 
   AssignOrderIdFunction:
     Type: AWS::Serverless::Function
+    DependsOn: SecretKey
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
@@ -211,7 +213,7 @@ Resources:
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
-          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}::}}"
+          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}}}"
       Layers:
         - !Ref Lib
       Events:
@@ -224,6 +226,7 @@ Resources:
 
   LogAuditEventFunction:
     Type: AWS::Serverless::Function
+    DependsOn: SecretKey
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
@@ -240,7 +243,7 @@ Resources:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           AUDIT_LOG_STORAGE: !Ref AuditLogStorage
-          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}::}}"
+          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}}}"
       Layers:
         - !Ref Lib
       Events:
@@ -280,6 +283,7 @@ Resources:
 
   CreateGuestFunction:
     Type: AWS::Serverless::Function
+    DependsOn: SecretKey
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
@@ -292,7 +296,7 @@ Resources:
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
-          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}::}}"
+          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}}}"
       Layers:
         - !Ref Lib
       Events:
@@ -305,6 +309,7 @@ Resources:
 
   MergeGuestFunction:
     Type: AWS::Serverless::Function
+    DependsOn: SecretKey
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
@@ -320,7 +325,7 @@ Resources:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           CARTS_TABLE: !Ref CartsTable
-          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}::}}"
+          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}}}"
       Layers:
         - !Ref Lib
       Events:
