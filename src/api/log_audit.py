@@ -18,8 +18,7 @@ class LogAudit(LambdaBase):
 
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Log a click_id"""
-        body = json.loads(event["body"])
-        click_id = body["click_id"]
+        click_id = self.body["click_id"]
         self.audit_log(AuditLogEvent.REGISTER_CLICK, click_id=click_id)
 
         return {}

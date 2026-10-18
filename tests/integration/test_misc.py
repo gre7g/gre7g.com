@@ -2,7 +2,9 @@
 
 from http import HTTPStatus
 import logging
+from time import monotonic
 
+from gre7g_utils import CSRF_HEADER, PAGE_EXPIRED
 from integration_base import BaseTestCase, Validate, SKIP_LOCAL
 
 # Constants:
@@ -25,7 +27,7 @@ class TestMisc(BaseTestCase):
             for method in methods:
                 response = self.request(
                     method,
-                    "/api/v1/lists",
+                    path,
                     auth_user=self.regular_user,
                     validate=Validate.NOTHING,
                 )
@@ -40,3 +42,22 @@ class TestMisc(BaseTestCase):
             validate=Validate.NOTHING,
         )
         assert response.status_code == HTTPStatus.FORBIDDEN
+
+    def test_csrf(self):
+        """Should reject writes with an invalid CSRF token"""
+        # No token required for GETs
+        response = self.get(
+            "/api/v1/cart",
+            validate=Validate.CSRF_ONLY,
+        )
+        assert response.status_code != PAGE_EXPIRED
+
+        # Token required for POST/PUT/DELETE
+        response = self.post(
+            "/api/v1/guest",
+            validate=Validate.CSRF_ONLY,
+        )
+        assert response.status_code == PAGE_EXPIRED
+
+        # Expired token
+        # Bad token

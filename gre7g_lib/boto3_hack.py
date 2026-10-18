@@ -189,6 +189,9 @@ class HackBoto:
                             policies.append((PolicyName(policy), TableName(item[policy]["TableName"])))
 
                     # Find environment variables
+                    # Mildly amusing sidenote: This sets the secret key we use for HMAC calculation to
+                    # "{{resolve:secretsmanager:${SecretKey}}}" which is pretty silly, but this only happens during
+                    # testing, and any constant value is fine, so sure, let's use that.
                     api_props = properties["Events"]["ApiEvent"]["Properties"]
                     env_vars = properties.get("Environment", {}).get("Variables", {})
                     function = Function(
@@ -263,7 +266,7 @@ class HackBoto:
 
     def call_func(self, path: str, method: str, headers, body: str, params: dict | str = "") -> dict:
         """Execute a lambda function from a web server request"""
-        event = {"body": body, "headers": headers}
+        event = {"body": body, "headers": headers, "httpMethod": method.upper()}
 
         if isinstance(params, dict):
             event["rawQueryString"] = urlencode(params, doseq=True)

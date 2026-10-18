@@ -25,8 +25,7 @@ class CartUpdate(LambdaBase):
         assert user_id
         assert self.carts_table
 
-        body = json.loads(event["body"])
-        products = [Product.from_dict(product) for product in body["products"]]
+        products = [Product.from_dict(product) for product in self.body["products"]]
 
         Cart(user_id, products).put(self.carts_table)
 

@@ -16,6 +16,7 @@ from unittest.mock import Mock
 import yaml
 
 from boto3_hack import HackBoto, Table
+from gre7g_utils import CSRF_HEADER, PAGE_EXPIRED
 from outputs import get_outputs_dict
 from users import CognitoUser, REG_USER_ID, ADMIN_USER_ID, ADMIN_GROUP_NAME
 from web_server import WebBrowser
@@ -42,6 +43,7 @@ class Validate(Enum):
     RQ_AND_RS = auto()
     RQ_ONLY = auto()
     RS_ONLY = auto()
+    CSRF_ONLY = auto()
     NOTHING = auto()
 
 
@@ -51,8 +53,7 @@ class BaseTestCase(TestCase):
     initialized: ClassVar[bool] = False
     openapi: ClassVar[OpenAPI]
     stack_name: ClassVar[str]
-    user_pool: ClassVar[str]
-    user_pool_client: ClassVar[str]
+    csrf_token: ClassVar[str] = ""
 
     # Sam outputs
     api_endpoint: ClassVar[str]
@@ -100,28 +101,44 @@ class BaseTestCase(TestCase):
     ) -> requests.Response:
         """Make a request to the API under test"""
         url = f"{self.api_endpoint}/{sub_url.lstrip('/')}"
-        kwargs.setdefault("headers", {"Content-Type": "application/json"})
+        rq_headers = kwargs.pop("headers", {"Content-Type": "application/json"})
+        if validate != Validate.CSRF_ONLY:
+            rq_headers[CSRF_HEADER] = self.csrf_token
         if auth_user:
-            kwargs["headers"].update({"authorization": f"Bearer {auth_user.id_token}"})
+            rq_headers["authorization"] = f"Bearer {auth_user.id_token}"
         if guest_user:
-            kwargs["headers"].update({"x-guest-id": guest_user})
+            rq_headers["x-guest-id"] = guest_user
         if STACK_NAME == RUN_BRIEF:
             content = json.dumps(kwargs.get("json", {}))
-            result = boto3.resource.call_func(
-                sub_url, method.lower(), kwargs.get("headers", {}), content, kwargs.get("params", {})
-            )
+            result = boto3.resource.call_func(sub_url, method.lower(), rq_headers, content, kwargs.get("params", {}))
+            rs_headers = result["headers"]
+            if (result["statusCode"] == PAGE_EXPIRED) and (validate != Validate.CSRF_ONLY):
+                # The token expired or hasn't been set yet, so let's redo it with the new token
+                rq_headers[CSRF_HEADER] = rs_headers[CSRF_HEADER]
+                result = boto3.resource.call_func(
+                    sub_url, method.lower(), rq_headers, content, kwargs.get("params", {})
+                )
+                rs_headers = result["headers"]
+
             response = Mock(status_code=result["statusCode"])
             response.json.return_value = json.loads(result.get("body", "{}"))
         else:
-            request = requests.Request(method, url, **kwargs)
+            request = requests.Request(method, url, headers=rq_headers, **kwargs)
             openapi_request = RequestsOpenAPIRequest(request)
             if validate in [Validate.RQ_AND_RS, Validate.RQ_ONLY]:
                 self.openapi.validate_request(openapi_request)
             session = requests.Session()
             response = session.send(request.prepare())
+            rs_headers = response.headers
+            if (response.status_code == PAGE_EXPIRED) and (validate != Validate.CSRF_ONLY):
+                # The token expired or hasn't been set yet, so let's redo it with the new token
+                rq_headers[CSRF_HEADER] = rs_headers[CSRF_HEADER]
+                response = session.send(request.prepare())
+                rs_headers = response.headers
             if validate in [Validate.RQ_AND_RS, Validate.RS_ONLY]:
                 openapi_response = RequestsOpenAPIResponse(response)
                 self.openapi.validate_response(openapi_request, openapi_response)
+        BaseTestCase.csrf_token = rs_headers.get(CSRF_HEADER, "")
         return response
 
     def get(self, *args, **kwargs) -> requests.Response:

@@ -9,11 +9,15 @@ from dataclasses import dataclass, field
 from datetime import datetime, UTC
 from decimal import Decimal
 from enum import auto, StrEnum
+from hashlib import sha3_256
+import hmac
 from http import HTTPStatus
 import json
 import jwt
 import logging
 import os
+from secrets import token_hex
+from time import monotonic
 from types_boto3_dynamodb.service_resource import Table as DynamoDBTable
 from typing import Any, Self, NewType, Callable
 from uuid import uuid1
@@ -29,10 +33,17 @@ LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.get
 TABLE_VERSION = 1
 MAX_ITEMS_PER_BATCH = 100
 SIGN_ALGORITHMS = ["RS256", "RS384", "RS512", "ES256", "ES384", "ES512"]
+CSRF_LIFETIME = 300  # 5 minutes
+CSRF_HEADER = "x-csrf-token"
+PAGE_EXPIRED = 419
 
 
 def currency(value: float) -> Decimal:
     return Decimal("%0.2f" % value)
+
+
+class CSRFException(Exception):
+    """CSRF expired or could not be authenticated"""
 
 
 class AuthenticationRequired(StrEnum):
@@ -322,14 +333,15 @@ class Order(Upgradeable):
 class LambdaBase(ABC):
     """Base class for lambdas"""
 
-    audit_log_table: DynamoDBTable | None = None
     products_table: DynamoDBTable | None = None
     carts_table: DynamoDBTable | None = None
     orders_table: DynamoDBTable | None = None
+    secret_key: bytes = b""
 
     path_parameters: dict = field(default_factory=dict)
     user_id: UserId | None = None
     guest_id: UserId | None = None
+    body: dict[str, Any] = field(default_factory=dict)
 
     AUTH_REQUIRED = AuthenticationRequired.NONE
 
@@ -360,12 +372,27 @@ class LambdaBase(ABC):
         except Exception:
             LOG.exception("failed to authenticate bearer token")
 
+    def validate_csrf(self, event: dict[str, Any]) -> None:
+        """Validate CSRF token"""
+        csrf_header = (event.get("headers") or {}).get(CSRF_HEADER, "")
+        if csrf_header:
+            expiry, random_bits, signature = csrf_header.split("-")
+            csrf_token = f"{expiry}-{random_bits}-"
+            csrf_token += hmac.new(self.secret_key, csrf_token.encode("ascii"), sha3_256).hexdigest()
+            if hmac.compare_digest(csrf_header, csrf_token):
+                return
+        raise CSRFException()
+
     def wrapper(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Wrapper around the handler than takes care of parameters, privileges, and error handling"""
         try:
             self.path_parameters = event.get("pathParameters") or {}
             self.extract_user_id(event)
             self.guest_id = event.get("headers", {}).get("x-guest-id")
+            if event.get("body"):
+                self.body = json.loads(event["body"])
+            if event.get("httpMethod") != "GET":
+                self.validate_csrf(event)
 
             match self.AUTH_REQUIRED:
                 case AuthenticationRequired.NONE:
@@ -407,14 +434,21 @@ class LambdaBase(ABC):
             status = HTTPStatus.BAD_REQUEST
             body = {"message": str(error)}
 
+        except CSRFException:
+            LOG.error("CSRF error")
+            status = PAGE_EXPIRED  # type: ignore [assignment]
+            body = {"message": "CSRF error"}
+
         except Exception as error:
             LOG.exception("Unhandled exception")
             status = HTTPStatus.INTERNAL_SERVER_ERROR
             body = {"message": str(error)}
 
+        csrf_token = f"{int(monotonic() + CSRF_LIFETIME)}-{token_hex()}-"
+        csrf_token += hmac.new(self.secret_key, csrf_token.encode("ascii"), sha3_256).hexdigest()
         return {
             "statusCode": status,
-            "headers": {"content-type": "application/json"},
+            "headers": {"content-type": "application/json", CSRF_HEADER: csrf_token},
             "body": json.dumps(body),
         }
 
@@ -428,11 +462,12 @@ class LambdaBase(ABC):
     def lambda_handler(cls) -> Callable | None:
         """A convenience method for instantiating a Lambda handler"""
         try:
-            audit_log_table = cls.get_table("AUDIT_LOG_TABLE")
             products_table = cls.get_table("PRODUCTS_TABLE")
             carts_table = cls.get_table("CARTS_TABLE")
             orders_table = cls.get_table("ORDERS_TABLE")
-            return cls(audit_log_table, products_table, carts_table, orders_table).wrapper
+            env_secret = os.getenv("SECRET_KEY")
+            secret_key = env_secret.encode("ascii") if env_secret else b""
+            return cls(products_table, carts_table, orders_table, secret_key).wrapper
         except:
             LOG.exception("loading object failed")
             return None
