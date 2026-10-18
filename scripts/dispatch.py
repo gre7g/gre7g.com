@@ -60,6 +60,7 @@ os.environ["PYTHONPATH"] = os.pathsep.join(paths)
 
 from gre7g_lib.audit import configure_audit_log, SourceHash, AUDIT_LOG
 from gre7g_lib.boto3_hack import HackBoto
+from gre7g_lib.db_defaults import write_default_data_to_db
 from gre7g_utils import UserId, Cart, Product, ProductId
 from gre7g_lib.outputs import get_outputs_dict
 from gre7g_lib.users import REG_USER_ID, ADMIN_USER_ID, ADMIN_GROUP_NAME, CognitoUser, USER_EMAIL
@@ -96,39 +97,11 @@ def setup_sample_data(dest_dict: dict) -> None:
     # Databases
     dynamodb = boto3.resource("dynamodb")
     outputs = dest_dict["outputs"]
+    products_table = dynamodb.Table(outputs["products_table_name"])
     carts_table = dynamodb.Table(outputs["carts_table_name"])
-    # list_table = dynamodb.Table(outputs["list_table_name"])
-    # last_update_table = dynamodb.Table(outputs["last_update_table_name"])
-
-    # New data
+    orders_table = dynamodb.Table(outputs["orders_table_name"])
     user_id = UserId(REG_USER_ID)
-    products = [
-        Product("Skeleton Crew", 1, 13.99, "books/skeleton-crew", ProductId("kc1")),
-        Product("Long Way Home", 1, 18.49, "books/long-way-home", ProductId("lwh")),
-    ]
-    cart = Cart(user_id, products)
-    # list_id = ListId("list1_id")
-    # items = [
-    #     ListEntry("eggs", user_id, item_id=ItemId("item1_id")),
-    #     ListEntry("milk", user_id, True, ItemId("item2_id")),
-    #     ListEntry("bacon", user_id, item_id=ItemId("item3_id")),
-    # ]
-    # todo_list = TodoList("Groceries", [user_id], list_id, items)
-    # user = User(user_id, lists={list_id: ListIdAndPriv(list_id, Privilege.ADMIN)})
-    # timestamp1 = LastUpdate(user_id)
-    # timestamp2 = LastUpdate(list_id)
-
-    # Write data to databases
-    carts_table.SECRET_OVERRIDE = True  # We might not have permission, but this is test infrastructure
-    cart.put(carts_table)
-    carts_table.SECRET_OVERRIDE = False
-    # list_table.SECRET_OVERRIDE = True
-    # todo_list.put(list_table)
-    # list_table.SECRET_OVERRIDE = False
-    # last_update_table.SECRET_OVERRIDE = True
-    # timestamp1.put(last_update_table)
-    # timestamp2.put(last_update_table)
-    # last_update_table.SECRET_OVERRIDE = False
+    write_default_data_to_db(user_id, products_table, carts_table, orders_table)
 
 
 @dataclass

@@ -28,6 +28,9 @@ class Download(LambdaBase):
         order_id = self.path_parameters["order_id"]
         assert order_id
 
+        # TODO: It's absolutely crucial that when the order is created, the items are taken from the product list and
+        # not from the cart. The user can write whatever they want into the cart, and they could use to do various
+        # malicious things such as adding more files to the download list and changing the costs.
         order = Order.get(self.orders_table, self.user_id, order_id)
         files = {}
         for product in order.products:
