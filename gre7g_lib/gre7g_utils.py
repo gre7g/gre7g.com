@@ -96,10 +96,11 @@ class Product(Upgradeable):
     """A product for sale, sold, or in a shopping cart"""
 
     name: str
-    quantity: int
-    cost_per: float
+    description: str
     listing_path: str
     product_id: ProductId = field(default_factory=lambda: ProductId(uuid1().hex))
+    quantity: int = 0
+    cost_per: float = 0.00
     downloads: list[str] = field(default_factory=list)
     status: ProductStatus = ProductStatus.AVAILABLE
     parent_id: str | None = None
@@ -111,29 +112,32 @@ class Product(Upgradeable):
         """Generate an object from a dict"""
         value_dict = cls.upgrade(value_dict)
         name = value_dict["name"]
-        quantity = value_dict["quantity"]
-        cost_per = value_dict["cost_per"]
+        description = value_dict["description"]
         listing_path = value_dict["listing_path"]
         product_id = value_dict["product_id"]
+        quantity = value_dict["quantity"]
+        cost_per = value_dict["cost_per"]
         downloads = value_dict["downloads"]
         status = value_dict["status"]
         parent_id = value_dict["parent_id"]
         child_ids = value_dict["child_ids"]
         assert isinstance(name, str)
-        assert isinstance(quantity, int | Decimal)
-        assert isinstance(cost_per, float | Decimal)
+        assert isinstance(description, str)
         assert isinstance(listing_path, str)
         assert isinstance(product_id, str)
+        assert isinstance(quantity, int | Decimal)
+        assert isinstance(cost_per, float | Decimal)
         assert isinstance(downloads, list)
         assert isinstance(status, str)
         assert isinstance(parent_id, str | None)
         assert isinstance(child_ids, list)
         return cls(
             name,
-            int(quantity),
-            float(cost_per),
+            description,
             listing_path,
             ProductId(product_id),
+            int(quantity),
+            float(cost_per),
             downloads,
             ProductStatus(status),
             parent_id,
@@ -144,10 +148,11 @@ class Product(Upgradeable):
         """Convert the object to a client version's dict"""
         return {
             "name": self.name,
-            "quantity": self.quantity,
-            "cost_per": float(self.cost_per),
+            "description": self.description,
             "listing_path": self.listing_path,
             "product_id": self.product_id,
+            "quantity": self.quantity,
+            "cost_per": float(self.cost_per),
             "downloads": self.downloads,
             "status": self.status.value,
             "parent_id": self.parent_id,
@@ -233,6 +238,7 @@ class Order(Upgradeable):
     total_cost: float
     order_id: OrderId = field(default_factory=lambda: OrderId(uuid1().hex))
     timestamp: Timestamp = field(default_factory=lambda: Timestamp(datetime.now(UTC).isoformat()))
+    notes: list[str] = field(default_factory=list)
     version: int = TABLE_VERSION
 
     @classmethod
@@ -247,6 +253,7 @@ class Order(Upgradeable):
         total_cost = value_dict["total_cost"]
         order_id = value_dict["order_id"]
         timestamp = value_dict["timestamp"]
+        notes = value_dict["notes"]
         assert isinstance(user_id, str)
         assert isinstance(products, list)
         assert isinstance(subtotal_cost, float | Decimal)
@@ -255,6 +262,7 @@ class Order(Upgradeable):
         assert isinstance(total_cost, float | Decimal)
         assert isinstance(order_id, str)
         assert isinstance(timestamp, str)
+        assert isinstance(notes, list)
         product_list = [Product.from_dict(product) for product in products]
         return cls(
             UserId(user_id),
@@ -265,6 +273,7 @@ class Order(Upgradeable):
             float(total_cost),
             OrderId(order_id),
             Timestamp(timestamp),
+            notes,
             TABLE_VERSION,
         )
 
@@ -278,6 +287,7 @@ class Order(Upgradeable):
             "total_cost": float(self.total_cost),
             "order_id": self.order_id,
             "timestamp": self.timestamp,
+            "notes": self.notes,
         }
 
     def to_dict(self) -> dict[str, Any]:
@@ -291,6 +301,7 @@ class Order(Upgradeable):
             "total_cost": currency(self.total_cost),
             "order_id": self.order_id,
             "timestamp": self.timestamp,
+            "notes": self.notes,
             "version": TABLE_VERSION,
         }
 
