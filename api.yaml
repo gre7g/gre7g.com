@@ -23,9 +23,14 @@ components:
     product:
       type: object
       properties:
-        product_id:
-          type: string
         name:
+          type: string
+        description:
+          type: string
+        listing_path:
+          type: string
+          description: Informational only
+        product_id:
           type: string
         quantity:
           type: number
@@ -34,9 +39,6 @@ components:
           description: |
             CAUTION: This field is informational and should never be considered authoritative! The user could PUT any 
             cost when they update their cart, but we MUST refer to authoritative price during check-out.
-        listing_path:
-          type: string
-          description: Informational only
         downloads:
           type: array
           description: Filenames for digital downloads associated with this item
@@ -54,13 +56,16 @@ components:
             type: string
       additionalProperties: false
       required:
-        - product_id
         - name
+        - description
+        - listing_path
+        - product_id
         - quantity
         - cost_per
-        - listing_path
         - downloads
         - status
+        - parent_id
+        - child_ids
 
     product_list:
       type: object
@@ -295,10 +300,6 @@ paths:
                     items:
                       type: object
                       properties:
-                        order_id:
-                          type: string
-                        timestamp:
-                          type: string
                         products:
                           type: array
                           items:
@@ -311,14 +312,23 @@ paths:
                           type: number
                         total_cost:
                           type: number
+                        order_id:
+                          type: string
+                        timestamp:
+                          type: string
+                        notes:
+                          type: array
+                          items:
+                            type: string
                       additionalProperties: false
                       required:
-                        - timestamp
                         - products
                         - subtotal_cost
                         - discount
                         - shipping_cost
                         - total_cost
+                        - timestamp
+                        - notes
                 additionalProperties: false
                 required:
                   - orders
