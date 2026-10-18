@@ -131,6 +131,7 @@ products = [
             returning to Tish. Old and gray, back stooped from decades of labor, he would try to get up out of bed, and 
             change his mind. Why bother?
         </p>
+        <p>
             He couldn’t have been more wrong. He was still young, his pelt still tan, and his back didn’t hurt when he 
             rose.
         </p>
