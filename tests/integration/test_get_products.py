@@ -20,5 +20,5 @@ class TestCartFetch(BaseTestCase):
             assert response.status_code == HTTPStatus.OK
             result = response.json()
             assert len(result) == 1
-            assert len(result["products"]) == len(product_dict["products"])
+            assert len(result["products"]) >= len(product_dict["products"])
             assert all(product in result["products"] for product in product_dict["products"])

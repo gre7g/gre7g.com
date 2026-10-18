@@ -585,7 +585,7 @@ def write_default_data_to_db(
 
     def find(product_id: str) -> Product:
         for item in products:
-            if item.parent_id == product_id:
+            if item.product_id == product_id:
                 return item
         assert False
 

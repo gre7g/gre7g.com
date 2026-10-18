@@ -15,12 +15,12 @@ AuditObj = dict[str, Any]
 class BaseTestCase(integration_base.BaseTestCase):
     """Base class for integration tests"""
 
-    PRODUCT1 = Product("Skeleton Crew", "aa", "books/skeleton-crew", ProductId("kc1"), 1, 13.99)
+    PRODUCT1 = Product("Skeleton Crew", "aa", "books/skeleton-crew", ProductId("p1"), 1, 13.99)
     P_DICT1 = {
         "name": "Skeleton Crew",
         "description": "aa",
         "listing_path": "books/skeleton-crew",
-        "product_id": "kc1",
+        "product_id": "p1",
         "quantity": 1,
         "cost_per": 13.99,
         "downloads": [],
@@ -28,40 +28,40 @@ class BaseTestCase(integration_base.BaseTestCase):
         "parent_id": None,
         "child_ids": [],
     }
-    PRODUCT2 = Product("Long Way Home", "bb", "books/long-way-home", ProductId("lwh"), 1, 18.49)
+    PRODUCT2 = Product("Long Way Home", "bb", "books/long-way-home", ProductId("p2"), 1, 18.49)
     P_DICT2 = {
         "name": "Long Way Home",
         "description": "bb",
         "quantity": 1,
         "cost_per": 18.49,
         "listing_path": "books/long-way-home",
-        "product_id": "lwh",
+        "product_id": "p2",
         "downloads": [],
         "status": "available",
         "parent_id": None,
         "child_ids": [],
     }
-    PRODUCT3 = Product("Small World", "cc", "books/small-world", ProductId("kc2"), 1, 15.99, ["test.zip"])
+    PRODUCT3 = Product("Small World", "cc", "books/small-world", ProductId("p3"), 1, 15.99, ["test.zip"])
     P_DICT3 = {
         "name": "Small World",
         "description": "cc",
         "quantity": 1,
         "cost_per": 15.99,
         "listing_path": "books/small-world",
-        "product_id": "kc2",
+        "product_id": "p3",
         "downloads": ["test.zip"],
         "status": "available",
         "parent_id": None,
         "child_ids": [],
     }
-    PRODUCT4 = Product("Long Way Home", "dd", "books/long-way-home", ProductId("lwh"), 2, 18.49)
+    PRODUCT4 = Product("Long Way Home", "dd", "books/long-way-home", ProductId("p2"), 2, 18.49)
     P_DICT4 = {
         "name": "Long Way Home",
         "description": "dd",
         "quantity": 2,
         "cost_per": 18.49,
         "listing_path": "books/long-way-home",
-        "product_id": "lwh",
+        "product_id": "p2",
         "downloads": [],
         "status": "available",
         "parent_id": None,
