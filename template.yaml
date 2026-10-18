@@ -22,6 +22,12 @@ Globals:
       - !Sub arn:aws:lambda:${AWS::Region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:68
 
 Resources:
+  SecretKey:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub ${AWS::StackName}-secret-key
+      Description: Secret key for CSRF HMAC
+
   UserPool:
     Type: AWS::Cognito::UserPool
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
@@ -174,10 +180,13 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref CartsTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref SecretKey
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           CARTS_TABLE: !Ref CartsTable
+          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}::}}"
       Layers:
         - !Ref Lib
       Events:
@@ -196,9 +205,13 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-assign-order-id
       CodeUri: src/api
       Handler: assign_order_id.lambda_handler
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref SecretKey
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
+          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}::}}"
       Layers:
         - !Ref Lib
       Events:
@@ -221,10 +234,13 @@ Resources:
       Policies:
         - S3CrudPolicy:
             BucketName: !Ref AuditLogStorage
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref SecretKey
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           AUDIT_LOG_STORAGE: !Ref AuditLogStorage
+          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}::}}"
       Layers:
         - !Ref Lib
       Events:
@@ -270,9 +286,13 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-create-guest
       CodeUri: src/api
       Handler: create_guest.lambda_handler
+      Policies:
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref SecretKey
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
+          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}::}}"
       Layers:
         - !Ref Lib
       Events:
@@ -294,10 +314,13 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref CartsTable
+        - AWSSecretsManagerGetSecretValuePolicy:
+            SecretArn: !Ref SecretKey
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           CARTS_TABLE: !Ref CartsTable
+          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}::}}"
       Layers:
         - !Ref Lib
       Events:
