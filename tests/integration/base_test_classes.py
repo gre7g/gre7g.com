@@ -15,21 +15,23 @@ AuditObj = dict[str, Any]
 class BaseTestCase(integration_base.BaseTestCase):
     """Base class for integration tests"""
 
-    PRODUCT1 = Product("Skeleton Crew", 1, 13.99, "books/skeleton-crew", ProductId("kc1"))
+    PRODUCT1 = Product("Skeleton Crew", "aa", "books/skeleton-crew", ProductId("kc1"), 1, 13.99)
     P_DICT1 = {
         "name": "Skeleton Crew",
-        "quantity": 1,
-        "cost_per": 13.99,
+        "description": "aa",
         "listing_path": "books/skeleton-crew",
         "product_id": "kc1",
+        "quantity": 1,
+        "cost_per": 13.99,
         "downloads": [],
         "status": "available",
         "parent_id": None,
         "child_ids": [],
     }
-    PRODUCT2 = Product("Long Way Home", 1, 18.49, "books/long-way-home", ProductId("lwh"))
+    PRODUCT2 = Product("Long Way Home", "bb", "books/long-way-home", ProductId("lwh"), 1, 18.49)
     P_DICT2 = {
         "name": "Long Way Home",
+        "description": "bb",
         "quantity": 1,
         "cost_per": 18.49,
         "listing_path": "books/long-way-home",
@@ -39,9 +41,10 @@ class BaseTestCase(integration_base.BaseTestCase):
         "parent_id": None,
         "child_ids": [],
     }
-    PRODUCT3 = Product("Small World", 1, 15.99, "books/small-world", ProductId("kc2"), ["test.zip"])
+    PRODUCT3 = Product("Small World", "cc", "books/small-world", ProductId("kc2"), 1, 15.99, ["test.zip"])
     P_DICT3 = {
         "name": "Small World",
+        "description": "cc",
         "quantity": 1,
         "cost_per": 15.99,
         "listing_path": "books/small-world",
@@ -51,9 +54,10 @@ class BaseTestCase(integration_base.BaseTestCase):
         "parent_id": None,
         "child_ids": [],
     }
-    PRODUCT4 = Product("Long Way Home", 2, 18.49, "books/long-way-home", ProductId("lwh"))
+    PRODUCT4 = Product("Long Way Home", "dd", "books/long-way-home", ProductId("lwh"), 2, 18.49)
     P_DICT4 = {
         "name": "Long Way Home",
+        "description": "dd",
         "quantity": 2,
         "cost_per": 18.49,
         "listing_path": "books/long-way-home",
@@ -110,6 +114,7 @@ class BaseTestCase(integration_base.BaseTestCase):
                     "total_cost": 18.99,
                     "order_id": "order1_id",
                     "timestamp": "recently",
+                    "notes": [],
                 },
                 {
                     "products": [self.P_DICT3],
@@ -119,6 +124,7 @@ class BaseTestCase(integration_base.BaseTestCase):
                     "total_cost": 21.49,
                     "order_id": "order2_id",
                     "timestamp": "long ago",
+                    "notes": [],
                 },
             ]
         }

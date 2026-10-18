@@ -5,7 +5,7 @@ from gre7g_utils import Product, ProductId, Cart, UserId, ProductStatus, Order, 
 
 def write_default_data_to_db(
     user_id: UserId, products_table: DynamoDBTable, carts_table: DynamoDBTable, orders_table: DynamoDBTable
-):
+) -> None:
     products = [
         Product(
             "Kanti Cycle 1: Skeleton Crew",
@@ -577,10 +577,11 @@ def write_default_data_to_db(
             13.00,
         ),
     ]
-    products_table.SECRET_OVERRIDE = True  # We might not have permission, but this is test infrastructure
+    # We might not have permission, but this is test infrastructure
+    products_table.SECRET_OVERRIDE = True  # type: ignore [attr-defined]
     for product in products:
         product.put(products_table)
-    products_table.SECRET_OVERRIDE = False
+    products_table.SECRET_OVERRIDE = False  # type: ignore [attr-defined]
 
     def find(product_id: str) -> Product:
         for item in products:
@@ -597,10 +598,10 @@ def write_default_data_to_db(
     carts = [
         Cart(user_id, [sc, lwh, pin]),
     ]
-    carts_table.SECRET_OVERRIDE = True
+    carts_table.SECRET_OVERRIDE = True  # type: ignore [attr-defined]
     for cart in carts:
         cart.put(carts_table)
-    carts_table.SECRET_OVERRIDE = False
+    carts_table.SECRET_OVERRIDE = False  # type: ignore [attr-defined]
 
     rl = find("tm1-paperback")
     rl.quantity = 1
@@ -636,7 +637,7 @@ def write_default_data_to_db(
             ["8:25am 3/22/2026: This is a placeholder item, so I'm refunding your order. Sorry about that!"],
         ),
     ]
-    orders_table.SECRET_OVERRIDE = True
+    orders_table.SECRET_OVERRIDE = True  # type: ignore [attr-defined]
     for order in orders:
         order.put(orders_table)
-    carts_table.SECRET_OVERRIDE = False
+    carts_table.SECRET_OVERRIDE = False  # type: ignore [attr-defined]
