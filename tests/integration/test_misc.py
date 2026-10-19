@@ -6,7 +6,7 @@ from http import HTTPStatus
 import logging
 import os
 from secrets import token_hex
-from time import monotonic
+from time import time
 
 from gre7g_utils import CSRF_HEADER, PAGE_EXPIRED
 from integration_base import BaseTestCase, Validate, SKIP_LOCAL, NO_CLOUD
@@ -64,7 +64,7 @@ class TestMisc(BaseTestCase):
         assert response.status_code == PAGE_EXPIRED
 
         # Bad token
-        csrf_token = f"{int(monotonic())+60}-123456-123456"
+        csrf_token = f"{int(time())+60}-123456-123456"
         response = self.post(
             "/api/v1/guest",
             headers={"Content-Type": "application/json", CSRF_HEADER: csrf_token},
@@ -77,8 +77,50 @@ class TestMisc(BaseTestCase):
         """Should reject writes with an expired CSRF token"""
         secret_key = os.getenv("SECRET_KEY")
         assert secret_key
-        csrf_token = f"{int(monotonic() - 1)}-{token_hex()}-"
-        csrf_token += hmac.new(secret_key.encode("ascii"), csrf_token.encode("ascii"), sha3_256).hexdigest()
+
+        # Still good
+        csrf_token = f"{int(time() + 60)}-{token_hex()}-"
+        message = f"{csrf_token}1.2.3.4".encode("ascii")
+        csrf_token += hmac.new(secret_key.encode("ascii"), message, sha3_256).hexdigest()
+        response = self.post(
+            "/api/v1/guest",
+            headers={"Content-Type": "application/json", CSRF_HEADER: csrf_token},
+            validate=Validate.CSRF_ONLY,
+        )
+        assert response.status_code != PAGE_EXPIRED
+
+        # Expired 1s ago
+        csrf_token = f"{int(time() - 1)}-{token_hex()}-"
+        message = f"{csrf_token}1.2.3.4".encode("ascii")
+        csrf_token += hmac.new(secret_key.encode("ascii"), message, sha3_256).hexdigest()
+        response = self.post(
+            "/api/v1/guest",
+            headers={"Content-Type": "application/json", CSRF_HEADER: csrf_token},
+            validate=Validate.CSRF_ONLY,
+        )
+        assert response.status_code == PAGE_EXPIRED
+
+    @NO_CLOUD
+    def test_stolen_csrf(self):
+        """Should reject writes with an CSRF token taken from another machine"""
+        secret_key = os.getenv("SECRET_KEY")
+        assert secret_key
+
+        # From our (simulated) IP
+        csrf_token = f"{int(time() + 60)}-{token_hex()}-"
+        message = f"{csrf_token}1.2.3.4".encode("ascii")
+        csrf_token += hmac.new(secret_key.encode("ascii"), message, sha3_256).hexdigest()
+        response = self.post(
+            "/api/v1/guest",
+            headers={"Content-Type": "application/json", CSRF_HEADER: csrf_token},
+            validate=Validate.CSRF_ONLY,
+        )
+        assert response.status_code != PAGE_EXPIRED
+
+        # From another IP
+        csrf_token = f"{int(time() + 60)}-{token_hex()}-"
+        message = f"{csrf_token}99.99.99.99".encode("ascii")
+        csrf_token += hmac.new(secret_key.encode("ascii"), message, sha3_256).hexdigest()
         response = self.post(
             "/api/v1/guest",
             headers={"Content-Type": "application/json", CSRF_HEADER: csrf_token},

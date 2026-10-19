@@ -17,7 +17,7 @@ import jwt
 import logging
 import os
 from secrets import token_hex
-from time import monotonic
+from time import time
 from types_boto3_dynamodb.service_resource import Table as DynamoDBTable
 from typing import Any, Self, NewType, Callable
 from uuid import uuid1
@@ -372,28 +372,33 @@ class LambdaBase(ABC):
         except Exception:
             LOG.exception("failed to authenticate bearer token")
 
-    def validate_csrf(self, event: dict[str, Any]) -> None:
+    def validate_csrf(self, csrf_header: str, source_ip: str) -> None:
         """Validate CSRF token"""
-        csrf_header = (event.get("headers") or {}).get(CSRF_HEADER, "")
         if csrf_header:
             expiry, random_bits, signature = csrf_header.split("-")
-            if float(expiry) >= monotonic():
+            # We use time() and not monotonic() because the token could be generated on one machine and validated on
+            # another.
+            if float(expiry) >= time():
                 csrf_token = f"{expiry}-{random_bits}-"
-                csrf_token += hmac.new(self.secret_key, csrf_token.encode("ascii"), sha3_256).hexdigest()
+                message = f"{csrf_token}{source_ip}".encode("ascii")
+                csrf_token += hmac.new(self.secret_key, message, sha3_256).hexdigest()
                 if hmac.compare_digest(csrf_header, csrf_token):
                     return
         raise CSRFException()
 
     def wrapper(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Wrapper around the handler than takes care of parameters, privileges, and error handling"""
+        http_dict = event["requestContext"]["http"]
+        source_ip = http_dict["sourceIp"]
         try:
             self.path_parameters = event.get("pathParameters") or {}
             self.extract_user_id(event)
-            self.guest_id = event.get("headers", {}).get("x-guest-id")
+            headers = event.get("headers") or {}
+            self.guest_id = headers.get("x-guest-id")
             if event.get("body"):
                 self.body = json.loads(event["body"])
-            if event["requestContext"]["http"]["method"] != "GET":
-                self.validate_csrf(event)
+            if http_dict["method"] != "GET":
+                self.validate_csrf(headers.get(CSRF_HEADER, ""), source_ip)
 
             match self.AUTH_REQUIRED:
                 case AuthenticationRequired.NONE:
@@ -445,8 +450,9 @@ class LambdaBase(ABC):
             status = HTTPStatus.INTERNAL_SERVER_ERROR
             body = {"message": str(error)}
 
-        csrf_token = f"{int(monotonic() + CSRF_LIFETIME)}-{token_hex()}-"
-        csrf_token += hmac.new(self.secret_key, csrf_token.encode("ascii"), sha3_256).hexdigest()
+        csrf_token = f"{int(time() + CSRF_LIFETIME)}-{token_hex()}-"
+        message = f"{csrf_token}{source_ip}".encode("ascii")
+        csrf_token += hmac.new(self.secret_key, message, sha3_256).hexdigest()
         return {
             "statusCode": status,
             "headers": {"content-type": "application/json", CSRF_HEADER: csrf_token},
