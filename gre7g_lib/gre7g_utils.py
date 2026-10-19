@@ -392,7 +392,7 @@ class LambdaBase(ABC):
             self.guest_id = event.get("headers", {}).get("x-guest-id")
             if event.get("body"):
                 self.body = json.loads(event["body"])
-            if event.get("httpMethod") != "get":
+            if event["requestContext"]["http"]["method"] != "GET":
                 self.validate_csrf(event)
 
             match self.AUTH_REQUIRED:
