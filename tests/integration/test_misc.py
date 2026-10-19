@@ -1,11 +1,15 @@
 """Test miscellaneous checks on the lambda functions"""
 
+from hashlib import sha3_256
+import hmac
 from http import HTTPStatus
 import logging
+import os
+from secrets import token_hex
 from time import monotonic
 
 from gre7g_utils import CSRF_HEADER, PAGE_EXPIRED
-from integration_base import BaseTestCase, Validate, SKIP_LOCAL
+from integration_base import BaseTestCase, Validate, SKIP_LOCAL, NO_CLOUD
 
 # Constants:
 LOG = logging.getLogger(__name__)
@@ -59,5 +63,25 @@ class TestMisc(BaseTestCase):
         )
         assert response.status_code == PAGE_EXPIRED
 
-        # Expired token
         # Bad token
+        csrf_token = f"{int(monotonic())+60}-123456-123456"
+        response = self.post(
+            "/api/v1/guest",
+            headers={"Content-Type": "application/json", CSRF_HEADER: csrf_token},
+            validate=Validate.CSRF_ONLY,
+        )
+        assert response.status_code == PAGE_EXPIRED
+
+    @NO_CLOUD
+    def test_expired_csrf(self):
+        """Should reject writes with an expired CSRF token"""
+        secret_key = os.getenv("SECRET_KEY")
+        assert secret_key
+        csrf_token = f"{int(monotonic() - 1)}-{token_hex()}-"
+        csrf_token += hmac.new(secret_key.encode("ascii"), csrf_token.encode("ascii"), sha3_256).hexdigest()
+        response = self.post(
+            "/api/v1/guest",
+            headers={"Content-Type": "application/json", CSRF_HEADER: csrf_token},
+            validate=Validate.CSRF_ONLY,
+        )
+        assert response.status_code == PAGE_EXPIRED

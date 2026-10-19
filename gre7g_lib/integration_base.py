@@ -29,6 +29,7 @@ RUN_BRIEF = "BRIEF"
 SERVER_PORT = 8000
 TEMPLATE_YAML = Path(__file__).parents[1] / "template.yaml"
 SKIP_LOCAL = skipIf(os.getenv("STACK-NAME") == RUN_LOCALLY, "Local simulation doesn't support this test")
+NO_CLOUD = skipIf(os.getenv("STACK-NAME") not in [RUN_BRIEF, RUN_LOCALLY], "Cloud simulation doesn't support this test")
 
 logging.basicConfig(level=logging.INFO)
 for mouthy_log in ["boto3", "botocore", "urllib3"]:

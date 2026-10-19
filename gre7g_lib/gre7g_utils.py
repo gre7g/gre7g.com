@@ -377,10 +377,11 @@ class LambdaBase(ABC):
         csrf_header = (event.get("headers") or {}).get(CSRF_HEADER, "")
         if csrf_header:
             expiry, random_bits, signature = csrf_header.split("-")
-            csrf_token = f"{expiry}-{random_bits}-"
-            csrf_token += hmac.new(self.secret_key, csrf_token.encode("ascii"), sha3_256).hexdigest()
-            if hmac.compare_digest(csrf_header, csrf_token):
-                return
+            if float(expiry) >= monotonic():
+                csrf_token = f"{expiry}-{random_bits}-"
+                csrf_token += hmac.new(self.secret_key, csrf_token.encode("ascii"), sha3_256).hexdigest()
+                if hmac.compare_digest(csrf_header, csrf_token):
+                    return
         raise CSRFException()
 
     def wrapper(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
