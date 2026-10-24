@@ -24,7 +24,7 @@ declare global {
     }
 }
 
-import { sam_outputs } from "static/outputs.json" as SamOutputs;
+import sam_outputs from "../../static/outputs.json";
 
 /**
  * The Api class handles authentication, AJAX requests to the API, CSRF tokens, and request retries.
