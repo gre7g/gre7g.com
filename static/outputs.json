@@ -1,0 +1,14 @@
+{
+    "api_endpoint": "http://localhost:8888",
+    "audit_log": "gre7g-com-audit-log",
+    "carts_table_name": "CartsTable",
+    "cognito_host_name": "localhost:8888",
+    "cognito_login_url": "http://localhost:8888",
+    "orders_table_name": "OrdersTable",
+    "products_table_name": "ProductsTable",
+    "user_pool": "gre7g-com-user-pool",
+    "user_pool_client": "gre7g-com-user-pool-client",
+    "web_distribution": "gre7g-com-web-distribution",
+    "web_file_storage": "gre7g-com-web",
+    "website_url": "http://localhost:8888"
+}

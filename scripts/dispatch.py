@@ -206,14 +206,14 @@ class Dispatch:
     def delete(self, dest_dict: dict) -> None:
         """Delete the dev stack"""
         assert self.sam_path, "unable to find AWS sam"
-        bucket = dest_dict.get("outputs", {}).get("web_file_storage")
-        self.login_call([self.aws_path, "s3", "rm", f"s3://{bucket}", "--recursive"])
+        web_file_storage = dest_dict.get("outputs", {}).get("web_file_storage")
+        self.login_call([self.aws_path, "s3", "rm", f"s3://{web_file_storage}", "--recursive"])
         self.check_call([self.sam_path, "delete", "--stack-name", self.stack_name])
 
     def deploy(self, dest_dict: dict) -> None:
         """Deploy the stack, update the `dest_dict`"""
         assert self.sam_path, "unable to find AWS sam"
-        protect = str(self.name_set == "PROD").lower()
+        production = str(self.name_set == "PROD").lower()
         self.login_call(
             [
                 self.sam_path,
@@ -221,7 +221,7 @@ class Dispatch:
                 "--stack-name",
                 self.stack_name,
                 "--parameter-overrides",
-                f"EnableDeletionProtection={protect}",
+                f"EnableDeletionProtection={production}",
             ]
         )
         self.describe()
@@ -252,7 +252,8 @@ class Dispatch:
 
         # Read current configuration
         outputs = dest_dict.setdefault("outputs", {})
-        config = json.loads(
+        assert self.aws_path
+        client_config = json.loads(
             check_output(
                 [
                     self.aws_path,
@@ -269,16 +270,16 @@ class Dispatch:
 
         # This gives us more information than we'll need by nesting it in a dictionary and including some timestamps
         # that are read-only. Adjust the data now.
-        config = config["UserPoolClient"]
-        del config["CreationDate"]
-        del config["LastModifiedDate"]
+        client_config = client_config["UserPoolClient"]
+        del client_config["CreationDate"]
+        del client_config["LastModifiedDate"]
 
         # Replace the callback URLs
-        config["CallbackURLs"] = [outputs.get("website_url")]
+        client_config["CallbackURLs"] = [outputs.get("website_url")]
 
         # Write the configuration to a temporary file
         with NamedTemporaryFile(mode="wt", delete_on_close=False) as temp_file:
-            json.dump(config, temp_file)
+            json.dump(client_config, temp_file)
             temp_file.close()
 
             # The AWS command to upload this JSON requires a file:// syntax instead of a file path, so we need to
@@ -299,10 +300,10 @@ class Dispatch:
 
     def sync_static_files(self, dest_dict: dict) -> None:
         """Copy all images, stylesheets, scripts, and HTML to the S3 bucket"""
-        bucket = dest_dict.get("outputs", {}).get("web_file_storage")
-        self.check_call([self.aws_path, "s3", "cp", str(INDEX_PATH), f"s3://{bucket}/index.html"])
-        self.check_call([self.aws_path, "s3", "sync", str(STATIC_PATH), f"s3://{bucket}"])
-        self.check_call([self.aws_path, "s3", "sync", str(ASSETS_PATH), f"s3://{bucket}/assets/"])
+        web_file_storage = dest_dict.get("outputs", {}).get("web_file_storage")
+        self.check_call([self.aws_path, "s3", "cp", str(INDEX_PATH), f"s3://{web_file_storage}/index.html"])
+        self.check_call([self.aws_path, "s3", "sync", str(STATIC_PATH), f"s3://{web_file_storage}"])
+        self.check_call([self.aws_path, "s3", "sync", str(ASSETS_PATH), f"s3://{web_file_storage}/assets/"])
 
     def copy_config(self, dest_dict: dict) -> None:
         """Copy the sam outputs to a configuration file and upload"""
@@ -313,8 +314,8 @@ class Dispatch:
             temp_file.close()
 
             # Copy the file to S3
-            bucket = outputs.get("web_file_storage")
-            self.check_call([self.aws_path, "s3", "cp", temp_file.name, f"s3://{bucket}/{CONFIG_FILENAME}"])
+            web_file_storage = outputs.get("web_file_storage")
+            self.check_call([self.aws_path, "s3", "cp", temp_file.name, f"s3://{web_file_storage}/{CONFIG_FILENAME}"])
 
     def invalidate_cache(self, distribution: str) -> None:
         """Invalidate the cache so latest web files are served"""
@@ -448,12 +449,14 @@ class Dispatch:
             audit_log.info("complete")
         finally:
             # Are there any old deployments we can purge from the saved state? We don't want this to grow endlessly.
-            delete_old = (datetime.now(UTC) - DELETE_OLDER).isoformat()
-            recent = self.save_state.setdefault("dev-stack", {}).setdefault("recent", {})
+            delete_older_than = (datetime.now(UTC) - DELETE_OLDER).isoformat()
+            recent_stacks = self.save_state.setdefault("dev-stack", {}).setdefault("recent", {})
             # Get a list of keys to delete first so we don't modify while we're looping
-            old_keys = [key for key, values in recent.items() if values.get("timestamp", "0") < delete_old]
-            for key in old_keys:
-                del recent[key]
+            old_stack_names = [
+                key for key, values in recent_stacks.items() if values.get("timestamp", "0") < delete_older_than
+            ]
+            for stack_name in old_stack_names:
+                del recent_stacks[stack_name]
 
             # Write the saved state back out
             with open(YAML_PATH, "wt") as file_obj:
@@ -465,24 +468,24 @@ class Dispatch:
 def main():
     """Main function"""
     # Parse commandline arguments
-    parser = ArgumentParser()
-    parser.add_argument("-v", "--verbose", action="count", default=0)
-    parser.add_argument("-q", "--quiet", action="store_const", dest="verbose", const=-1)
-    parser.add_argument("-n", "--name", action="store", help="set development name")
-    parser.add_argument("-r", "--reset", action="store_true", help="reset saved variables")
+    arg_parser = ArgumentParser()
+    arg_parser.add_argument("-v", "--verbose", action="count", default=0)
+    arg_parser.add_argument("-q", "--quiet", action="store_const", dest="verbose", const=-1)
+    arg_parser.add_argument("-n", "--name", action="store", help="set development name")
+    arg_parser.add_argument("-r", "--reset", action="store_true", help="reset saved variables")
 
-    destination = parser.add_mutually_exclusive_group()
-    destination.add_argument("-b", "--brief", action="store_true", help="run quick with basic checks only")
-    destination.add_argument("-l", "--local", action="store_true", help="run locally with better checking")
-    destination.add_argument("-d", "--dev", action="store_true", help="deploy to development")
-    destination.add_argument("-p", "--prod", action="store_true", help="deploy to production")
+    destination_group = arg_parser.add_mutually_exclusive_group()
+    destination_group.add_argument("-b", "--brief", action="store_true", help="run quick with basic checks only")
+    destination_group.add_argument("-l", "--local", action="store_true", help="run locally with better checking")
+    destination_group.add_argument("-d", "--dev", action="store_true", help="deploy to development")
+    destination_group.add_argument("-p", "--prod", action="store_true", help="deploy to production")
 
-    parser.add_argument("command", nargs="?", help="bring the dev stack up (default) or down")
+    arg_parser.add_argument("command", nargs="?", help="bring the dev stack up (default) or down")
 
-    args = parser.parse_args()
+    args = arg_parser.parse_args()
 
     # Enable logging
-    log_level, level_name = LOG_LEVELS.get(max(2, args.verbose), logging.DEBUG)
+    log_level, level_name = LOG_LEVELS.get(max(2, args.verbose), logging.DEBUG)  # noqa
     logging.basicConfig(level=log_level)
     for mouthy_log in ["boto3", "botocore", "urllib3"]:
         logging.getLogger(mouthy_log).setLevel(logging.WARNING)
@@ -491,15 +494,15 @@ def main():
 
     # Sanitize incompatible combinations of options
     if args.command not in ["up", "down", "regular", "admin", "webserver", None]:
-        parser.error("valid commands: up, down, regular, admin")
+        arg_parser.error("valid commands: up, down, regular, admin")
     if args.command == "down":
         if args.prod or args.brief or args.local:
-            parser.error("this tool can only delete a development stack")
+            arg_parser.error("this tool can only delete a development stack")
         else:
             args.dev = True
     elif args.command == "up":  # explicit
         if args.brief or args.local:
-            parser.error("can't bring a local stack up")
+            arg_parser.error("can't bring a local stack up")
         elif not args.prod:
             args.dev = True
     elif not args.command:
@@ -527,7 +530,7 @@ def main():
         # No, build/deploy/test
         dispatch = Dispatch(args, level_name)
         if log_level < logging.WARNING:
-            dispatch.stdout = sys.stdout
+            dispatch.stdout = sys.stdout  # noqa
         start_time = monotonic()
         exit_code = dispatch.main()
         elapsed = monotonic() - start_time

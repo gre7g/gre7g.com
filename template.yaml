@@ -450,9 +450,13 @@ Outputs:
     Description: Used by integration tests
     Value: !Sub "https://${Api}.execute-api.${AWS::Region}.amazonaws.com"
 
-  WebDistribution:
-    Description: Cache mechanism
-    Value: !Ref WebDistribution
+  AuditLog:
+    Description: Used by integration tests
+    Value: !Ref AuditLogStorage
+
+  CartsTableName:
+    Description: Used by integration tests
+    Value: !Ref CartsTable
 
   CognitoHostName:
     Description: Used by the HTML script
@@ -462,29 +466,13 @@ Outputs:
     Description: Used by the HTML script
     Value: !Sub "https://${AWS::StackName}-auth.auth.${AWS::Region}.amazoncognito.com/login?client_id=${UserPoolClient}&response_type=code&scope=openid&redirect_uri=https://${WebDistribution.DomainName}"
 
-  WebsiteURL:
-    Description: Used in manual testing
-    Value: !Sub "https://${WebDistribution.DomainName}"
-
-  AuditLog:
-    Description: Used by integration tests
-    Value: !Ref AuditLogStorage
-
-  ProductsTableName:
-    Description: Used by integration tests
-    Value: !Ref ProductsTable
-
-  CartsTableName:
-    Description: Used by integration tests
-    Value: !Ref CartsTable
-
   OrdersTableName:
     Description: Used by integration tests
     Value: !Ref OrdersTable
 
-  WebFileStorage:
-    Description: Used by dispatch script
-    Value: !Ref WebFileStorage
+  ProductsTableName:
+    Description: Used by integration tests
+    Value: !Ref ProductsTable
 
   UserPool:
     Description: Used by integration tests
@@ -493,3 +481,15 @@ Outputs:
   UserPoolClient:
     Description: Used by integration tests
     Value: !Ref UserPoolClient
+
+  WebDistribution:
+    Description: Cache mechanism
+    Value: !Ref WebDistribution
+
+  WebFileStorage:
+    Description: Used by dispatch script
+    Value: !Ref WebFileStorage
+
+  WebsiteURL:
+    Description: Used in manual testing
+    Value: !Sub "https://${WebDistribution.DomainName}"
