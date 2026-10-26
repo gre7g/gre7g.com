@@ -72,7 +72,7 @@ export class Api {
         const session = await fetchAuthSession();
         const access_token = session.tokens?.accessToken.toString();
         if (access_token) {
-            return_value.headers["Authorization"] = `Bearer ${access_token}`;
+            (return_value as any).headers["Authorization"] = `Bearer ${access_token}`;
         }
         return return_value;
     }
