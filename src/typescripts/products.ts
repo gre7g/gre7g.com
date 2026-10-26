@@ -4,6 +4,7 @@ declare global { interface Product {    name: string,
     product_id: string,
     quantity: number,
     cost_per: number,
+    images: string[],
     downloads: string[],
     status: "available" | "sold_out" | "ordered" | "canceled" | "shipped" | "partial" | "downloaded" | "refunded",
     parent_id: string | null,
@@ -18,13 +19,5 @@ export class Products {
 
     async show_path(path: string): Promise<void> {
         // TODO
-    }
-
-    show_products() {
-        this.product_list.forEach((product) => {
-            if (!product.parent_id) {
-                console.log(product.name);
-            }
-        });
     }
 }

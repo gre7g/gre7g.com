@@ -112,6 +112,7 @@ class Product(Upgradeable):
     product_id: ProductId = field(default_factory=lambda: ProductId(uuid1().hex))
     quantity: int = 0
     cost_per: float = 0.00
+    images: list[str] = field(default_factory=list)
     downloads: list[str] = field(default_factory=list)
     status: ProductStatus = ProductStatus.AVAILABLE
     parent_id: str | None = None
@@ -128,6 +129,7 @@ class Product(Upgradeable):
         product_id = value_dict["product_id"]
         quantity = value_dict["quantity"]
         cost_per = value_dict["cost_per"]
+        images = value_dict["images"]
         downloads = value_dict["downloads"]
         status = value_dict["status"]
         parent_id = value_dict["parent_id"]
@@ -138,6 +140,7 @@ class Product(Upgradeable):
         assert isinstance(product_id, str)
         assert isinstance(quantity, int | Decimal)
         assert isinstance(cost_per, float | Decimal)
+        assert isinstance(images, list)
         assert isinstance(downloads, list)
         assert isinstance(status, str)
         assert isinstance(parent_id, str | None)
@@ -149,6 +152,7 @@ class Product(Upgradeable):
             ProductId(product_id),
             int(quantity),
             float(cost_per),
+            images,
             downloads,
             ProductStatus(status),
             parent_id,
@@ -164,6 +168,7 @@ class Product(Upgradeable):
             "product_id": self.product_id,
             "quantity": self.quantity,
             "cost_per": float(self.cost_per),
+            "images": self.images,
             "downloads": self.downloads,
             "status": self.status.value,
             "parent_id": self.parent_id,

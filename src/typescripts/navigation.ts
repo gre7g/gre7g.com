@@ -1,4 +1,4 @@
-import { G_PRODUCTS } from "./main";
+import { G_PRODUCTS, G_UI } from "./main";
 
 export class Navigator {
     async update(path: string): Promise<void> {
@@ -23,8 +23,8 @@ export class Navigator {
         } else if (G_PRODUCTS.has_path(path)) {
             await G_PRODUCTS.show_path(path);
         } else {
-            G_PRODUCTS.show_products();
-            console.log("Show the default view"); // TODO
+            G_UI.products.section.show();
+            await G_UI.products.update();
         }
     }
 }
