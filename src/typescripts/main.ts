@@ -11,14 +11,19 @@ export let G_PRODUCTS: Products;
 /**
  * Start-up code
  */
-class Main {
-    async main(): Promise<void> {
-        G_API = new Api();
-        G_NAVIGATOR = new Navigator();
-        G_PRODUCTS = new Products();
-        await G_NAVIGATOR.update(window.location.pathname);
-    }
+class Main {}
+
+async function main(): Promise<void> {
+    G_MAIN = new Main();
+    G_API = new Api();
+    G_NAVIGATOR = new Navigator();
+    G_PRODUCTS = new Products();
+    await G_NAVIGATOR.update(window.location.pathname);
 }
 
-G_MAIN = new Main();
-(window as any).main = G_MAIN.main;
+console.log("setting main");
+(window as any).main = main;
+$("#test").on("click", async () => {
+    const x = await G_API.get("/api/v1/products");
+    console.log(x);
+});

@@ -333,6 +333,7 @@ class Dispatch:
         _, stderr = process.communicate()
         warnings = [line for line in stderr.splitlines() if SEARCH_PRETTIER_EXT.search(line)]
         if warnings:
+            print("Prettier found issues:")
             print("\n".join(warnings))
             assert False
 
