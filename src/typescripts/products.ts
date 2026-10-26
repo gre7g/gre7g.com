@@ -13,10 +13,18 @@ export class Products {
     product_list: Product[] = [];
 
     has_path(path: string): boolean {
-        return false; // TODO
+        return this.product_list.some(item => item.listing_path === path);
     }
 
     async show_path(path: string): Promise<void> {
         // TODO
+    }
+
+    show_products() {
+        this.product_list.forEach((product) => {
+            if (!product.parent_id) {
+                console.log(product.name);
+            }
+        });
     }
 }

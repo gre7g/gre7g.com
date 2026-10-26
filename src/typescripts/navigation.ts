@@ -23,6 +23,7 @@ export class Navigator {
         } else if (G_PRODUCTS.has_path(path)) {
             await G_PRODUCTS.show_path(path);
         } else {
+            G_PRODUCTS.show_products();
             console.log("Show the default view"); // TODO
         }
     }
