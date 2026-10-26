@@ -26,7 +26,6 @@ declare global {
 }
 
 const response: Response = await fetch(CONFIG_URL);
-console.log(`response: ${response.status}`);
 const SAM_OUTPUTS: SamOutputs = await response.json();
 
 /**

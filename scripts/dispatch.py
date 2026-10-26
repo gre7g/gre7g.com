@@ -197,7 +197,7 @@ class Dispatch:
         if process.returncode:
             if ("Please reauthenticate using 'aws login'." in stderr) or ("The provided token has expired." in stderr):
                 self.check_call([self.aws_path, "login"], stdout=self.stdout, stderr=sys.stderr)
-                self.check_call(command, stdout=self.stdout, stderr=sys.stderr)
+                self.check_call(command, stdout=self.stdout, stderr=sys.stderr)  # TODO: what if no changes?
             elif "No changes to deploy." in stderr:
                 pass
             else:
