@@ -15,6 +15,11 @@ export class Main {
         G_API = new Api();
         G_NAVIGATOR = new Navigator();
         G_PRODUCTS = new Products();
+        G_PRODUCTS.product_list = await G_API.get("/api/v1/products");
         await G_NAVIGATOR.update(window.location.pathname);
+
+        // TODO
+        $("#test").on("click", async () => {
+        });
     }
 }
