@@ -58,7 +58,7 @@ export class Api {
 
     private async common(path: string): Promise<Record<string, any>> {
         let return_value = {
-            url: `${SAM_OUTPUTS.api_endpoint}${path}`,
+            url: path,
             headers: {
                 "x-csrf-token": this.csrf_token,
                 "x-guest-id": this.guest_id,
