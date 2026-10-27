@@ -44,6 +44,9 @@ components:
           description: Filenames for digital downloads associated with this item
           items:
             type: string
+        media:
+          type: string
+          description: paperback, ebook, etc.
         status:
           type: string
           description: available, sold_out, ordered, canceled, shipped, partial, downloaded, or refunded
@@ -63,6 +66,7 @@ components:
         - quantity
         - cost_per
         - downloads
+        - media
         - status
         - parent_id
         - child_ids
