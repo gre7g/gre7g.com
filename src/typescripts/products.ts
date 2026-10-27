@@ -6,6 +6,7 @@ declare global { interface Product {    name: string,
     cost_per: number,
     images: string[],
     downloads: string[],
+    media: string,
     status: "available" | "sold_out" | "ordered" | "canceled" | "shipped" | "partial" | "downloaded" | "refunded",
     parent_id: string | null,
     child_ids: string[]}}

@@ -25,6 +25,7 @@ class ProductsUI extends ListSection {
                 new_item.find("a").attr("href", product.listing_path);
                 new_item.find("img").attr("src", product.images[0]);
                 new_item.find(".product-name").text(product.name);
+                new_item.find(".media").text(product.media);
                 this.unordered_list.append(new_item);
             }
         });

@@ -27,6 +27,7 @@ def write_default_data_to_db(
             "books/skeleton-crew",
             ProductId("kc1"),
             images=["/static/images/products/skeleton-crew-1.png"],
+            media="paperback, ebook, audio",
             child_ids=[ProductId("kc1-paperback"), ProductId("kc1-ebook"), ProductId("kc1-audiobook")],
         ),
         Product(
@@ -37,6 +38,7 @@ def write_default_data_to_db(
             9,
             13.99,
             ["/static/images/products/skeleton-crew-1.png"],
+            media="paperback",
             parent_id=ProductId("kc1"),
         ),
         Product(
@@ -56,6 +58,7 @@ def write_default_data_to_db(
             4.99,
             ["/static/images/products/skeleton-crew-1.png"],
             ["KC1SkeletonCrew.epub", "KC1SkeletonCrew.mobi", "KC1SkeletonCrew.pdf"],
+            "ebook",
             parent_id=ProductId("kc1"),
         ),
         Product(
@@ -71,6 +74,7 @@ def write_default_data_to_db(
             16.11,
             ["/static/images/products/skeleton-crew-1.png"],
             ["KC1SkeletonCrew.zip"],
+            "audio",
             parent_id=ProductId("kc1"),
         ),
         Product(
@@ -91,6 +95,7 @@ def write_default_data_to_db(
             "books/small-world",
             ProductId("kc2"),
             images=["/static/images/products/small-world-1.png"],
+            media="paperback, ebook, audio",
             child_ids=[ProductId("kc2-paperback"), ProductId("kc2-ebook"), ProductId("kc2-audiobook")],
         ),
         Product(
@@ -101,6 +106,7 @@ def write_default_data_to_db(
             3,
             15.99,
             ["/static/images/products/small-world-1.png"],
+            media="paperback",
             parent_id=ProductId("kc2"),
         ),
         Product(
@@ -120,6 +126,7 @@ def write_default_data_to_db(
             5.99,
             ["/static/images/products/small-world-1.png"],
             ["KC2SmallWorld.epub", "KC2SmallWorld.mobi", "KC2SmallWorld.pdf"],
+            "ebook",
             parent_id=ProductId("kc2"),
         ),
         Product(
@@ -135,6 +142,7 @@ def write_default_data_to_db(
             17.40,
             ["/static/images/products/small-world-1.png"],
             ["KC2SmallWorld.zip"],
+            "audio",
             parent_id=ProductId("kc2"),
         ),
         Product(
@@ -158,6 +166,7 @@ def write_default_data_to_db(
             "books/fair-trade",
             ProductId("kc3"),
             images=["/static/images/products/fair-trade-1.png"],
+            media="paperback, ebook, audio",
             child_ids=[ProductId("kc3-paperback"), ProductId("kc3-ebook"), ProductId("kc3-audiobook")],
         ),
         Product(
@@ -168,6 +177,7 @@ def write_default_data_to_db(
             5,
             17.99,
             ["/static/images/products/fair-trade-1.png"],
+            media="paperback",
             parent_id=ProductId("kc3"),
         ),
         Product(
@@ -187,6 +197,7 @@ def write_default_data_to_db(
             6.99,
             ["/static/images/products/fair-trade-1.png"],
             ["KC3FairTrade.epub", "KC3FairTrade.mobi", "KC3FairTrade.pdf"],
+            "ebook",
             parent_id=ProductId("kc3"),
         ),
         Product(
@@ -202,6 +213,7 @@ def write_default_data_to_db(
             21.83,
             ["/static/images/products/fair-trade-1.png"],
             ["KC3FairTrade.zip"],
+            "audio",
             parent_id=ProductId("kc3"),
         ),
         Product(
@@ -227,6 +239,7 @@ def write_default_data_to_db(
             "books/nobody-left-behind",
             ProductId("kc3.5"),
             images=["/static/images/products/nobody-left-behind-1.png"],
+            media="paperback, ebook, audio",
             child_ids=[ProductId("kc3.5-paperback"), ProductId("kc3.5-ebook"), ProductId("kc3.5-audiobook")],
         ),
         Product(
@@ -237,6 +250,7 @@ def write_default_data_to_db(
             46,
             19.99,
             ["/static/images/products/nobody-left-behind-1.png"],
+            media="paperback",
             parent_id=ProductId("kc3.5"),
         ),
         Product(
@@ -256,6 +270,7 @@ def write_default_data_to_db(
             9.99,
             ["/static/images/products/nobody-left-behind-1.png"],
             ["KC3.5NobodyLeftBehind.epub", "KC3.5NobodyLeftBehind.mobi", "KC3.5NobodyLeftBehind.pdf"],
+            "ebook",
             parent_id=ProductId("kc3.5"),
         ),
         Product(
@@ -271,6 +286,7 @@ def write_default_data_to_db(
             99.99,
             ["/static/images/products/nobody-left-behind-1.png"],
             ["KC3.5NobodyLeftBehind.zip"],
+            "audio",
             parent_id=ProductId("kc3.5"),
         ),
         Product(
@@ -296,6 +312,7 @@ def write_default_data_to_db(
             "books/reapers-lottery",
             ProductId("tm1"),
             images=["/static/images/products/reapers-lottery-1.png"],
+            media="paperback, ebook, audio",
             child_ids=[ProductId("tm1-paperback"), ProductId("tm1-ebook"), ProductId("tm1-audiobook")],
         ),
         Product(
@@ -306,6 +323,7 @@ def write_default_data_to_db(
             9,
             16.99,
             ["/static/images/products/reapers-lottery-1.png"],
+            media="paperback",
             parent_id=ProductId("tm1"),
         ),
         Product(
@@ -325,6 +343,7 @@ def write_default_data_to_db(
             7.99,
             ["/static/images/products/reapers-lottery-1.png"],
             ["TM1ReapersLottery.epub", "TM1ReapersLottery.mobi", "TM1ReapersLottery.pdf"],
+            "ebook",
             parent_id=ProductId("tm1"),
         ),
         Product(
@@ -340,6 +359,7 @@ def write_default_data_to_db(
             20.62,
             ["/static/images/products/reapers-lottery-1.png"],
             ["TM1ReapersLottery.zip"],
+            "audio",
             parent_id=ProductId("tm1"),
         ),
         Product(
@@ -364,6 +384,7 @@ def write_default_data_to_db(
             "books/executioners-gambit",
             ProductId("tm2"),
             images=["/static/images/products/executioners-gambit-1.png"],
+            media="paperback, ebook, audio",
             child_ids=[ProductId("tm2-paperback"), ProductId("tm2-ebook"), ProductId("tm2-audiobook")],
         ),
         Product(
@@ -374,6 +395,7 @@ def write_default_data_to_db(
             11,
             22.99,
             ["/static/images/products/executioners-gambit-1.png"],
+            media="paperback",
             parent_id=ProductId("tm2"),
         ),
         Product(
@@ -393,6 +415,7 @@ def write_default_data_to_db(
             9.99,
             ["/static/images/products/executioners-gambit-1.png"],
             ["TM2ExecutionersGambit.epub", "TM2ExecutionersGambit.mobi", "TM2ExecutionersGambit.pdf"],
+            "ebook",
             parent_id=ProductId("tm2"),
         ),
         Product(
@@ -408,6 +431,7 @@ def write_default_data_to_db(
             23.39,
             ["/static/images/products/executioners-gambit-1.png"],
             ["TM2ExecutionersGambit.zip"],
+            "audio",
             parent_id=ProductId("tm2"),
         ),
         Product(
@@ -430,6 +454,7 @@ def write_default_data_to_db(
             "books/long-way-home",
             ProductId("lwh"),
             images=["/static/images/products/long-way-home-1.png"],
+            media="paperback, ebook, audio",
             child_ids=[ProductId("lwh-paperback"), ProductId("lwh-ebook"), ProductId("lwh-audiobook")],
         ),
         Product(
@@ -440,6 +465,7 @@ def write_default_data_to_db(
             83,
             18.49,
             ["/static/images/products/long-way-home-1.png"],
+            media="paperback",
             parent_id=ProductId("lwh"),
         ),
         Product(
@@ -459,6 +485,7 @@ def write_default_data_to_db(
             8.99,
             ["/static/images/products/long-way-home-1.png"],
             ["LongWayHome.epub", "LongWayHome.mobi", "LongWayHome.pdf"],
+            "ebook",
             parent_id=ProductId("lwh"),
         ),
         Product(
@@ -474,6 +501,7 @@ def write_default_data_to_db(
             18.83,
             ["/static/images/products/long-way-home-1.png"],
             ["LongWayHome.zip"],
+            "audio",
             parent_id=ProductId("lwh"),
         ),
         Product(
@@ -505,6 +533,7 @@ def write_default_data_to_db(
             "books/tales-of-hayven-celestia-1",
             ProductId("tohc1"),
             images=["/static/images/products/tales-of-hayven-celestia-1-1.png"],
+            media="paperback, ebook, audio",
             child_ids=[ProductId("tohc1-paperback"), ProductId("tohc1-ebook"), ProductId("tohc1-audiobook")],
         ),
         Product(
@@ -515,6 +544,7 @@ def write_default_data_to_db(
             12,
             18.95,
             ["/static/images/products/tales-of-hayven-celestia-1-1.png"],
+            media="paperback",
             parent_id=ProductId("tohc1"),
         ),
         Product(
@@ -534,6 +564,7 @@ def write_default_data_to_db(
             8.99,
             ["/static/images/products/tales-of-hayven-celestia-1-1.png"],
             ["TalesOfHayvenCelestia1.epub", "TalesOfHayvenCelestia1.mobi", "TalesOfHayvenCelestia1.pdf"],
+            "ebook",
             parent_id=ProductId("tohc1"),
         ),
         Product(
@@ -549,6 +580,7 @@ def write_default_data_to_db(
             27.77,
             ["/static/images/products/tales-of-hayven-celestia-1-1.png"],
             ["TalesOfHayvenCelestia1.zip"],
+            "audio",
             parent_id=ProductId("tohc1"),
         ),
         Product(
@@ -566,6 +598,7 @@ def write_default_data_to_db(
             "books/tales-of-hayven-celestia-2",
             ProductId("tohc2"),
             images=["/static/images/products/tales-of-hayven-celestia-2-1.png"],
+            media="paperback, ebook",
             child_ids=[ProductId("tohc2-paperback"), ProductId("tohc2-ebook")],
         ),
         Product(
@@ -575,6 +608,7 @@ def write_default_data_to_db(
             ProductId("tohc2-paperback"),
             21,
             22.99,
+            media="paperback",
             parent_id=ProductId("tohc2"),
         ),
         Product(
@@ -594,6 +628,7 @@ def write_default_data_to_db(
             9.99,
             ["/static/images/products/tales-of-hayven-celestia-2-1.png"],
             ["TalesOfHayvenCelestia2.epub", "TalesOfHayvenCelestia2.mobi", "TalesOfHayvenCelestia2.pdf"],
+            "ebook",
             parent_id=ProductId("tohc2"),
         ),
         Product(
@@ -610,6 +645,7 @@ def write_default_data_to_db(
             6,
             13.00,
             ["/static/images/products/hayven-celestia-pin-1.png"],
+            media="jewelry",
         ),
     ]
     # We might not have permission, but this is test infrastructure

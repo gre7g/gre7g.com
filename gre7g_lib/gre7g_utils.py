@@ -114,6 +114,7 @@ class Product(Upgradeable):
     cost_per: float = 0.00
     images: list[str] = field(default_factory=list)
     downloads: list[str] = field(default_factory=list)
+    media: str = ""
     status: ProductStatus = ProductStatus.AVAILABLE
     parent_id: str | None = None
     child_ids: list[str] = field(default_factory=list)
@@ -131,6 +132,7 @@ class Product(Upgradeable):
         cost_per = value_dict["cost_per"]
         images = value_dict["images"]
         downloads = value_dict["downloads"]
+        media = value_dict["media"]
         status = value_dict["status"]
         parent_id = value_dict["parent_id"]
         child_ids = value_dict["child_ids"]
@@ -142,6 +144,7 @@ class Product(Upgradeable):
         assert isinstance(cost_per, float | Decimal)
         assert isinstance(images, list)
         assert isinstance(downloads, list)
+        assert isinstance(media, str)
         assert isinstance(status, str)
         assert isinstance(parent_id, str | None)
         assert isinstance(child_ids, list)
@@ -154,6 +157,7 @@ class Product(Upgradeable):
             float(cost_per),
             images,
             downloads,
+            media,
             ProductStatus(status),
             parent_id,
             child_ids,
@@ -170,6 +174,7 @@ class Product(Upgradeable):
             "cost_per": float(self.cost_per),
             "images": self.images,
             "downloads": self.downloads,
+            "media": self.media,
             "status": self.status.value,
             "parent_id": self.parent_id,
             "child_ids": self.child_ids,
