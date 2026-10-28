@@ -1,4 +1,4 @@
-import { G_UI } from "./main"
+import { G_UI } from "./main";
 
 export interface Product {
     name: string;

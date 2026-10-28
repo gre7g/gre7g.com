@@ -1,4 +1,4 @@
-import { G_PRODUCTS } from "./main";
+import { G_CART, G_PRODUCTS } from "./main";
 import { Product } from "./products";
 
 class ListSection {
@@ -14,10 +14,6 @@ class ListSection {
 }
 
 class ProductsUI extends ListSection {
-    constructor(section: JQuery<HTMLElement>) {
-        super(section);
-    }
-
     async update() {
         this.unordered_list.empty();
         Object.values(G_PRODUCTS.product_list).forEach((product) => {
@@ -41,7 +37,7 @@ class ProductUI {
         this.section = section;
     }
 
-    price(): string {
+    private price(): string {
         if (this.product?.child_ids.length == 0) {
             return new Intl.NumberFormat("default", {
                 style: "currency",
@@ -58,7 +54,7 @@ class ProductUI {
         }
     }
 
-    media_links(): string {
+    private media_links(): string {
         let links: string[] = [];
         Object.values(G_PRODUCTS.product_list).forEach((product) => {
             if (this.product?.child_ids.includes(product.product_id)) {
@@ -87,11 +83,25 @@ class ProductUI {
     }
 }
 
+class CartUI extends ListSection {
+    async update() {
+        this.unordered_list.empty();
+        Object.values(G_CART.contents).forEach((product) => {
+            if (!product.parent_id) {
+                const new_item = this.list_item.clone();
+                new_item.find(".product-name").text(product.name);
+                this.unordered_list.append(new_item);
+            }
+        });
+    }
+}
+
 export class UI {
     current_section = "products";
     sections = {
         products: new ProductsUI($("#products")),
         product: new ProductUI($("#product-listing")),
+        cart: new CartUI($("#cart")),
     };
 
     async show(section: string) {

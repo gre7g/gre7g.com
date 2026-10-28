@@ -2,27 +2,21 @@ import { $ } from "jquery";
 import { Amplify } from "aws-amplify";
 import { signInWithRedirect, fetchAuthSession } from "aws-amplify/auth";
 
-const PAGE_EXPIRED = 419;
 const CONFIG_URL = "/config.json";
 
-declare global {
-    /**
-     * Outputs from `sam deploy`, kept in a file at `/config.json`
-     */
-    interface SamOutputs {
-        api_endpoint: string;
-        audit_log: string;
-        carts_table_name: string;
-        cognito_host_name: string;
-        cognito_login_url: string;
-        orders_table_name: string;
-        products_table_name: string;
-        user_pool: string;
-        user_pool_client: string;
-        web_distribution: string;
-        web_file_storage: string;
-        website_url: string;
-    }
+interface SamOutputs {
+    api_endpoint: string;
+    audit_log: string;
+    carts_table_name: string;
+    cognito_host_name: string;
+    cognito_login_url: string;
+    orders_table_name: string;
+    products_table_name: string;
+    user_pool: string;
+    user_pool_client: string;
+    web_distribution: string;
+    web_file_storage: string;
+    website_url: string;
 }
 
 const response: Response = await fetch(CONFIG_URL);
@@ -59,13 +53,14 @@ export class Api {
     private async common(path: string): Promise<Record<string, any>> {
         let return_value = {
             url: path,
+            contentType: "application/json",
+            dataType: "json",
             headers: {
                 "x-csrf-token": this.csrf_token,
                 "x-guest-id": this.guest_id,
             },
-            dataType: "json",
             error: (response_headers: JQuery.jqXHR, text_status: string) => {
-                console.log(`Error: ${text_status}`);
+                throw new Error(text_status); // TODO
             },
         };
         const session = await fetchAuthSession();
@@ -76,24 +71,30 @@ export class Api {
         return return_value;
     }
 
-    async get(path: string) {
+    private async request(method: string, path: string, data?: Record<string, any>) {
         let common = await this.common(path);
+        if (data) {
+            common.data = data;
+        }
         return await $.ajax({
-            method: "GET",
+            method: method,
             statusCode: {
-                200: (data, text_status, response_headers) => {
+                200: (response, text_status, response_headers) => {
                     this.csrf_token = response_headers.getResponseHeader("x-csrf-token")!;
-                    return data;
+                    return response;
                 },
                 419: async (response_headers) => {
                     // 419 indicates that the CSRF token is invalid or expired, so let's update and try again
                     this.csrf_token = response_headers.getResponseHeader("x-csrf-token")!;
-                    let common = await this.common(path);
+                    common = await this.common(path);
+                    if (data) {
+                        common.data = data;
+                    }
                     return await $.ajax({
                         method: "GET",
-                        success: (data) => {
+                        success: (response) => {
                             this.csrf_token = response_headers.getResponseHeader("x-csrf-token")!;
-                            return data;
+                            return response;
                         },
                         ...common,
                     });
@@ -101,5 +102,21 @@ export class Api {
             },
             ...common,
         });
+    }
+
+    async get(path: string) {
+        return await this.request("GET", path);
+    }
+
+    async post(path: string, data: Record<string, any>) {
+        return await this.request("POST", path, data);
+    }
+
+    async put(path: string, data: Record<string, any>) {
+        return await this.request("PUT", path, data);
+    }
+
+    async delete(path: string, data: Record<string, any>) {
+        return await this.request("DELETE", path, data);
     }
 }
