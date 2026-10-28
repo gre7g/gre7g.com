@@ -24,16 +24,16 @@ def write_default_data_to_db(
             </p>
             <p>SciFi / Action</p>
             """,
-            "books/skeleton-crew",
+            "/books/skeleton-crew",
             ProductId("kc1"),
             images=["/static/images/products/skeleton-crew-1.png"],
-            media="paperback, ebook, audio",
+            media="paperback, ebook, audiobook",
             child_ids=[ProductId("kc1-paperback"), ProductId("kc1-ebook"), ProductId("kc1-audiobook")],
         ),
         Product(
             "Skeleton Crew − paperback",
             "<p>220 pages, Illustrated</p>",
-            "books/skeleton-crew/paperback",
+            "/books/skeleton-crew/paperback",
             ProductId("kc1-paperback"),
             9,
             13.99,
@@ -52,7 +52,7 @@ def write_default_data_to_db(
                 <li>.pdf format</li>
             </ul>
             """,
-            "books/skeleton-crew/ebook",
+            "/books/skeleton-crew/ebook",
             ProductId("kc1-ebook"),
             -1,
             4.99,
@@ -68,13 +68,13 @@ def write_default_data_to_db(
             <p>Voiced by the amazing Piers Ryman</p>
             <p>Digital download is a .zip of DRM-free .mp3 files</p>
             """,
-            "books/skeleton-crew/audiobook",
+            "/books/skeleton-crew/audiobook",
             ProductId("kc1-audiobook"),
             -1,
             16.11,
             ["/static/images/products/skeleton-crew-1.png"],
             ["KC1SkeletonCrew.zip"],
-            "audio",
+            "audiobook",
             parent_id=ProductId("kc1"),
         ),
         Product(
@@ -92,16 +92,16 @@ def write_default_data_to_db(
             </p>
             <p>SciFi / Action</p>
             """,
-            "books/small-world",
+            "/books/small-world",
             ProductId("kc2"),
             images=["/static/images/products/small-world-1.png"],
-            media="paperback, ebook, audio",
+            media="paperback, ebook, audiobook",
             child_ids=[ProductId("kc2-paperback"), ProductId("kc2-ebook"), ProductId("kc2-audiobook")],
         ),
         Product(
             "Small World − paperback",
             "<p>300 pages, Illustrated</p>",
-            "books/small-world/paperback",
+            "/books/small-world/paperback",
             ProductId("kc2-paperback"),
             3,
             15.99,
@@ -120,7 +120,7 @@ def write_default_data_to_db(
                 <li>.pdf format</li>
             </ul>
             """,
-            "books/small-world/ebook",
+            "/books/small-world/ebook",
             ProductId("kc2-ebook"),
             -1,
             5.99,
@@ -136,13 +136,13 @@ def write_default_data_to_db(
             <p>Voiced by the amazing Piers Ryman</p>
             <p>Digital download is a .zip of DRM-free .mp3 files</p>
             """,
-            "books/small-world/audiobook",
+            "/books/small-world/audiobook",
             ProductId("kc2-audiobook"),
             -1,
             17.40,
             ["/static/images/products/small-world-1.png"],
             ["KC2SmallWorld.zip"],
-            "audio",
+            "audiobook",
             parent_id=ProductId("kc2"),
         ),
         Product(
@@ -163,16 +163,16 @@ def write_default_data_to_db(
             </p>
             <p>SciFi / Action</p>
             """,
-            "books/fair-trade",
+            "/books/fair-trade",
             ProductId("kc3"),
             images=["/static/images/products/fair-trade-1.png"],
-            media="paperback, ebook, audio",
+            media="paperback, ebook, audiobook",
             child_ids=[ProductId("kc3-paperback"), ProductId("kc3-ebook"), ProductId("kc3-audiobook")],
         ),
         Product(
             "Fair Trade − paperback",
             "<p>334 pages, Illustrated</p>",
-            "books/fair-trade/paperback",
+            "/books/fair-trade/paperback",
             ProductId("kc3-paperback"),
             5,
             17.99,
@@ -191,7 +191,7 @@ def write_default_data_to_db(
                 <li>.pdf format</li>
             </ul>
             """,
-            "books/fair-trade/ebook",
+            "/books/fair-trade/ebook",
             ProductId("kc3-ebook"),
             -1,
             6.99,
@@ -207,13 +207,13 @@ def write_default_data_to_db(
             <p>Voiced by the amazing Piers Ryman</p>
             <p>Digital download is a .zip of DRM-free .mp3 files</p>
             """,
-            "books/fair-trade/audiobook",
+            "/books/fair-trade/audiobook",
             ProductId("kc3-audiobook"),
             -1,
             21.83,
             ["/static/images/products/fair-trade-1.png"],
             ["KC3FairTrade.zip"],
-            "audio",
+            "audiobook",
             parent_id=ProductId("kc3"),
         ),
         Product(
@@ -236,16 +236,16 @@ def write_default_data_to_db(
             </p>
             <p>SciFi / Intrigue</p>
             """,
-            "books/nobody-left-behind",
+            "/books/nobody-left-behind",
             ProductId("kc3.5"),
             images=["/static/images/products/nobody-left-behind-1.png"],
-            media="paperback, ebook, audio",
+            media="paperback, ebook, audiobook",
             child_ids=[ProductId("kc3.5-paperback"), ProductId("kc3.5-ebook"), ProductId("kc3.5-audiobook")],
         ),
         Product(
             "Nobody Left Behind − paperback",
             "<p>228 pages, Illustrated</p>",
-            "books/nobody-left-behind/paperback",
+            "/books/nobody-left-behind/paperback",
             ProductId("kc3.5-paperback"),
             46,
             19.99,
@@ -264,7 +264,7 @@ def write_default_data_to_db(
                 <li>.pdf format</li>
             </ul>
             """,
-            "books/nobody-left-behind/ebook",
+            "/books/nobody-left-behind/ebook",
             ProductId("kc3.5-ebook"),
             -1,
             9.99,
@@ -280,13 +280,13 @@ def write_default_data_to_db(
             <p>Voiced by the amazing Piers Ryman</p>
             <p>Digital download is a .zip of DRM-free .mp3 files</p>
             """,
-            "books/nobody-left-behind/audiobook",
+            "/books/nobody-left-behind/audiobook",
             ProductId("kc3.5-audiobook"),
             -1,
             99.99,
             ["/static/images/products/nobody-left-behind-1.png"],
             ["KC3.5NobodyLeftBehind.zip"],
-            "audio",
+            "audiobook",
             parent_id=ProductId("kc3.5"),
         ),
         Product(
@@ -309,16 +309,16 @@ def write_default_data_to_db(
             </p>
             <p>SciFi / Mystery</p>
             """,
-            "books/reapers-lottery",
+            "/books/reapers-lottery",
             ProductId("tm1"),
             images=["/static/images/products/reapers-lottery-1.png"],
-            media="paperback, ebook, audio",
+            media="paperback, ebook, audiobook",
             child_ids=[ProductId("tm1-paperback"), ProductId("tm1-ebook"), ProductId("tm1-audiobook")],
         ),
         Product(
             "Reaper's Lottery − paperback",
             "<p>432 pages, Illustrated</p>",
-            "books/reapers-lottery/paperback",
+            "/books/reapers-lottery/paperback",
             ProductId("tm1-paperback"),
             9,
             16.99,
@@ -337,7 +337,7 @@ def write_default_data_to_db(
                 <li>.pdf format</li>
             </ul>
             """,
-            "books/reapers-lottery/ebook",
+            "/books/reapers-lottery/ebook",
             ProductId("tm1-ebook"),
             -1,
             7.99,
@@ -353,13 +353,13 @@ def write_default_data_to_db(
             <p>Voiced by the amazing Piers Ryman</p>
             <p>Digital download is a .zip of DRM-free .mp3 files</p>
             """,
-            "books/reapers-lottery/audiobook",
+            "/books/reapers-lottery/audiobook",
             ProductId("tm1-audiobook"),
             -1,
             20.62,
             ["/static/images/products/reapers-lottery-1.png"],
             ["TM1ReapersLottery.zip"],
-            "audio",
+            "audiobook",
             parent_id=ProductId("tm1"),
         ),
         Product(
@@ -381,16 +381,16 @@ def write_default_data_to_db(
             </p>
             <p>SciFi / Mystery</p>
             """,
-            "books/executioners-gambit",
+            "/books/executioners-gambit",
             ProductId("tm2"),
             images=["/static/images/products/executioners-gambit-1.png"],
-            media="paperback, ebook, audio",
+            media="paperback, ebook, audiobook",
             child_ids=[ProductId("tm2-paperback"), ProductId("tm2-ebook"), ProductId("tm2-audiobook")],
         ),
         Product(
             "Executioner's Gambit − paperback",
             "<p>493 pages, Illustrated</p>",
-            "books/executioners-gambit/paperback",
+            "/books/executioners-gambit/paperback",
             ProductId("tm2-paperback"),
             11,
             22.99,
@@ -409,7 +409,7 @@ def write_default_data_to_db(
                 <li>.pdf format</li>
             </ul>
             """,
-            "books/executioners-gambit/ebook",
+            "/books/executioners-gambit/ebook",
             ProductId("tm2-ebook"),
             -1,
             9.99,
@@ -425,13 +425,13 @@ def write_default_data_to_db(
             <p>Voiced by the amazing Piers Ryman</p>
             <p>Digital download is a .zip of DRM-free .mp3 files</p>
             """,
-            "books/executioners-gambit/audiobook",
+            "/books/executioners-gambit/audiobook",
             ProductId("tm2-audiobook"),
             -1,
             23.39,
             ["/static/images/products/executioners-gambit-1.png"],
             ["TM2ExecutionersGambit.zip"],
-            "audio",
+            "audiobook",
             parent_id=ProductId("tm2"),
         ),
         Product(
@@ -451,16 +451,16 @@ def write_default_data_to_db(
                 ● M/F ● M/M ● Group Sex ●
             </p>
             """,
-            "books/long-way-home",
+            "/books/long-way-home",
             ProductId("lwh"),
             images=["/static/images/products/long-way-home-1.png"],
-            media="paperback, ebook, audio",
+            media="paperback, ebook, audiobook",
             child_ids=[ProductId("lwh-paperback"), ProductId("lwh-ebook"), ProductId("lwh-audiobook")],
         ),
         Product(
             "Long Way Home − paperback",
             "<p>292 pages, Explicit Illustrations</p>",
-            "books/long-way-home/paperback",
+            "/books/long-way-home/paperback",
             ProductId("lwh-paperback"),
             83,
             18.49,
@@ -479,7 +479,7 @@ def write_default_data_to_db(
                 <li>.pdf format</li>
             </ul>
             """,
-            "books/long-way-home/ebook",
+            "/books/long-way-home/ebook",
             ProductId("lwh-ebook"),
             -1,
             8.99,
@@ -495,13 +495,13 @@ def write_default_data_to_db(
             <p>Voiced by the amazing Piers Ryman</p>
             <p>Digital download is a .zip of DRM-free .mp3 files</p>
             """,
-            "books/long-way-home/audiobook",
+            "/books/long-way-home/audiobook",
             ProductId("lwh-audiobook"),
             -1,
             18.83,
             ["/static/images/products/long-way-home-1.png"],
             ["LongWayHome.zip"],
-            "audio",
+            "audiobook",
             parent_id=ProductId("lwh"),
         ),
         Product(
@@ -530,16 +530,16 @@ def write_default_data_to_db(
                 SciFi / Short Stories
             </p>
             """,
-            "books/tales-of-hayven-celestia-1",
+            "/books/tales-of-hayven-celestia-1",
             ProductId("tohc1"),
             images=["/static/images/products/tales-of-hayven-celestia-1-1.png"],
-            media="paperback, ebook, audio",
+            media="paperback, ebook, audiobook",
             child_ids=[ProductId("tohc1-paperback"), ProductId("tohc1-ebook"), ProductId("tohc1-audiobook")],
         ),
         Product(
             "Tales of Hayven Celestia 1 − paperback",
             "<p>419 pages, Illustrated</p>",
-            "books/tales-of-hayven-celestia-1/paperback",
+            "/books/tales-of-hayven-celestia-1/paperback",
             ProductId("tohc1-paperback"),
             12,
             18.95,
@@ -558,7 +558,7 @@ def write_default_data_to_db(
                 <li>.pdf format</li>
             </ul>
             """,
-            "books/tales-of-hayven-celestia-1/ebook",
+            "/books/tales-of-hayven-celestia-1/ebook",
             ProductId("tohc1-ebook"),
             -1,
             8.99,
@@ -574,13 +574,13 @@ def write_default_data_to_db(
             <p>Voiced by the amazing Piers Ryman</p>
             <p>Digital download is a .zip of DRM-free .mp3 files</p>
             """,
-            "books/tales-of-hayven-celestia-1/audiobook",
+            "/books/tales-of-hayven-celestia-1/audiobook",
             ProductId("tohc1-audiobook"),
             -1,
             27.77,
             ["/static/images/products/tales-of-hayven-celestia-1-1.png"],
             ["TalesOfHayvenCelestia1.zip"],
-            "audio",
+            "audiobook",
             parent_id=ProductId("tohc1"),
         ),
         Product(
@@ -595,7 +595,7 @@ def write_default_data_to_db(
                 SciFi / Short Stories
             </p>
             """,
-            "books/tales-of-hayven-celestia-2",
+            "/books/tales-of-hayven-celestia-2",
             ProductId("tohc2"),
             images=["/static/images/products/tales-of-hayven-celestia-2-1.png"],
             media="paperback, ebook",
@@ -604,7 +604,7 @@ def write_default_data_to_db(
         Product(
             "Tales of Hayven Celestia 2 − paperback",
             "<p>353 pages, Illustrated</p>",
-            "books/tales-of-hayven-celestia-2/paperback",
+            "/books/tales-of-hayven-celestia-2/paperback",
             ProductId("tohc2-paperback"),
             21,
             22.99,
@@ -622,7 +622,7 @@ def write_default_data_to_db(
                 <li>.pdf format</li>
             </ul>
             """,
-            "books/tales-of-hayven-celestia-2/ebook",
+            "/books/tales-of-hayven-celestia-2/ebook",
             ProductId("tohc2-ebook"),
             -1,
             9.99,
@@ -640,7 +640,7 @@ def write_default_data_to_db(
                 grids glitters in the light as you move!
             </p>
             """,
-            "apparel/hayven-celestia-pin",
+            "/apparel/hayven-celestia-pin",
             ProductId("hc-pin"),
             6,
             13.00,

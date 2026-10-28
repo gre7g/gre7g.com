@@ -1,7 +1,7 @@
 import { $ } from "jquery";
 import { Api } from "./api";
 import { Navigator } from "./navigation";
-import { Products } from "./products";
+import { Products, Product } from "./products";
 import { UI } from "./ui";
 
 export let G_API: Api;
@@ -19,11 +19,27 @@ export class Main {
         G_NAVIGATOR = new Navigator();
         G_PRODUCTS = new Products();
         const response = await G_API.get("/api/v1/products");
-        G_PRODUCTS.product_list = response.products;
-        await G_NAVIGATOR.update(window.location.pathname);
+        console.log(response.products);
+        G_PRODUCTS.product_list = Object.fromEntries(
+            response.products.map((product: Product) => [product.listing_path, product]),
+        );
+        console.log(G_PRODUCTS);
+        await G_NAVIGATOR.go(window.location.pathname);
+
+        $(window).on("popstate", async () => {
+            await G_NAVIGATOR.go(window.location.pathname);
+        });
+        $("a.internal").on("click", async (event) => {
+            event.preventDefault();
+            const href = $(event.currentTarget).attr("href");
+            history.pushState(null, "", href);
+            await G_NAVIGATOR.go(href!);
+        });
+        $("#add-to-cart").on("click", async (event) => {
+            // await TODO
+        });
 
         // TODO
-        $("#test").on("click", async () => {
-        });
+        $("#test").on("click", async () => {});
     }
 }

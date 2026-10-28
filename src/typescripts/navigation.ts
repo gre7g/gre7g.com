@@ -1,7 +1,7 @@
 import { G_PRODUCTS, G_UI } from "./main";
 
 export class Navigator {
-    async update(path: string): Promise<void> {
+    async go(path: string): Promise<void> {
         if (path == "/shop") {
             console.log("Show shop"); // TODO
         } else if (path == "/appearances") {
@@ -23,8 +23,7 @@ export class Navigator {
         } else if (G_PRODUCTS.has_path(path)) {
             await G_PRODUCTS.show_path(path);
         } else {
-            G_UI.products.section.show();
-            await G_UI.products.update();
+            await G_UI.show("products");
         }
     }
 }

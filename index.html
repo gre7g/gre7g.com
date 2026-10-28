@@ -13,35 +13,35 @@
         <header>
             <nav>
                 <ul id="nav-bar">
-                    <li id="home_link"><a href="/">Gre7g Luterman</a></li>
+                    <li id="home_link"><a href="/" class="internal">Gre7g Luterman</a></li>
                     <li>
                         <span>Books</span>
                         <ul class="drop-down" style="display: none">
-                            <li><a href="/books/skeleton-crew">Skeleton Crew</a></li>
-                            <li><a href="/books/small-world">Small World</a></li>
-                            <li><a href="/books/fair-trade">Fair Trade</a></li>
-                            <li><a href="/books/nobody-left-behind">Nobody Left Behind</a></li>
+                            <li><a href="/books/skeleton-crew" class="internal">Skeleton Crew</a></li>
+                            <li><a href="/books/small-world" class="internal">Small World</a></li>
+                            <li><a href="/books/fair-trade" class="internal">Fair Trade</a></li>
+                            <li><a href="/books/nobody-left-behind" class="internal">Nobody Left Behind</a></li>
                             <li class="divider"></li>
-                            <li><a href="/books/reapers-lottery">Reaper's Lottery</a></li>
-                            <li><a href="/books/executioners-gambit">Executioner's Gambit</a></li>
+                            <li><a href="/books/reapers-lottery" class="internal">Reaper's Lottery</a></li>
+                            <li><a href="/books/executioners-gambit" class="internal">Executioner's Gambit</a></li>
                             <li class="divider"></li>
-                            <li><a href="/books/long-way-home">Long Way Home</a></li>
+                            <li><a href="/books/long-way-home" class="internal">Long Way Home</a></li>
                             <li class="divider"></li>
-                            <li><a href="/books/tales-of-hayven-celestia-1">Tales of Hayven Celestia 1</a></li>
-                            <li><a href="/books/tales-of-hayven-celestia-2">Tales of Hayven Celestia 2</a></li>
+                            <li><a href="/books/tales-of-hayven-celestia-1" class="internal">Tales of Hayven Celestia 1</a></li>
+                            <li><a href="/books/tales-of-hayven-celestia-2" class="internal">Tales of Hayven Celestia 2</a></li>
                         </ul>
                     </li>
                     <li>
-                        <a href="/shop"><span>Shop</span></a>
+                        <a href="/shop" class="internal"><span>Shop</span></a>
                     </li>
                     <li>
-                        <a href="/appearances"><span>Appearances</span></a>
+                        <a href="/appearances" class="internal"><span>Appearances</span></a>
                     </li>
                     <li>
-                        <a href="/contact"><span>Contact</span></a>
+                        <a href="/contact" class="internal"><span>Contact</span></a>
                     </li>
                     <li>
-                        <a href="/about"><span>About</span></a>
+                        <a href="/about" class="internal"><span>About</span></a>
                     </li>
                 </ul>
                 <ul id="socials">
@@ -85,17 +85,17 @@
                     </li>
                     <li id="profile">
                         <ul class="drop-down" style="display: none">
-                            <li><a href="/user/profile">user profile</a></li>
-                            <li><a href="/user/logout">logout</a></li>
+                            <li><a href="/user/profile" class="internal">user profile</a></li>
+                            <li><a href="/user/logout" class="internal">logout</a></li>
                         </ul>
                     </li>
-                    <li id="cart_button"><a href="/cart">cart</a></li>
+                    <li id="cart_button"><a href="/cart" class="internal">cart</a></li>
                 </ul>
             </nav>
         </header>
 
         <main>
-            <div id="appearances" style="display: none">
+            <section id="appearances" style="display: none">
                 <article>
                     <h1>Motor City Furry Con</h1>
                     <img src="/static/images/mcfc27.png" alt="Motor City Furry Con 2027" />
@@ -105,7 +105,7 @@
                         from March 19th-21st. Stop by pick up some merch from the booth!
                     </p>
                 </article>
-            </div>
+            </section>
 
             <form id="contact" style="display: none">
                 <div>
@@ -124,7 +124,7 @@
                 <div><button>Submit</button></div>
             </form>
 
-            <article id="about" style="display: none">
+            <article id="/about" class="internal" style="display: none">
                 <h1>Gre7g Luterman</h1>
                 <img src="/static/images/gre7g.jpg" alt="Gre7g Luterman" />
                 <p>
@@ -138,37 +138,52 @@
                 <p>Creating is what makes us human.</p>
             </article>
 
-            <div id="cart" style="display: none">
+            <section id="cart" style="display: none">
                 <h1>Shopping Cart</h1>
                 <ul>
                     <li><span class="product-name"></span></li>
                 </ul>
-            </div>
+            </section>
 
-            <div id="products">
+            <section id="products">
                 <h1>Products</h1>
                 <ul>
                     <li>
-                        <a>
+                        <a class="internal">
                             <img />
                             <span class="product-name"></span>
                         </a>
                         <div class="media"></div>
                     </li>
                 </ul>
-            </div>
+            </section>
 
-            <div id="product-listing" style="display: none"></div>
+            <section id="product-listing" style="display: none">
+                <div id="carousel">
+                    <img id="example" />
+                    <div id="views"></div>
+                </div>
+                <div class="product-name"></div>
+                <button id="add-to-cart">Add to Cart</button>
+                <div id="price"></div>
+                <div class="description"></div>
+                <div class="media">
+                    Available in: <span></span>
+                </div>
+                <div class="external">
+                    Also available from: <span></span>
+                </div>
+            </section>
 
-            <div id="look-inside" style="display: none"></div>
+            <section id="look-inside" style="display: none"></section>
         </main>
 
         <footer>
             <nav>
                 <ul id="minor_nav">
                     <li class="copyright">&copy;2027 Gre7g Luterman</li>
-                    <li><a href="/privacy">Privacy Policy</a></li>
-                    <li><a href="/sitemap">Sitemap</a></li>
+                    <li><a href="/privacy" class="internal">Privacy Policy</a></li>
+                    <li><a href="/sitemap" class="internal">Sitemap</a></li>
                 </ul>
             </nav>
         </footer>
