@@ -19,7 +19,6 @@ export class Products {
     product_list: Record<string, Product> = {};
 
     has_path(path: string): boolean {
-        console.log(path, path in this.product_list);
         return path in this.product_list;
     }
 

@@ -76,7 +76,7 @@ class ProductUI {
         this.section.find(".product-name").text(this.product?.name!);
         this.section.find(".description").html(this.product?.description!);
         const media = this.media_links();
-        $("#add-to-cart").toggle(media != "");
+        $("#add-to-cart").toggle(media == "");
         const media_element = this.section.find(".media");
         media_element.toggle(media != "");
         media_element.find("span").html(media);
@@ -87,11 +87,9 @@ class CartUI extends ListSection {
     async update() {
         this.unordered_list.empty();
         Object.values(G_CART.contents).forEach((product) => {
-            if (!product.parent_id) {
-                const new_item = this.list_item.clone();
-                new_item.find(".product-name").text(product.name);
-                this.unordered_list.append(new_item);
-            }
+            const new_item = this.list_item.clone();
+            new_item.find(".product-name").text(product.name);
+            this.unordered_list.append(new_item);
         });
     }
 }

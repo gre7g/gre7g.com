@@ -74,7 +74,7 @@ export class Api {
     private async request(method: string, path: string, data?: Record<string, any>) {
         let common = await this.common(path);
         if (data) {
-            common.data = data;
+            common.data = JSON.stringify(data);
         }
         return await $.ajax({
             method: method,

@@ -15,7 +15,7 @@ export class Navigator {
         } else if (path == "/user/logout") {
             console.log("Log the user out"); // TODO
         } else if (path == "/cart") {
-            console.log("Show the shopping cart"); // TODO
+            await G_UI.show("cart");
         } else if (path == "/privacy") {
             console.log("Show privacy policy"); // TODO
         } else if (path == "/sitemap") {
