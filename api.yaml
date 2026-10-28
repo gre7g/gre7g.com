@@ -181,6 +181,29 @@ paths:
         "500":
           $ref: "#/components/responses/500-internal-server-error"
 
+  /api/v1/cart/shipping:
+    post:
+      summary: Calculate shipping
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/empty"
+      responses:
+        "200":
+          description: Successful calculation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shipping_cost:
+                    type: number
+                additionalProperties: false
+                required:
+                  - shipping_cost
+
   /api/v1/click_id:
     post:
       summary: Log a click_id

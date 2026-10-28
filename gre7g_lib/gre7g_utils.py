@@ -36,6 +36,7 @@ SIGN_ALGORITHMS = ["RS256", "RS384", "RS512", "ES256", "ES384", "ES512"]
 CSRF_LIFETIME = 300  # 5 minutes
 CSRF_HEADER = "x-csrf-token"
 PAGE_EXPIRED = 419
+PHYSICAL_SHIPPING = 5.99  # $5.99 for shipping paperbacks and jewelry in the US
 
 
 def currency(value: float) -> Decimal:
@@ -498,3 +499,11 @@ class LambdaBase(ABC):
             Key=f"custom/{now.strftime('%Y-%m')}/{uuid1().hex}.json",
             Body=json.dumps(data | kwargs),
         )
+
+    def calc_shipping(self, cart: Cart):
+        """Calculate shipping costs on the given cart"""
+        shipping_cost = 0.00
+        for product in cart.products:
+            if product.media in ["paperback", "jewelry"]:
+                shipping_cost = max(shipping_cost, PHYSICAL_SHIPPING)
+        return shipping_cost

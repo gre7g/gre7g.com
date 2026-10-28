@@ -9,7 +9,6 @@
         <title>Gre7g's Bookshop</title>
     </head>
     <body>
-        <button id="test">Test</button>
         <header>
             <nav>
                 <ul id="nav-bar">
@@ -35,13 +34,13 @@
                         <a href="/shop" class="internal"><span>Shop</span></a>
                     </li>
                     <li>
-                        <a href="/appearances" class="internal"><span>Appearances</span></a>
+                        <a href="/gre7g/appearances" class="internal"><span>Appearances</span></a>
                     </li>
                     <li>
-                        <a href="/contact" class="internal"><span>Contact</span></a>
+                        <a href="/gre7g/contact" class="internal"><span>Contact</span></a>
                     </li>
                     <li>
-                        <a href="/about" class="internal"><span>About</span></a>
+                        <a href="/gre7g/about" class="internal"><span>About</span></a>
                     </li>
                 </ul>
                 <ul id="socials">
@@ -124,7 +123,7 @@
                 <div><button>Submit</button></div>
             </form>
 
-            <article id="/about" class="internal" style="display: none">
+            <article id="/gre7g/about" class="internal" style="display: none">
                 <h1>Gre7g Luterman</h1>
                 <img src="/static/images/gre7g.jpg" alt="Gre7g Luterman" />
                 <p>
@@ -143,6 +142,17 @@
                 <ul>
                     <li><span class="product-name"></span></li>
                 </ul>
+                <button id="checkout-button">Checkout</button>
+            </section>
+
+            <section id="checkout" style="display: none">
+                <h1>Checkout</h1>
+                <ul>
+                    <li><span class="product-name"></span></li>
+                </ul>
+                <div id="subtotal">Subtotal: <span></span></div>
+                <div id="shipping">Shipping: <span></span></div>
+                <div id="total">Total: <span></span></div>
             </section>
 
             <section id="products">

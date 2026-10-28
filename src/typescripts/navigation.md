@@ -16,9 +16,9 @@ Paths:
 
   Generally the same a / but with less about information
 
-- /appearances
-- /contact
-- /about
+- /gre7g/appearances
+- /gre7g/contact
+- /gre7g/about
 - /user/profile
 - /user/logout
 - /cart

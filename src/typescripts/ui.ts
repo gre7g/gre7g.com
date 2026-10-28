@@ -1,4 +1,4 @@
-import { G_CART, G_PRODUCTS } from "./main";
+import { G_API, G_CART, G_PRODUCTS } from "./main";
 import { Product } from "./products";
 
 class ListSection {
@@ -94,12 +94,51 @@ class CartUI extends ListSection {
     }
 }
 
+export class CheckoutUI extends CartUI {
+    override async update() {
+        await super.update();
+
+        // Calculate subtotal
+        let subtotal = 0.0;
+        G_CART.contents.forEach((product) => {
+            subtotal += product.quantity * product.cost_per;
+            console.log(subtotal);
+        });
+        let currency = new Intl.NumberFormat("default", {
+            style: "currency",
+            currency: "USD",
+        }).format(subtotal);
+        console.log(currency);
+        this.section.find(".subtotal span").text(currency);
+
+        // Get shipping
+        const response = await G_API.post("/api/v1/cart/shipping", {});
+        currency = new Intl.NumberFormat("default", {
+            style: "currency",
+            currency: "USD",
+        }).format(response?.shipping_cost);
+        console.log(currency);
+        this.section.find(".shipping span").text(currency);
+
+        // Calculate total
+        const total = subtotal + response?.shipping_cost;
+        console.log(total);
+        currency = new Intl.NumberFormat("default", {
+            style: "currency",
+            currency: "USD",
+        }).format(total);
+        console.log(currency);
+        this.section.find(".total span").text(currency);
+    }
+}
+
 export class UI {
     current_section = "products";
     sections = {
         products: new ProductsUI($("#products")),
         product: new ProductUI($("#product-listing")),
         cart: new CartUI($("#cart")),
+        checkout: new CheckoutUI($("#checkout")),
     };
 
     async show(section: string) {

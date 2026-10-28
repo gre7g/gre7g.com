@@ -232,6 +232,31 @@ Resources:
             Method: post
             ApiId: !Ref Api
 
+  CalculateShippingFunction:
+    Type: AWS::Serverless::Function
+    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-calculate-shipping
+      CodeUri: src/api
+      Handler: calculate_shipping.lambda_handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref CartsTable
+      Environment:
+        Variables:
+          JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
+          SECRET_KEY: !Ref SecretKey
+      Layers:
+        - !Ref Lib
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /api/v1/cart/shipping
+            Method: post
+            ApiId: !Ref Api
+
   LogAuditEventFunction:
     Type: AWS::Serverless::Function
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]

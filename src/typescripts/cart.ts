@@ -32,7 +32,9 @@ export class Cart {
             })
         ) {
             // Didn't find item, so add it
-            this.contents.push(product);
+            const copy = {...product};
+            copy.quantity = 1;
+            this.contents.push(copy);
         }
 
         // Save the cart

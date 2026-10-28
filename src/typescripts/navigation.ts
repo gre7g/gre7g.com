@@ -4,11 +4,11 @@ export class Navigator {
     async go(path: string): Promise<void> {
         if (path == "/shop") {
             console.log("Show shop"); // TODO
-        } else if (path == "/appearances") {
+        } else if (path == "/gre7g/appearances") {
             console.log("Show appearances"); // TODO
-        } else if (path == "/contact") {
+        } else if (path == "/gre7g/contact") {
             console.log("Show contact form"); // TODO
-        } else if (path == "/about") {
+        } else if (path == "/gre7g/about") {
             console.log("Show about the author"); // TODO
         } else if (path == "/user/profile") {
             console.log("Show user profile"); // TODO
@@ -16,6 +16,8 @@ export class Navigator {
             console.log("Log the user out"); // TODO
         } else if (path == "/cart") {
             await G_UI.show("cart");
+        } else if (path == "/cart/checkout") {
+            await G_UI.show("checkout");
         } else if (path == "/privacy") {
             console.log("Show privacy policy"); // TODO
         } else if (path == "/sitemap") {
