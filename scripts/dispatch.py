@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import re
+from secrets import token_hex
 from shutil import which
 from subprocess import Popen, PIPE, check_output, check_call
 import sys
@@ -221,7 +222,7 @@ class Dispatch:
                 "--stack-name",
                 self.stack_name,
                 "--parameter-overrides",
-                f"EnableDeletionProtection={production}",
+                f"EnableDeletionProtection={production},SecretKey={token_hex()}",
             ]
         )
         self.describe()

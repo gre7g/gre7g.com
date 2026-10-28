@@ -2,6 +2,9 @@ AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
+  SecretKey:
+    Type: String
+
   EnableDeletionProtection:
     Type: String
     Default: "false"
@@ -22,11 +25,18 @@ Globals:
       - !Sub arn:aws:lambda:${AWS::Region}:017000801446:layer:AWSLambdaPowertoolsPythonV2:68
 
 Resources:
-  SecretKey:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: !Sub ${AWS::StackName}-secret-key
-      Description: Secret key for CSRF HMAC
+# Regretfully, I'm removing my reliance on AWS SecretsManager. This is a good module, and I'm sure if I needed it, then
+# it would be well worth the charges. I doubt I could live without it. But the simple fact is that I don't need this.
+# I'm only using it to create a secret for the CSRF validation which prevents a low-risk attack on low-value data on a
+# low-value website. This module is racking up a lot of charges, and its value to me just doesn't justify the expense.
+# So, I'm replacing the SecretsManager with generating a secret in my dispatch.py script and passing it in as a
+# parameter. I'll leave some of the SecretManager stuff in and comment it out in case I ever want to find this again.
+#
+#  SecretKey:
+#    Type: AWS::SecretsManager::Secret
+#    Properties:
+#      Name: !Sub ${AWS::StackName}-secret-key
+#      Description: Secret key for CSRF HMAC
 
   UserPool:
     Type: AWS::Cognito::UserPool
@@ -52,7 +62,7 @@ Resources:
     Properties:
       ClientName: !Sub ${AWS::StackName}-user-pool-client
       UserPoolId: !Ref UserPool
-      GenerateSecret: false
+#      GenerateSecret: false
       ExplicitAuthFlows:
         - ALLOW_USER_PASSWORD_AUTH
         - ALLOW_REFRESH_TOKEN_AUTH
@@ -159,6 +169,7 @@ Resources:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           CARTS_TABLE: !Ref CartsTable
+          SECRET_KEY: !Ref SecretKey
       Layers:
         - !Ref Lib
       Events:
@@ -171,7 +182,7 @@ Resources:
 
   CartUpdateFunction:
     Type: AWS::Serverless::Function
-    DependsOn: SecretKey
+#    DependsOn: SecretKey
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
@@ -181,13 +192,14 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref CartsTable
-        - AWSSecretsManagerGetSecretValuePolicy:
-            SecretArn: !Ref SecretKey
+#        - AWSSecretsManagerGetSecretValuePolicy:
+#            SecretArn: !Ref SecretKey
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           CARTS_TABLE: !Ref CartsTable
-          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}}}"
+          SECRET_KEY: !Ref SecretKey
+#          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}}}"
       Layers:
         - !Ref Lib
       Events:
@@ -200,20 +212,16 @@ Resources:
 
   AssignOrderIdFunction:
     Type: AWS::Serverless::Function
-    DependsOn: SecretKey
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
       FunctionName: !Sub ${AWS::StackName}-assign-order-id
       CodeUri: src/api
       Handler: assign_order_id.lambda_handler
-      Policies:
-        - AWSSecretsManagerGetSecretValuePolicy:
-            SecretArn: !Ref SecretKey
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
-          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}}}"
+          SECRET_KEY: !Ref SecretKey
       Layers:
         - !Ref Lib
       Events:
@@ -226,7 +234,6 @@ Resources:
 
   LogAuditEventFunction:
     Type: AWS::Serverless::Function
-    DependsOn: SecretKey
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
@@ -237,13 +244,11 @@ Resources:
       Policies:
         - S3CrudPolicy:
             BucketName: !Ref AuditLogStorage
-        - AWSSecretsManagerGetSecretValuePolicy:
-            SecretArn: !Ref SecretKey
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           AUDIT_LOG_STORAGE: !Ref AuditLogStorage
-          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}}}"
+          SECRET_KEY: !Ref SecretKey
       Layers:
         - !Ref Lib
       Events:
@@ -271,6 +276,7 @@ Resources:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           ORDERS_TABLE: !Ref OrdersTable
+          SECRET_KEY: !Ref SecretKey
       Layers:
         - !Ref Lib
       Events:
@@ -283,20 +289,16 @@ Resources:
 
   CreateGuestFunction:
     Type: AWS::Serverless::Function
-    DependsOn: SecretKey
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
       FunctionName: !Sub ${AWS::StackName}-create-guest
       CodeUri: src/api
       Handler: create_guest.lambda_handler
-      Policies:
-        - AWSSecretsManagerGetSecretValuePolicy:
-            SecretArn: !Ref SecretKey
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
-          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}}}"
+          SECRET_KEY: !Ref SecretKey
       Layers:
         - !Ref Lib
       Events:
@@ -309,7 +311,6 @@ Resources:
 
   MergeGuestFunction:
     Type: AWS::Serverless::Function
-    DependsOn: SecretKey
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
@@ -319,13 +320,11 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref CartsTable
-        - AWSSecretsManagerGetSecretValuePolicy:
-            SecretArn: !Ref SecretKey
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           CARTS_TABLE: !Ref CartsTable
-          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}}}"
+          SECRET_KEY: !Ref SecretKey
       Layers:
         - !Ref Lib
       Events:
@@ -351,6 +350,7 @@ Resources:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           ORDERS_TABLE: !Ref OrdersTable
+          SECRET_KEY: !Ref SecretKey
       Layers:
         - !Ref Lib
       Events:
@@ -376,6 +376,7 @@ Resources:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           PRODUCTS_TABLE: !Ref ProductsTable
+          SECRET_KEY: !Ref SecretKey
       Layers:
         - !Ref Lib
       Events:
