@@ -102,14 +102,12 @@ export class CheckoutUI extends CartUI {
         let subtotal = 0.0;
         G_CART.contents.forEach((product) => {
             subtotal += product.quantity * product.cost_per;
-            console.log(subtotal);
         });
         let currency = new Intl.NumberFormat("default", {
             style: "currency",
             currency: "USD",
         }).format(subtotal);
-        console.log(currency);
-        this.section.find(".subtotal span").text(currency);
+        this.section.find("#subtotal span").text(currency);
 
         // Get shipping
         const response = await G_API.post("/api/v1/cart/shipping", {});
@@ -117,18 +115,15 @@ export class CheckoutUI extends CartUI {
             style: "currency",
             currency: "USD",
         }).format(response?.shipping_cost);
-        console.log(currency);
-        this.section.find(".shipping span").text(currency);
+        this.section.find("#shipping span").text(currency);
 
         // Calculate total
         const total = subtotal + response?.shipping_cost;
-        console.log(total);
         currency = new Intl.NumberFormat("default", {
             style: "currency",
             currency: "USD",
         }).format(total);
-        console.log(currency);
-        this.section.find(".total span").text(currency);
+        this.section.find("#total span").text(currency);
     }
 }
 
