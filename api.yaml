@@ -200,9 +200,12 @@ paths:
                 properties:
                   shipping_cost:
                     type: number
+                  user_status:
+                    type: string
                 additionalProperties: false
                 required:
                   - shipping_cost
+                  - user_status
 
   /api/v1/click_id:
     post:

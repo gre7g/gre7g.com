@@ -77,6 +77,14 @@ class AuditLogEvent(StrEnum):
     REGISTER_CLICK = auto()
 
 
+class ProductMix(StrEnum):
+    """Describes a mix of products"""
+    NONE = auto()
+    ALL_DIGITAL = auto()
+    ALL_PHYSICAL = auto()
+    MIX_OF_TYPES = auto()
+
+
 @dataclass
 class Upgradeable:
     """Base class for a table row with a version number"""
@@ -500,10 +508,13 @@ class LambdaBase(ABC):
             Body=json.dumps(data | kwargs),
         )
 
-    def calc_shipping(self, cart: Cart):
-        """Calculate shipping costs on the given cart"""
-        shipping_cost = 0.00
+    @staticmethod
+    def get_cart_mix(cart: Cart) -> ProductMix:
+        """Return what mix of items we have"""
+        mix = ProductMix.NONE
         for product in cart.products:
             if product.media in ["paperback", "jewelry"]:
-                shipping_cost = max(shipping_cost, PHYSICAL_SHIPPING)
-        return shipping_cost
+                mix = ProductMix.ALL_PHYSICAL if mix in [ProductMix.NONE, ProductMix.ALL_PHYSICAL] else ProductMix.MIX_OF_TYPES
+            else:
+                mix = ProductMix.ALL_DIGITAL if mix in [ProductMix.NONE, ProductMix.ALL_DIGITAL] else ProductMix.MIX_OF_TYPES
+        return mix

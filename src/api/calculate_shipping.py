@@ -7,7 +7,7 @@ import os
 from typing import Any
 from uuid import uuid1
 
-from gre7g_utils import LambdaBase, Cart
+from gre7g_utils import LambdaBase, Cart, PHYSICAL_SHIPPING, ProductMix
 
 # Constants:
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)
@@ -24,7 +24,15 @@ class CalculateShipping(LambdaBase):
         assert self.carts_table
 
         cart = Cart.get(self.carts_table, user_id)
-        return {"shipping_cost": self.calc_shipping(cart)}
+        mix = self.get_cart_mix(cart)
+
+        shipping_cost = PHYSICAL_SHIPPING if mix in [ProductMix.ALL_PHYSICAL, ProductMix.MIX_OF_TYPES] else 0.00
+        if user_id:
+            user_status = "logged_in"
+        else:
+            user_status = "must_log_in" if mix in [ProductMix.ALL_DIGITAL, ProductMix.MIX_OF_TYPES] else "may_log_in"
+
+        return {"shipping_cost": shipping_cost, "user_status": user_status}
 
 
 lambda_handler = CalculateShipping.lambda_handler()
