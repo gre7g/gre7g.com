@@ -16,8 +16,6 @@ export class Navigator {
             console.log("Log the user out"); // TODO
         } else if (path == "/cart") {
             await G_UI.show("cart");
-        } else if (path == "/cart/checkout") {
-            await G_UI.show("checkout");
         } else if (path == "/privacy") {
             console.log("Show privacy policy"); // TODO
         } else if (path == "/sitemap") {
