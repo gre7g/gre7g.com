@@ -16,7 +16,7 @@ class ListSection {
 class ProductsUI extends ListSection {
     async update() {
         this.unordered_list.empty();
-        Object.values(G_PRODUCTS.product_list).forEach((product) => {
+        const populate_item = (product: Product) => {
             if (!product.parent_id) {
                 const new_item = this.list_item.clone();
                 new_item.find("a").attr("href", product.listing_path);
@@ -25,7 +25,8 @@ class ProductsUI extends ListSection {
                 new_item.find(".media").text(product.media);
                 this.unordered_list.append(new_item);
             }
-        });
+        };
+        Object.values(G_PRODUCTS.product_list).forEach(populate_item);
     }
 }
 
@@ -45,22 +46,24 @@ class ProductUI {
             }).format(this.product.cost_per);
         } else {
             let min_cost = 9999.99;
-            Object.values(G_PRODUCTS.product_list).forEach((product) => {
+            const check_min = (product: Product) => {
                 if (this.product?.child_ids.includes(product.product_id) && product.cost_per < min_cost) {
                     min_cost = product.cost_per;
                 }
-            });
+            };
+            Object.values(G_PRODUCTS.product_list).forEach(check_min);
             return `from ${min_cost}`;
         }
     }
 
     private media_links(): string {
         let links: string[] = [];
-        Object.values(G_PRODUCTS.product_list).forEach((product) => {
+        const add_link = (product: Product) => {
             if (this.product?.child_ids.includes(product.product_id)) {
                 links.push(`<a href="${product.listing_path}">${product.media}</a>`);
             }
-        });
+        };
+        Object.values(G_PRODUCTS.product_list).forEach(add_link);
         const formatter = new Intl.ListFormat("en", { style: "long", type: "conjunction" });
         return formatter.format(links);
     }
@@ -69,10 +72,11 @@ class ProductUI {
         $("#example").attr("href", this.product?.images[0]!);
         $("#price").text(this.price());
         const views = $("#views");
-        this.product?.images?.forEach((path) => {
+        const add_view = (path: string) => {
             const view = $(`<img src="${path}" />`);
             views.append(view);
-        });
+        };
+        this.product?.images?.forEach(add_view);
         this.section.find(".product-name").text(this.product?.name!);
         this.section.find(".description").html(this.product?.description!);
         const media = this.media_links();
@@ -86,11 +90,12 @@ class ProductUI {
 class CartUI extends ListSection {
     async update() {
         this.unordered_list.empty();
-        Object.values(G_CART.contents).forEach((product) => {
+        const add_item = (product: Product) => {
             const new_item = this.list_item.clone();
             new_item.find(".product-name").text(product.name);
             this.unordered_list.append(new_item);
-        });
+        };
+        Object.values(G_CART.contents).forEach(add_item);
     }
 }
 
@@ -100,9 +105,10 @@ export class CheckoutUI extends CartUI {
 
         // Calculate subtotal
         let subtotal = 0.0;
-        G_CART.contents.forEach((product) => {
+        const add_item = (product: Product) => {
             subtotal += product.quantity * product.cost_per;
-        });
+        };
+        G_CART.contents.forEach(add_item);
         let currency = new Intl.NumberFormat("default", {
             style: "currency",
             currency: "USD",

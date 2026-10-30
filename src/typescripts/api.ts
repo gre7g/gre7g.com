@@ -76,32 +76,20 @@ export class Api {
         if (data) {
             common.data = JSON.stringify(data);
         }
-        return await $.ajax({
-            method: method,
-            statusCode: {
-                200: (response, text_status, response_headers) => {
-                    this.csrf_token = response_headers.getResponseHeader("x-csrf-token")!;
-                    return response;
-                },
-                419: async (response_headers) => {
-                    // 419 indicates that the CSRF token is invalid or expired, so let's update and try again
-                    this.csrf_token = response_headers.getResponseHeader("x-csrf-token")!;
-                    common = await this.common(path);
-                    if (data) {
-                        common.data = data;
-                    }
-                    return await $.ajax({
-                        method: "GET",
-                        success: (response) => {
-                            this.csrf_token = response_headers.getResponseHeader("x-csrf-token")!;
-                            return response;
-                        },
-                        ...common,
-                    });
-                },
-            },
-            ...common,
-        });
+        const success = (response, text_status, response_headers) => {
+            this.csrf_token = response_headers.getResponseHeader("x-csrf-token")!;
+            return response;
+        };
+        const page_expired = async (response_headers) => {
+                // 419 indicates that the CSRF token is invalid or expired, so let's update and try again
+                this.csrf_token = response_headers.getResponseHeader("x-csrf-token")!;
+                common = await this.common(path);
+                if (data) {
+                    common.data = data;
+                }
+                return await $.ajax({method: "GET", success: success, ...common});
+            };
+        return await $.ajax({method: method, statusCode: {200: success, 419: page_expired}, ...common});
     }
 
     async get(path: string) {

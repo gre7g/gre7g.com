@@ -28,23 +28,26 @@ export class Main {
         await G_CART.load();
         await G_NAVIGATOR.go(window.location.pathname);
 
-        $(window).on("popstate", async () => {
+        const popstate = async () => {
             await G_NAVIGATOR.go(window.location.pathname);
-        });
-        $("a.internal").on("click", async (event) => {
+        };
+        $(window).on("popstate", popstate);
+        const navigate_internal = async (event: MouseEvent) => {
             event.preventDefault();
-            const href = $(event.currentTarget).attr("href");
+            const href = $(event.currentTarget!).attr("href");
             history.pushState(null, "", href);
             await G_NAVIGATOR.go(href!);
-        });
-        $("#add-to-cart").on("click", async () => {
+        };
+        $("a.internal").on("click", navigate_internal);
+        const add_to_cart = async () => {
             if (G_UI.sections.product.product) {
                 await G_CART.add(G_UI.sections.product.product);
                 history.pushState(null, "", "/cart");
                 await G_NAVIGATOR.go("/cart");
             }
-        });
-        $("#checkout-button").on("click", async () => {
+        };
+        $("#add-to-cart").on("click", add_to_cart);
+        const checkout = async () => {
             // Note: We are setting the URL bar to /cart/checkout, but we're not decoding it. The Navigator class
             // doesn't decode that URL. Instead, we are manually advancing the view to the checkout page. Why? Because
             // having a name for this page will allow us to use the browser's back button, but bookmarking the checkout
@@ -53,6 +56,7 @@ export class Main {
             // begin the checkout process. I call this "burying the URL".
             history.pushState(null, "", "/cart/checkout");
             await G_UI.show("checkout");
-        });
+        };
+        $("#checkout-button").on("click", checkout);
     }
 }

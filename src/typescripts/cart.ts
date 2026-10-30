@@ -20,17 +20,16 @@ export class Cart {
 
     async add(product: Product) {
         // Search through the cart contents to see if we already have one
-        if (
-            !this.contents.some((item) => {
-                if (item.product_id == product.product_id) {
-                    // Found the item, so instead of adding a new entry, just increase how many are in the entry
-                    item.quantity++;
-                    return true;
-                } else {
-                    return false;
-                }
-            })
-        ) {
+        const item_is_product = (item: Product) => {
+            if (item.product_id == product.product_id) {
+                // Found the item, so instead of adding a new entry, just increase how many are in the entry
+                item.quantity++;
+                return true;
+            } else {
+                return false;
+            }
+        }
+        if (!this.contents.some(item_is_product)) {
             // Didn't find item, so add it
             const copy = {...product};
             copy.quantity = 1;
