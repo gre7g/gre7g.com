@@ -19,7 +19,7 @@ class CreateGuest(LambdaBase):
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Create a guest authorization"""
 
-        return {"auth_token": uuid1().hex}
+        return {"auth_token": str(uuid1())}
 
 
 lambda_handler = CreateGuest.lambda_handler()

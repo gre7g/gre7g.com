@@ -19,7 +19,7 @@ class AssignOrderId(LambdaBase):
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Assign order_id"""
 
-        return {"order_id": uuid1().hex}
+        return {"order_id": str(uuid1())}
 
 
 lambda_handler = AssignOrderId.lambda_handler()

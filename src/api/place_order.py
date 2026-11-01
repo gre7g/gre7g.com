@@ -78,7 +78,7 @@ class PlaceOrder(LambdaBase):
                 CheckoutPaymentIntent.CAPTURE,
                 [
                     PurchaseUnitRequest(
-                        AmountWithBreakdown(CURRENCY, total_cost, breakdown), uuid1().hex, items=item_list
+                        AmountWithBreakdown(CURRENCY, total_cost, breakdown), str(uuid1()), items=item_list
                     )
                 ],
             )

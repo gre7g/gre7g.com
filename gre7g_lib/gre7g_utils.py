@@ -26,6 +26,7 @@ from paypalserversdk.logging.configuration.api_logging_configuration import (
 from paypalserversdk.controllers.orders_controller import OrdersController
 from paypalserversdk.paypal_serversdk_client import PaypalServersdkClient
 from secrets import token_hex
+from threading import Thread
 from time import time
 from types_boto3_dynamodb.service_resource import Table as DynamoDBTable
 from typing import Any, Self, NewType, Callable
@@ -132,7 +133,7 @@ class Product(Upgradeable):
     name: str
     description: str
     listing_path: str
-    product_id: ProductId = field(default_factory=lambda: ProductId(uuid1().hex))
+    product_id: ProductId = field(default_factory=lambda: ProductId(str(uuid1())))
     quantity: int = 0
     cost_per: float = 0.00
     images: list[str] = field(default_factory=list)
@@ -280,7 +281,7 @@ class Order(Upgradeable):
     shipping_cost: float
     total_cost: float
     discount: float = 0.00
-    order_id: OrderId = field(default_factory=lambda: OrderId(uuid1().hex))
+    order_id: OrderId = field(default_factory=lambda: OrderId(str(uuid1())))
     timestamp: Timestamp = field(default_factory=lambda: Timestamp(datetime.now(UTC).isoformat()))
     notes: list[str] = field(default_factory=list)
     version: int = TABLE_VERSION
@@ -521,11 +522,16 @@ class LambdaBase(ABC):
         """Log an event to the audit log"""
         now = datetime.now(UTC)
         data = {"timestamp": now.isoformat(), "event": event.value, "user_id": self.user_id, "guest_id": self.guest_id}
-        boto3.client("s3").put_object(
-            Bucket=os.environ["AUDIT_LOG_STORAGE"],
-            Key=f"custom/{now.strftime('%Y-%m')}/{uuid1().hex}.json",
-            Body=json.dumps(data | kwargs),
+        thread = Thread(
+            target=boto3.client("s3").put_object,
+            kwargs={
+                "Bucket": os.environ["AUDIT_LOG_STORAGE"],
+                "Key": f"custom/{now.strftime('%Y-%m')}/{str(uuid1())}.json",
+                "Body": json.dumps(data | kwargs),
+            },
+            daemon=False,
         )
+        thread.start()
 
     @staticmethod
     def get_cart_mix(cart: Cart) -> ProductMix:
@@ -581,4 +587,6 @@ class LambdaBase(ABC):
         )
 
         return paypal.orders
+
+
 # TODO: put descriptions for paypal orders in db
