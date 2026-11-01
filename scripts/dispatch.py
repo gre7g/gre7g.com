@@ -214,7 +214,13 @@ class Dispatch:
     def deploy(self, dest_dict: dict) -> None:
         """Deploy the stack, update the `dest_dict`"""
         assert self.sam_path, "unable to find AWS sam"
-        production = str(self.name_set == "PROD").lower()
+        parameters = {
+            "CsrfSecretKey": token_hex(),
+            "PaypalSandbox": "False",
+            "PaypalClientId": os.getenv("LIVE_PAYPAL_CLIENT_ID"),
+            "PaypalClientSecret": os.getenv("LIVE_PAYPAL_CLIENT_SECRET"),
+            "EnableDeletionProtection": str(self.name_set == "PROD").lower(),
+        }
         self.login_call(
             [
                 self.sam_path,
@@ -222,7 +228,7 @@ class Dispatch:
                 "--stack-name",
                 self.stack_name,
                 "--parameter-overrides",
-                f"EnableDeletionProtection={production},SecretKey={token_hex()}",
+                ",".join(f"{key}={value}" for key, value in parameters.items()),
             ]
         )
         self.describe()

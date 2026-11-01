@@ -5,7 +5,6 @@ from aws_lambda_powertools.utilities.typing import LambdaContext
 import logging
 import os
 from typing import Any
-from uuid import uuid1
 
 from gre7g_utils import LambdaBase, Cart, PHYSICAL_SHIPPING, ProductMix
 

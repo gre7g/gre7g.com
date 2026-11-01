@@ -133,9 +133,11 @@ export class CheckoutUI extends CartUI {
 
         // Login status message
         const login_status = $("#login_status");
+        const place_order = $("#place_order");
         switch (response.user_status) {
             case "logged_in":
                 login_status.hide();
+                place_order.show();
                 break;
             case "may_log_in":
                 login_status.show();
@@ -143,12 +145,14 @@ export class CheckoutUI extends CartUI {
 account. Yes, I know we all hate having to make an account on every freakin’ site we visit, but having an account makes 
 things so much easier if you ever wish to access or contact me about an order. I promise not to share your address, and 
 I won't spam you.`);
+                place_order.show();
                 break;
             case "must_log_in":
                 login_status.show();
                 login_status.find("span").html(`Digital downloads <em>must</em> be tied 
 to an account. Yes, I know we all hate having to make an account on every freakin’ site we visit, but I promise not to 
 share your address, and I won't spam you.`);
+                place_order.hide();
                 break;
         }
     }

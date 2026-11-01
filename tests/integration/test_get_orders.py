@@ -12,7 +12,7 @@ LOG = logging.getLogger(__name__)
 class TestGetOrders(BaseTestCase):
     def test_no_id(self):
         """Should fail if there's no user ID"""
-        response = self.get("/api/v1/orders")
+        response = self.get("/api/v1/order")
         assert response.status_code == HTTPStatus.FORBIDDEN
 
     def test_user(self) -> None:
@@ -20,7 +20,7 @@ class TestGetOrders(BaseTestCase):
         orders, order_dict = self.order_data()
         with self.create_records([(self.orders_table, orders[0]), (self.orders_table, orders[1])]):
             response = self.get(
-                "/api/v1/orders",
+                "/api/v1/order",
                 auth_user=self.regular_user,
             )
             assert response.status_code == HTTPStatus.OK

@@ -2,7 +2,16 @@ AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
-  SecretKey:
+  CsrfSecretKey:
+    Type: String
+
+  PaypalSandbox:
+    Type: String
+
+  PaypalClientId:
+    Type: String
+
+  PaypalClientSecret:
     Type: String
 
   EnableDeletionProtection:
@@ -32,7 +41,7 @@ Resources:
 # So, I'm replacing the SecretsManager with generating a secret in my dispatch.py script and passing it in as a
 # parameter. I'll leave some of the SecretManager stuff in and comment it out in case I ever want to find this again.
 #
-#  SecretKey:
+#  CsrfSecretKey:
 #    Type: AWS::SecretsManager::Secret
 #    Properties:
 #      Name: !Sub ${AWS::StackName}-secret-key
@@ -169,7 +178,7 @@ Resources:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           CARTS_TABLE: !Ref CartsTable
-          SECRET_KEY: !Ref SecretKey
+          CSRF_SECRET_KEY: !Ref CsrfSecretKey
       Layers:
         - !Ref Lib
       Events:
@@ -182,7 +191,7 @@ Resources:
 
   CartUpdateFunction:
     Type: AWS::Serverless::Function
-#    DependsOn: SecretKey
+#    DependsOn: CsrfSecretKey
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
@@ -193,13 +202,13 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref CartsTable
 #        - AWSSecretsManagerGetSecretValuePolicy:
-#            SecretArn: !Ref SecretKey
+#            SecretArn: !Ref CsrfSecretKey
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           CARTS_TABLE: !Ref CartsTable
-          SECRET_KEY: !Ref SecretKey
-#          SECRET_KEY: !Sub "{{resolve:secretsmanager:${SecretKey}}}"
+#          CSRF_SECRET_KEY: !Sub "{{resolve:secretsmanager:${CsrfSecretKey}}}"
+          CSRF_SECRET_KEY: !Ref CsrfSecretKey
       Layers:
         - !Ref Lib
       Events:
@@ -221,7 +230,7 @@ Resources:
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
-          SECRET_KEY: !Ref SecretKey
+          CSRF_SECRET_KEY: !Ref CsrfSecretKey
       Layers:
         - !Ref Lib
       Events:
@@ -246,7 +255,7 @@ Resources:
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
-          SECRET_KEY: !Ref SecretKey
+          CSRF_SECRET_KEY: !Ref CsrfSecretKey
       Layers:
         - !Ref Lib
       Events:
@@ -273,7 +282,7 @@ Resources:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           AUDIT_LOG_STORAGE: !Ref AuditLogStorage
-          SECRET_KEY: !Ref SecretKey
+          CSRF_SECRET_KEY: !Ref CsrfSecretKey
       Layers:
         - !Ref Lib
       Events:
@@ -301,7 +310,7 @@ Resources:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           ORDERS_TABLE: !Ref OrdersTable
-          SECRET_KEY: !Ref SecretKey
+          CSRF_SECRET_KEY: !Ref CsrfSecretKey
       Layers:
         - !Ref Lib
       Events:
@@ -323,7 +332,7 @@ Resources:
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
-          SECRET_KEY: !Ref SecretKey
+          CSRF_SECRET_KEY: !Ref CsrfSecretKey
       Layers:
         - !Ref Lib
       Events:
@@ -349,7 +358,7 @@ Resources:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           CARTS_TABLE: !Ref CartsTable
-          SECRET_KEY: !Ref SecretKey
+          CSRF_SECRET_KEY: !Ref CsrfSecretKey
       Layers:
         - !Ref Lib
       Events:
@@ -375,15 +384,82 @@ Resources:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           ORDERS_TABLE: !Ref OrdersTable
-          SECRET_KEY: !Ref SecretKey
+          CSRF_SECRET_KEY: !Ref CsrfSecretKey
       Layers:
         - !Ref Lib
       Events:
         ApiEvent:
           Type: HttpApi
           Properties:
-            Path: /api/v1/orders
+            Path: /api/v1/order
             Method: get
+            ApiId: !Ref Api
+
+  PlaceOrderFunction:
+    Type: AWS::Serverless::Function
+    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-place-order
+      CodeUri: src/api
+      Handler: place_order.lambda_handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref CartsTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref ProductsTable
+      Environment:
+        Variables:
+          JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
+          CARTS_TABLE: !Ref CartsTable
+          PRODUCTS_TABLE: !Ref ProductsTable
+          CSRF_SECRET_KEY: !Ref CsrfSecretKey
+          PAYPAL_SANDBOX: !Ref PaypalSandbox
+          PAYPAL_CLIENT_ID: !Ref PaypalClientId
+          PAYPAL_CLIENT_SECRET: !Ref PaypalClientSecret
+      Layers:
+        - !Ref Lib
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /api/v1/order
+            Method: post
+            ApiId: !Ref Api
+
+  ConfirmOrderFunction:
+    Type: AWS::Serverless::Function
+    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-confirm-order
+      CodeUri: src/api
+      Handler: confirm_order.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref CartsTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref OrdersTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProductsTable
+      Environment:
+        Variables:
+          JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
+          CARTS_TABLE: !Ref CartsTable
+          ORDERS_TABLE: !Ref OrdersTable
+          PRODUCTS_TABLE: !Ref ProductsTable
+          CSRF_SECRET_KEY: !Ref CsrfSecretKey
+          PAYPAL_SANDBOX: !Ref PaypalSandbox
+          PAYPAL_CLIENT_ID: !Ref PaypalClientId
+          PAYPAL_CLIENT_SECRET: !Ref PaypalClientSecret
+      Layers:
+        - !Ref Lib
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /api/v1/order/{order_id}
+            Method: put
             ApiId: !Ref Api
 
   GetProductsFunction:
@@ -401,7 +477,7 @@ Resources:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           PRODUCTS_TABLE: !Ref ProductsTable
-          SECRET_KEY: !Ref SecretKey
+          CSRF_SECRET_KEY: !Ref CsrfSecretKey
       Layers:
         - !Ref Lib
       Events:

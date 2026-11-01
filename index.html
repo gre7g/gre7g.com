@@ -5,6 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="/static/styles.css" />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script
+            src="https://www.paypal.com/sdk/js?client-id=AasArFKKraJH8yr0s2bu_ZGbdhJv4zllQVGlJBunhxii-uq8eYyNbt6RmrTJ6ieomtWKhkJn9-80-ez4&buyer-country=US&currency=USD&components=buttons&enable-funding=venmo,paylater,card"
+            data-sdk-integration-source="developer-studio"
+        ></script>
         <script type="module" src="/src/typescripts/entry_point.ts"></script>
         <title>Gre7g's Bookshop</title>
     </head>
@@ -157,6 +161,7 @@
                     <span></span>
                     <button class="login">Log In</button> or <button class="register">Create Account</button>
                 </div>
+                <div id="place_order"></div>
             </section>
 
             <section id="products">

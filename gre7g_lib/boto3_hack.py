@@ -34,6 +34,13 @@ PARAMETERS = re.compile(r"\{(\w+)}")
 RW_POLICY = "DynamoDBCrudPolicy"
 RO_POLICY = "DynamoDBReadPolicy"
 DELAY_SERVER_START = 0.2
+ENV_VAR_CONSTS = {
+    "CSRF_SECRET_KEY": "sooper sekret key for local testing only",
+    "PAYPAL_SANDBOX": "True",
+    "PAYPAL_CLIENT_ID": os.getenv("SANDBOX_PAYPAL_CLIENT_ID"),
+    "PAYPAL_CLIENT_SECRET": os.getenv("SANDBOX_PAYPAL_CLIENT_SECRET"),
+    "PAYPAL_CALLBACK_URL": "https://still.need.to.figure.out.the.url",
+}
 
 
 def hack_jwt_decode(token, key, algorithms, issuer, options) -> dict[str, str]:
@@ -189,11 +196,11 @@ class HackBoto:
                             policies.append((PolicyName(policy), TableName(item[policy]["TableName"])))
 
                     # Find environment variables
-                    # Mildly amusing sidenote: This sets the secret key we use for HMAC calculation to
-                    # "{{resolve:secretsmanager:${SecretKey}}}" which is pretty silly, but this only happens during
-                    # testing, and any constant value is fine, so sure, let's use that.
                     api_props = properties["Events"]["ApiEvent"]["Properties"]
                     env_vars = properties.get("Environment", {}).get("Variables", {})
+                    for var_name in env_vars:
+                        if var_name in ENV_VAR_CONSTS:
+                            env_vars[var_name] = ENV_VAR_CONSTS[var_name]
                     function = Function(
                         properties["CodeUri"],
                         properties["Handler"],

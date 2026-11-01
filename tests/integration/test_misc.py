@@ -25,7 +25,7 @@ class TestMisc(BaseTestCase):
             ("/api/v1/click_id", ["GET", "PUT", "DELETE"]),
             ("/api/v1/download/order1_id", ["POST", "PUT", "DELETE"]),
             ("/api/v1/guest", ["GET", "DELETE"]),
-            ("/api/v1/orders", ["POST", "PUT", "DELETE"]),
+            ("/api/v1/order", ["POST", "PUT", "DELETE"]),
             ("/api/v1/products", ["POST", "PUT", "DELETE"]),
         ]:
             for method in methods:
@@ -75,7 +75,7 @@ class TestMisc(BaseTestCase):
     @NO_CLOUD
     def test_expired_csrf(self):
         """Should reject writes with an expired CSRF token"""
-        secret_key = os.getenv("SECRET_KEY")
+        secret_key = os.getenv("CSRF_SECRET_KEY")
         assert secret_key
 
         # Still good
@@ -103,7 +103,7 @@ class TestMisc(BaseTestCase):
     @NO_CLOUD
     def test_stolen_csrf(self):
         """Should reject writes with an CSRF token taken from another machine"""
-        secret_key = os.getenv("SECRET_KEY")
+        secret_key = os.getenv("CSRF_SECRET_KEY")
         assert secret_key
 
         # From our (simulated) IP

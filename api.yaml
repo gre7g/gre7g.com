@@ -166,7 +166,7 @@ paths:
             schema:
               $ref: "#/components/schemas/empty"
       responses:
-        "200":
+        "201":
           description: Successful assignment
           content:
             application/json:
@@ -191,7 +191,7 @@ paths:
             schema:
               $ref: "#/components/schemas/empty"
       responses:
-        "200":
+        "201":
           description: Successful calculation
           content:
             application/json:
@@ -224,7 +224,7 @@ paths:
               required:
                 - click_id
       responses:
-        "200":
+        "201":
           description: Successful log
           content:
             application/json:
@@ -275,7 +275,7 @@ paths:
             schema:
               $ref: "#/components/schemas/empty"
       responses:
-        "200":
+        "201":
           description: Successful authorization
           content:
             application/json:
@@ -313,7 +313,7 @@ paths:
         "500":
           $ref: "#/components/responses/500-internal-server-error"
 
-  /api/v1/orders:
+  /api/v1/order:
     get:
       summary: Get orders
       description: Get a list of all previous orders
@@ -336,11 +336,11 @@ paths:
                             $ref: "#/components/schemas/product"
                         subtotal_cost:
                           type: number
-                        discount:
-                          type: number
                         shipping_cost:
                           type: number
                         total_cost:
+                          type: number
+                        discount:
                           type: number
                         order_id:
                           type: string
@@ -354,9 +354,9 @@ paths:
                       required:
                         - products
                         - subtotal_cost
-                        - discount
                         - shipping_cost
                         - total_cost
+                        - discount
                         - timestamp
                         - notes
                 additionalProperties: false
@@ -364,6 +364,73 @@ paths:
                   - orders
         "403":
           $ref: "#/components/responses/403-forbidden"
+        "500":
+          $ref: "#/components/responses/500-internal-server-error"
+
+    post:
+      summary: Submit an order
+      description: Send an order to PayPal for processing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/empty"
+      responses:
+        "201":
+          description: Purchase success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  links:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        href:
+                          type: string
+                        method:
+                          type: string
+                        rel:
+                          type: string
+                      additionalProperties: false
+                      required:
+                        - href
+                        - method
+                        - rel
+                  status:
+                    type: string
+                  out_of_stock:
+                    type: array
+                    items:
+                      type: string
+                additionalProperties: false
+                required:
+                  - status
+
+  /api/v1/order/<order_id>:
+    put:
+      summary: Confirm an order
+      description: Verify that an order processed successfully
+      parameters:
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/empty"
+      responses:
+        "200":
+          description: Successful confirmation
         "500":
           $ref: "#/components/responses/500-internal-server-error"
 

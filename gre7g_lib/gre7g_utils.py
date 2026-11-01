@@ -16,6 +16,15 @@ import json
 import jwt
 import logging
 import os
+from paypalserversdk.configuration import Environment
+from paypalserversdk.http.auth.o_auth_2 import ClientCredentialsAuthCredentials
+from paypalserversdk.logging.configuration.api_logging_configuration import (
+    LoggingConfiguration,
+    RequestLoggingConfiguration,
+    ResponseLoggingConfiguration,
+)
+from paypalserversdk.controllers.orders_controller import OrdersController
+from paypalserversdk.paypal_serversdk_client import PaypalServersdkClient
 from secrets import token_hex
 from time import time
 from types_boto3_dynamodb.service_resource import Table as DynamoDBTable
@@ -41,6 +50,10 @@ PHYSICAL_SHIPPING = 5.99  # $5.99 for shipping paperbacks and jewelry in the US
 
 def currency(value: float) -> Decimal:
     return Decimal("%0.2f" % value)
+
+
+class AuthException(Exception):
+    """Authentication required"""
 
 
 class CSRFException(Exception):
@@ -79,6 +92,7 @@ class AuditLogEvent(StrEnum):
 
 class ProductMix(StrEnum):
     """Describes a mix of products"""
+
     NONE = auto()
     ALL_DIGITAL = auto()
     ALL_PHYSICAL = auto()
@@ -263,9 +277,9 @@ class Order(Upgradeable):
     user_id: UserId
     products: list[Product]
     subtotal_cost: float
-    discount: float
     shipping_cost: float
     total_cost: float
+    discount: float = 0.00
     order_id: OrderId = field(default_factory=lambda: OrderId(uuid1().hex))
     timestamp: Timestamp = field(default_factory=lambda: Timestamp(datetime.now(UTC).isoformat()))
     notes: list[str] = field(default_factory=list)
@@ -278,18 +292,18 @@ class Order(Upgradeable):
         user_id = value_dict["user_id"]
         products = value_dict["products"]
         subtotal_cost = value_dict["subtotal_cost"]
-        discount = value_dict["discount"]
         shipping_cost = value_dict["shipping_cost"]
         total_cost = value_dict["total_cost"]
+        discount = value_dict["discount"]
         order_id = value_dict["order_id"]
         timestamp = value_dict["timestamp"]
         notes = value_dict["notes"]
         assert isinstance(user_id, str)
         assert isinstance(products, list)
         assert isinstance(subtotal_cost, float | Decimal)
-        assert isinstance(discount, float | Decimal)
         assert isinstance(shipping_cost, float | Decimal)
         assert isinstance(total_cost, float | Decimal)
+        assert isinstance(discount, float | Decimal)
         assert isinstance(order_id, str)
         assert isinstance(timestamp, str)
         assert isinstance(notes, list)
@@ -298,9 +312,9 @@ class Order(Upgradeable):
             UserId(user_id),
             product_list,
             float(subtotal_cost),
-            float(discount),
             float(shipping_cost),
             float(total_cost),
+            float(discount),
             OrderId(order_id),
             Timestamp(timestamp),
             notes,
@@ -312,9 +326,9 @@ class Order(Upgradeable):
         return {
             "products": [product.to_client_dict() for product in self.products],
             "subtotal_cost": float(self.subtotal_cost),
-            "discount": float(self.discount),
             "shipping_cost": float(self.shipping_cost),
             "total_cost": float(self.total_cost),
+            "discount": float(self.discount),
             "order_id": self.order_id,
             "timestamp": self.timestamp,
             "notes": self.notes,
@@ -326,9 +340,9 @@ class Order(Upgradeable):
             "user_id": self.user_id,
             "products": [product.to_dict() for product in self.products],
             "subtotal_cost": currency(self.subtotal_cost),
-            "discount": currency(self.discount),
             "shipping_cost": currency(self.shipping_cost),
             "total_cost": currency(self.total_cost),
+            "discount": currency(self.discount),
             "order_id": self.order_id,
             "timestamp": self.timestamp,
             "notes": self.notes,
@@ -437,7 +451,7 @@ class LambdaBase(ABC):
                 case _:
                     raise Exception("unknown authentication requirement")
 
-            status = HTTPStatus.OK
+            status = HTTPStatus.CREATED if http_dict["method"] == "POST" else HTTPStatus.OK
             body = self.handler(event=event, context=context)
 
         except ClientError as error:
@@ -449,8 +463,13 @@ class LambdaBase(ABC):
                 status = HTTPStatus.INTERNAL_SERVER_ERROR
                 body = {"message": error.response["Error"]["Message"]}
 
+        except AuthException:
+            LOG.error("API function requires authentication and none provided")
+            status = HTTPStatus.UNAUTHORIZED
+            body = {"message": "Unauthorized"}
+
         except PermissionError:
-            LOG.error("Unauthenticated")
+            LOG.error("User lacks privileges for API function")
             status = HTTPStatus.FORBIDDEN
             body = {"message": "Forbidden"}
 
@@ -491,7 +510,7 @@ class LambdaBase(ABC):
             products_table = cls.get_table("PRODUCTS_TABLE")
             carts_table = cls.get_table("CARTS_TABLE")
             orders_table = cls.get_table("ORDERS_TABLE")
-            env_secret = os.getenv("SECRET_KEY")
+            env_secret = os.getenv("CSRF_SECRET_KEY")
             secret_key = env_secret.encode("ascii") if env_secret else b""
             return cls(products_table, carts_table, orders_table, secret_key).wrapper
         except:
@@ -514,7 +533,52 @@ class LambdaBase(ABC):
         mix = ProductMix.NONE
         for product in cart.products:
             if product.media in ["paperback", "jewelry"]:
-                mix = ProductMix.ALL_PHYSICAL if mix in [ProductMix.NONE, ProductMix.ALL_PHYSICAL] else ProductMix.MIX_OF_TYPES
+                mix = (
+                    ProductMix.ALL_PHYSICAL
+                    if mix in [ProductMix.NONE, ProductMix.ALL_PHYSICAL]
+                    else ProductMix.MIX_OF_TYPES
+                )
             else:
-                mix = ProductMix.ALL_DIGITAL if mix in [ProductMix.NONE, ProductMix.ALL_DIGITAL] else ProductMix.MIX_OF_TYPES
+                mix = (
+                    ProductMix.ALL_DIGITAL
+                    if mix in [ProductMix.NONE, ProductMix.ALL_DIGITAL]
+                    else ProductMix.MIX_OF_TYPES
+                )
         return mix
+
+    @staticmethod
+    def get_paypal_controller() -> OrdersController:
+        """Get an OrdersController from the PayPal SDK"""
+        # PayPal connection is configured via environment variables so the codes won't be committed into git
+        paypal_sandbox = os.getenv("PAYPAL_SANDBOX") == "True"
+        paypal_client_id = os.getenv("PAYPAL_CLIENT_ID")
+        paypal_client_secret = os.getenv("PAYPAL_CLIENT_SECRET")
+
+        assert paypal_client_id
+        assert paypal_client_secret
+
+        # Configure logging
+        log_config = LoggingConfiguration(
+            log_level=logging.INFO if paypal_sandbox else logging.WARNING,
+            mask_sensitive_headers=not paypal_sandbox,
+            request_logging_config=RequestLoggingConfiguration(
+                log_body=paypal_sandbox,
+                log_headers=paypal_sandbox,
+            ),
+            response_logging_config=ResponseLoggingConfiguration(
+                log_body=paypal_sandbox,
+                log_headers=paypal_sandbox,
+            ),
+        )
+
+        # Connect to PayPal
+        paypal = PaypalServersdkClient(
+            logging_configuration=log_config,
+            environment=Environment.SANDBOX if paypal_sandbox else Environment.PRODUCTION,
+            client_credentials_auth_credentials=ClientCredentialsAuthCredentials(
+                paypal_client_id, paypal_client_secret
+            ),
+        )
+
+        return paypal.orders
+# TODO: put descriptions for paypal orders in db
