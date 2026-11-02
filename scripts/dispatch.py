@@ -39,7 +39,7 @@ ASSETS_PATH = DIST_PATH / "assets"
 TEST_PATH = ROOT_PATH / "tests"
 INTEGRATION_PATH = TEST_PATH / "integration"
 STATIC_TEST_PATH = TEST_PATH / "static"
-LIB_PATH = ROOT_PATH / "gre7g_lib"
+LIB_PATH = ROOT_PATH / "lib" / "deploy"
 STATIC_PATH = ROOT_PATH / "static"
 TEMPLATE_YAML = ROOT_PATH / "template.yaml"
 VITE_CONFIG_PATH = ROOT_PATH / "vite.config.ts"
@@ -59,13 +59,13 @@ paths = [str(LIB_PATH), str(ROOT_PATH)]
 sys.path.extend(paths)
 os.environ["PYTHONPATH"] = os.pathsep.join(paths)
 
-from gre7g_lib.audit import configure_audit_log, SourceHash, AUDIT_LOG
-from gre7g_lib.boto3_hack import HackBoto
-from gre7g_lib.db_defaults import write_default_data_to_db
+from lib.local.audit import configure_audit_log, SourceHash, AUDIT_LOG
+from lib.local.boto3_hack import HackBoto
+from lib.local.db_defaults import write_default_data_to_db
 from gre7g_utils import UserId
-from gre7g_lib.outputs import get_outputs_dict
-from gre7g_lib.users import REG_USER_ID, ADMIN_USER_ID, ADMIN_GROUP_NAME, CognitoUser, USER_EMAIL
-from gre7g_lib.web_server import WebBrowser
+from lib.local.outputs import get_outputs_dict
+from lib.local.users import REG_USER_ID, ADMIN_USER_ID, ADMIN_GROUP_NAME, CognitoUser, USER_EMAIL
+from lib.local.web_server import WebBrowser
 
 
 def compile_ts(minify: bool = True) -> None:

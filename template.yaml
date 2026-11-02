@@ -158,7 +158,7 @@ Resources:
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: !Sub ${AWS::StackName}-lib
-      ContentUri: gre7g_lib
+      ContentUri: lib/deploy
       RetentionPolicy: Delete
     Metadata:
       BuildMethod: python3.14

@@ -27,7 +27,8 @@ STACK_NAME = os.environ["STACK-NAME"]
 RUN_LOCALLY = "LOCAL"
 RUN_BRIEF = "BRIEF"
 SERVER_PORT = 8000
-TEMPLATE_YAML = Path(__file__).parents[1] / "template.yaml"
+ROOT_PATH = Path(__file__).parents[2]
+TEMPLATE_YAML = ROOT_PATH / "template.yaml"
 SKIP_LOCAL = skipIf(os.getenv("STACK-NAME") == RUN_LOCALLY, "Local simulation doesn't support this test")
 NO_CLOUD = skipIf(os.getenv("STACK-NAME") not in [RUN_BRIEF, RUN_LOCALLY], "Cloud simulation doesn't support this test")
 
@@ -181,7 +182,6 @@ class BaseTestCase(TestCase):
         if not BaseTestCase.initialized:
             BaseTestCase.initialized = True
 
-            path = Path(__file__).parents[1]
             if STACK_NAME in [RUN_LOCALLY, RUN_BRIEF]:
                 if STACK_NAME == RUN_LOCALLY:
                     WebBrowser(SERVER_PORT).launch_daemon()
@@ -197,7 +197,7 @@ class BaseTestCase(TestCase):
                 # BaseTestCase.regular_user, BaseTestCase.admin_user = CognitoUser.create_users(
                 BaseTestCase.regular_user = CognitoUser.create_users(self.user_pool, self.user_pool_client)
 
-            self.setup_openapi(path / "api.yaml")
+            self.setup_openapi(ROOT_PATH / "api.yaml")
             dynamodb = boto3.resource("dynamodb")
             BaseTestCase.carts_table = dynamodb.Table(self.carts_table_name)
             BaseTestCase.orders_table = dynamodb.Table(self.orders_table_name)

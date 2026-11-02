@@ -9,5 +9,5 @@ log_cli_level = "DEBUG"
 [tool.mypy]
 exclude = ["boto3_hack", "integration_base"]
 disallow_untyped_defs = true
-mypy_path = "gre7g_lib"
+mypy_path = "lib/deploy"
 explicit_package_bases = true

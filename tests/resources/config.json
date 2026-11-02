@@ -5,6 +5,7 @@
     "cognito_host_name": "localhost:8888",
     "cognito_login_url": "http://localhost:8888",
     "orders_table_name": "OrdersTable",
+    "paypal_client_id": "AasArFKKraJH8yr0s2bu_ZGbdhJv4zllQVGlJBunhxii-uq8eYyNbt6RmrTJ6ieomtWKhkJn9-80-ez4",
     "products_table_name": "ProductsTable",
     "user_pool": "gre7g-com-user-pool",
     "user_pool_client": "gre7g-com-user-pool-client",

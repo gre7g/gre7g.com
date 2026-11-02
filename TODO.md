@@ -14,7 +14,7 @@ Moderate Urgency
       than the HTML description that we have in the current description field. PayPal wants something for an item
       description, and it doesn't like the length and mark-up.
 - [ ] e-mail the administrator if we are unable to decrement the inventory quantities in confirm_order.py
-- [ ] Split library between app and testing modules.
+- [X] Split library between app and testing modules.
 
 Basic Features
 --------------

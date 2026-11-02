@@ -12,8 +12,8 @@ from urllib.parse import urlsplit
 # Constants:
 LOG = logging.getLogger(__name__)
 CHROME = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
-ROOT_PATH = Path(__file__).parents[1]
-LOCAL_CONFIG_PATH = Path(__file__).parent / "local-config.json"
+ROOT_PATH = Path(__file__).parents[2]
+LOCAL_CONFIG_PATH = ROOT_PATH / "tests" / "resources" / "config.json"
 DIST_PATH = ROOT_PATH / "dist"
 ASSETS_PATH = DIST_PATH / "assets"
 INDEX_PATH = DIST_PATH / "index.html"

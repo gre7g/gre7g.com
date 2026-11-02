@@ -15,4 +15,4 @@ class TestMypy(TestCase):
         root_path = Path(__file__).resolve().parents[2]
         os.chdir(str(root_path))
 
-        check_call(["mypy", str(root_path / "src"), str(root_path / "gre7g_lib")])
+        check_call(["mypy", str(root_path / "src"), str(root_path / "lib" / "deploy")])

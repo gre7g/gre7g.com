@@ -11,7 +11,7 @@ export class Api {
     csrf_token: string = "";
     guest_id: string = "";
 
-    constructor() {
+    load() {
         // Configure Amplify
         Amplify.configure({
             Auth: {

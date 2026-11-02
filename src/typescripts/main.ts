@@ -66,6 +66,7 @@ export class Main {
 
         const response: Response = await fetch(CONFIG_URL);
         G_SAM_OUTPUTS = await response.json();
+        G_API.load();
         await G_PRODUCTS.load();
         await G_CART.load();
         await G_NAVIGATOR.go(window.location.pathname);

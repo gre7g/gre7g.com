@@ -20,6 +20,6 @@ class TestBlack(TestCase):
             root_path / "scripts",
             root_path / "src",
             root_path / "tests",
-            root_path / "gre7g_lib",
+            root_path / "lib",
         ]:
             check_call([sys.executable, "-m", "black", "--check", str(path)])
