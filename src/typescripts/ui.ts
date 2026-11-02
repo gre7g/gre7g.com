@@ -100,6 +100,8 @@ class CartUI extends ListSection {
 }
 
 export class CheckoutUI extends CartUI {
+    total = 0.0;
+
     override async update() {
         await super.update();
 
@@ -124,11 +126,11 @@ export class CheckoutUI extends CartUI {
         this.section.find("#shipping span").text(currency);
 
         // Calculate total
-        const total = subtotal + response?.shipping_cost;
+        this.total = subtotal + response?.shipping_cost;
         currency = new Intl.NumberFormat("default", {
             style: "currency",
             currency: "USD",
-        }).format(total);
+        }).format(this.total);
         this.section.find("#total span").text(currency);
 
         // Login status message

@@ -28,10 +28,10 @@ export class Cart {
             } else {
                 return false;
             }
-        }
+        };
         if (!this.contents.some(item_is_product)) {
             // Didn't find item, so add it
-            const copy = {...product};
+            const copy = { ...product };
             copy.quantity = 1;
             this.contents.push(copy);
         }

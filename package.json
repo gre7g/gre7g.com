@@ -1,6 +1,7 @@
 {
     "type": "module",
     "dependencies": {
+        "@paypal/paypal-js": "^11.3.0",
         "aws-amplify": "^6.20.0",
         "jquery": "^4.0.0"
     },

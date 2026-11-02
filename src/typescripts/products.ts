@@ -1,4 +1,4 @@
-import { G_UI } from "./main";
+import { G_API, G_PRODUCTS, G_UI } from "./main";
 
 export interface Product {
     name: string;
@@ -17,6 +17,13 @@ export interface Product {
 
 export class Products {
     product_list: Record<string, Product> = {};
+
+    async load() {
+        const response = await G_API.get("/api/v1/products");
+        G_PRODUCTS.product_list = Object.fromEntries(
+            response.products.map((product: Product) => [product.listing_path, product]),
+        );
+    }
 
     has_path(path: string): boolean {
         return path in this.product_list;

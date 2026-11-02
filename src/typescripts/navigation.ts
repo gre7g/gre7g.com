@@ -1,6 +1,15 @@
 import { G_PRODUCTS, G_UI } from "./main";
+import { $ } from "jquery";
+import ClickEvent = JQuery.ClickEvent;
 
 export class Navigator {
+    async navigate_internal(event: ClickEvent) {
+        event.preventDefault();
+        const href = $(event.currentTarget!).attr("href");
+        history.pushState(null, "", href);
+        await this.go(href!);
+    }
+
     async go(path: string): Promise<void> {
         if (path == "/shop") {
             console.log("Show shop"); // TODO

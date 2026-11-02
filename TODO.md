@@ -4,6 +4,10 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 TODO
 ====
 
+High Urgency
+------------
+- [ ] Don't allow customers to buy physical items with a shipping country other than US
+
 Moderate Urgency
 ----------------
 - [ ] The products database entries should contain a description field that is longer than the item name but shorter 
