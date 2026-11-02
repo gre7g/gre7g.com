@@ -110,6 +110,7 @@ class ConfirmOrder(LambdaBase):
 
         assert user_id
         assert order_id
+        assert self.carts_table
 
         # Fetch order from PayPal
         response = self.get_paypal_controller().capture_order({"id": order_id, "prefer": "return=representation"})
