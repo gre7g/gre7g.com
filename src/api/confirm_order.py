@@ -6,39 +6,10 @@ from datetime import datetime
 import logging
 import os
 from paypalserversdk.api_helper import APIHelper
-from paypalserversdk.configuration import Environment
-from paypalserversdk.http.auth.o_auth_2 import ClientCredentialsAuthCredentials
-from paypalserversdk.logging.configuration.api_logging_configuration import (
-    LoggingConfiguration,
-    RequestLoggingConfiguration,
-    ResponseLoggingConfiguration,
-)
-from paypalserversdk.models.amount_breakdown import AmountBreakdown
-from paypalserversdk.models.amount_with_breakdown import AmountWithBreakdown
-from paypalserversdk.models.checkout_payment_intent import CheckoutPaymentIntent
-from paypalserversdk.controllers.orders_controller import OrdersController
-from paypalserversdk.models.item import Item
 from paypalserversdk.models.item_category import ItemCategory
-from paypalserversdk.models.money import Money
-from paypalserversdk.models.purchase_unit_request import PurchaseUnitRequest
-from paypalserversdk.models.order_request import OrderRequest
-from paypalserversdk.paypal_serversdk_client import PaypalServersdkClient
 from typing import Any
 
-from gre7g_utils import (
-    LambdaBase,
-    Cart,
-    AuthenticationRequired,
-    ProductMix,
-    AuthException,
-    PHYSICAL_SHIPPING,
-    Order,
-    UserId,
-    Product,
-    ProductStatus,
-    AuditLogEvent,
-    CURRENCY,
-)
+from gre7g_utils import LambdaBase, AuthenticationRequired, Order, Product, AuditLogEvent, CURRENCY
 
 # Constants:
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)
@@ -48,53 +19,6 @@ class ConfirmOrder(LambdaBase):
     """Confirm order"""
 
     AUTH_REQUIRED = AuthenticationRequired.GUEST_OR_USER
-
-    # def convert_cart_to_order(self, user_id: UserId, cart: Cart, mix: ProductMix) -> tuple[Order, dict]:
-    #     """Convert the shopping cart into an order (our format and PayPal's)"""
-    #     assert self.products_table
-    #
-    #     products = []
-    #     item_list = []
-    #     subtotal_cost = 0.00
-    #     for product in cart.products:
-    #         # WARNING: ITEM COSTS MUST BE LOOKED UP FROM THE PRODUCT DIRECTORY! The user writes the cart data, so these
-    #         # prices would be easy to change.
-    #         physical_goods = product_listing.media in ["paperback", "jewelry"]
-    #         subtotal_cost += product_listing.cost_per * product.quantity
-    #
-    #         # Product object for our Order object
-    #         product_listing.quantity = product.quantity
-    #         product_listing.status = ProductStatus.ORDERED if physical_goods else ProductStatus.AVAILABLE
-    #         products.append(product_listing)
-    #
-    #         # Item object for PayPal's item list
-    #         item = Item(
-    #             name=product_listing.name,
-    #             unit_amount=Money(CURRENCY, product_listing.cost_per),
-    #             quantity=str(product.quantity),
-    #             description=product_listing.description,
-    #             sku=product_listing.product_id,
-    #             category=ItemCategory.PHYSICAL_GOODS if physical_goods else ItemCategory.DIGITAL_GOODS,
-    #         )
-    #         item_list.append(item)
-    #
-    #     shipping_cost = PHYSICAL_SHIPPING if mix in [ProductMix.ALL_PHYSICAL, ProductMix.MIX_OF_TYPES] else 0.00
-    #     total_cost = subtotal_cost + shipping_cost
-    #     breakdown = AmountBreakdown(Money(CURRENCY, subtotal_cost), Money(CURRENCY, shipping_cost))
-    #
-    #     order = Order(user_id, products, subtotal_cost, shipping_cost, total_cost, notes=notes)
-    #     order_dict = {
-    #         "body": OrderRequest(
-    #             CheckoutPaymentIntent.CAPTURE,
-    #             [
-    #                 PurchaseUnitRequest(
-    #                     AmountWithBreakdown(CURRENCY, total_cost, breakdown), order.order_id, items=item_list
-    #                 )
-    #             ],
-    #         )
-    #     }
-    #
-    #     return order, order_dict
 
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Confirm order"""
@@ -157,16 +81,25 @@ class ConfirmOrder(LambdaBase):
                             ExpressionAttributeValues={":purchased": quantity},
                         )
                     except self.products_table.meta.client.exceptions.ConditionalCheckFailedException:
-                        LOG.error("Insufficient stock for product %r", product_listing)
+                        LOG.error(
+                            "Insufficient stock",
+                            extra={
+                                "product_id": product_id,
+                                "name": item["name"],
+                                "stock_quantity": product_listing.quantity,
+                                "purchase_quantity": quantity,
+                            },
+                        )
                         # TODO: email an admin, this is important!
 
                 product_listing.quantity = quantity
                 product_listing.cost_per = float(unit_amount["value"])
                 products.append(product_listing)
 
-            amount = purchase_unit["amount"]
-            assert amount["currency_code"] == CURRENCY
-            breakdown = amount["breakdown"]
+            # Create the order object
+            total = purchase_unit["amount"]
+            assert total["currency_code"] == CURRENCY
+            breakdown = total["breakdown"]
             subtotal = breakdown["item_total"]
             assert subtotal["currency_code"] == CURRENCY
             shipping = breakdown["shipping"]
@@ -177,47 +110,16 @@ class ConfirmOrder(LambdaBase):
                 products,
                 float(subtotal["value"]),
                 float(shipping["value"]),
-                float(amount["value"]),
+                float(total["value"]),
                 order_id=purchase_unit["reference_id"],
                 notes=notes,
             )
             order.put(self.orders_table)
-        a = {
-            "purchase_units": [
-                {
-                    "items": [
-                        {
-                            "category": "PHYSICAL_GOODS",
-                            "description": "<p>220 pages, Illustrated</p>",
-                            "name": "Skeleton Crew − paperback",
-                            "quantity": "1",
-                            "sku": "kc1-paperback",
-                            "tax": {...},
-                            "unit_amount": {"currency_code": "USD", "value": "13.99"},
-                        }
-                    ],
-                }
-            ],
-        }
-        return {}
 
-        #
-        # assert user_id
-        # assert self.carts_table
-        #
-        # cart = Cart.get(self.carts_table, user_id)
-        #
-        # # Verify that we have enough information to proceed
-        # mix = self.get_cart_mix(cart)
-        # if mix in [ProductMix.ALL_DIGITAL, ProductMix.MIX_OF_TYPES] and not self.user_id:
-        #     raise AuthException("User must login to purchase digital downloads")
-        #
-        # # Create order objects
-        # order, order_dict = self.convert_cart_to_order(user_id, cart, mix)
-        #
-        # # Submit order to PayPal
-        # result = self.get_paypal_controller().create_order(order_dict)
-        # return APIHelper.to_dictionary(result.body)
+        # Clear the shopping cart
+        self.carts_table.delete_item(Key={"user_id": user_id})
+
+        return {}
 
 
 lambda_handler = ConfirmOrder.lambda_handler()
