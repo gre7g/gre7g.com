@@ -6,7 +6,7 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
-- [ ] Don't allow customers to buy physical items with a shipping country other than US
+- [X] Don't allow customers to buy physical items with a shipping country other than US
 
 Moderate Urgency
 ----------------

@@ -8,7 +8,7 @@ export function load_paypal() {
         buyerCountry: "US",
         currency: "USD",
         components: "buttons",
-        enableFunding: "venmo,paylater,card"
+        enableFunding: "venmo,paylater,card",
     }).then((paypal: PayPalNamespace | null) => {
         if (paypal && paypal.Buttons) {
             const paypal_buttons = paypal.Buttons({
@@ -30,6 +30,10 @@ export function load_paypal() {
                     } catch (error) {
                         console.error(error);
                     }
+                },
+
+                onShippingChange(data, actions) {
+                    return data.shipping_address?.country_code === "US" ? actions.resolve() : actions.reject();
                 },
 
                 async onApprove(data: OnApproveData, actions: OnApproveActions) {
@@ -58,7 +62,7 @@ export function load_paypal() {
                         console.error(error);
                         // resultMessage(`Sorry, your transaction could not be processed...<br><br>${error}`);
                     }
-                }
+                },
             });
             paypal_buttons.render("#place_order");
         }
