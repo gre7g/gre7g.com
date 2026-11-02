@@ -35,12 +35,16 @@ from gre7g_utils import (
     Order,
     UserId,
     Product,
-    ProductStatus,AuditLogEvent, CURRENCY
+    ProductStatus,
+    AuditLogEvent,
+    CURRENCY,
 )
 
 # Constants:
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)
 
+# Types:
+ProductIdAndQty = tuple[str, int]
 
 class ConfirmOrder(LambdaBase):
     """Confirm order"""
@@ -134,7 +138,7 @@ class ConfirmOrder(LambdaBase):
             # actor could have put more stuff into the cart during the checkout process. The PayPal record will show
             # what they actually paid for.
             products = []
-            physical_product_ids = []
+            physical_ids_and_qtys: list[ProductIdAndQty] = []
 
             for item in purchase_unit["items"]:
                 # We will take the product objects from the products table, but keep a couple things from the PayPal
@@ -142,19 +146,34 @@ class ConfirmOrder(LambdaBase):
                 # checkout and order confirmation, it is possible, and we want to record what the user paid, not the
                 # latest price.
                 product_listing = Product.get(self.products_table, item["sku"])
-
-                if item["category"] == ItemCategory.PHYSICAL_GOODS:
-                    physical_product_ids.append(item["sku"])
-
-                product_listing.quantity = int(item["quantity"])
+                quantity = int(item["quantity"])
                 unit_amount = item["unit_amount"]
                 assert unit_amount["currency_code"] == CURRENCY
+
+                if item["category"] == ItemCategory.PHYSICAL_GOODS:
+                    physical_ids_and_qtys.append((item["sku"], quantity))
+
+                product_listing.quantity = quantity
                 product_listing.cost_per = float(unit_amount["value"])
-                products.append(product)
+                products.append(product_listing)
 
             # If there were any physical items, update the quantities in the database
-            if physical_product_ids:
-                # In a transaction, find all the records in self.products_table where {"product_id": product_id} and update quantity-=1, rolling back if any fail
+            if physical_ids_and_qtys:
+                updates = [
+                    {
+                        "Update": {
+                            "TableName": self.products_table.name,
+                            "Key": {"product_id": product_id},
+                            "UpdateExpression": "SET quantity = quantity - :purchased",
+                            "ExpressionAttributeValues": {":purchased": quantity},
+                        }
+                    }
+                    for product_id, quantity in physical_ids_and_qtys
+                ]
+                # TODO: the following call will throw botocore.exceptions.ClientError with
+                # error.response["Error"]["Code"] == "TransactionCanceledException" if the transaction fails. This is an
+                # important error, and we should email the administrator if it happens.
+                self.products_table.meta.client.transact_write_items(TransactItems=updates)
 
             amount = purchase_unit["amount"]
             assert amount["currency_code"] == CURRENCY
@@ -164,7 +183,15 @@ class ConfirmOrder(LambdaBase):
             shipping = breakdown["shipping"]
             assert shipping["currency_code"] == CURRENCY
             notes = ["%s: order placed" % datetime.now().strftime("%m/%d/%Y %H:%M")]
-            order = Order(user_id, products, float(subtotal["value"]), float(shipping["value"]), float(amount["value"]), order_id=purchase_unit["reference_id"], notes=notes)
+            order = Order(
+                user_id,
+                products,
+                float(subtotal["value"]),
+                float(shipping["value"]),
+                float(amount["value"]),
+                order_id=purchase_unit["reference_id"],
+                notes=notes,
+            )
             order.put(self.orders_table)
         a = {
             "purchase_units": [

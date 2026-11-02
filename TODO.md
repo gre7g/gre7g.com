@@ -9,6 +9,7 @@ Moderate Urgency
 - [ ] The products database entries should contain a description field that is longer than the item name but shorter 
       than the HTML description that we have in the current description field. PayPal wants something for an item
       description, and it doesn't like the length and mark-up.
+- [ ] e-mail the administrator if we are unable to decrement the inventory quantities in confirm_order.py
 
 Basic Features
 --------------
