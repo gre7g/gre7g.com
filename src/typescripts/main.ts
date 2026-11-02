@@ -7,10 +7,31 @@ import { load_paypal } from "./paypal";
 import { Products } from "./products";
 import { UI } from "./ui";
 
+interface SamOutputs {
+    api_endpoint: string;
+    audit_log: string;
+    carts_table_name: string;
+    cognito_host_name: string;
+    cognito_login_url: string;
+    orders_table_name: string;
+    paypal_client_id: string;
+    products_table_name: string;
+    user_pool: string;
+    user_pool_client: string;
+    web_distribution: string;
+    web_file_storage: string;
+    website_url: string;
+}
+
+// Constants:
+const CONFIG_URL = "/config.json";
+
+// Globals:
 export let G_API: Api;
 export let G_CART: Cart;
 export let G_NAVIGATOR: Navigator;
 export let G_PRODUCTS: Products;
+export let G_SAM_OUTPUTS: SamOutputs;
 export let G_UI: UI;
 
 /**
@@ -42,6 +63,9 @@ export class Main {
         G_NAVIGATOR = new Navigator();
         G_PRODUCTS = new Products();
         G_UI = new UI();
+
+        const response: Response = await fetch(CONFIG_URL);
+        G_SAM_OUTPUTS = await response.json();
         await G_PRODUCTS.load();
         await G_CART.load();
         await G_NAVIGATOR.go(window.location.pathname);

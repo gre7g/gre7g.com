@@ -2,25 +2,7 @@ import { $ } from "jquery";
 import { Amplify } from "aws-amplify";
 import { signInWithRedirect, fetchAuthSession } from "aws-amplify/auth";
 
-const CONFIG_URL = "/config.json";
-
-interface SamOutputs {
-    api_endpoint: string;
-    audit_log: string;
-    carts_table_name: string;
-    cognito_host_name: string;
-    cognito_login_url: string;
-    orders_table_name: string;
-    products_table_name: string;
-    user_pool: string;
-    user_pool_client: string;
-    web_distribution: string;
-    web_file_storage: string;
-    website_url: string;
-}
-
-const response: Response = await fetch(CONFIG_URL);
-const SAM_OUTPUTS: SamOutputs = await response.json();
+import { G_SAM_OUTPUTS } from "./main";
 
 /**
  * The Api class handles authentication, AJAX requests to the API, CSRF tokens, and request retries.
@@ -34,19 +16,19 @@ export class Api {
         Amplify.configure({
             Auth: {
                 Cognito: {
-                    userPoolId: SAM_OUTPUTS.user_pool,
-                    userPoolClientId: SAM_OUTPUTS.user_pool_client,
+                    userPoolId: G_SAM_OUTPUTS.user_pool,
+                    userPoolClientId: G_SAM_OUTPUTS.user_pool_client,
                     loginWith: {
                         oauth: {
-                            domain: SAM_OUTPUTS.cognito_host_name,
+                            domain: G_SAM_OUTPUTS.cognito_host_name,
                             scopes: ["openid"],
-                            redirectSignIn: [SAM_OUTPUTS.website_url],
-                            redirectSignOut: [SAM_OUTPUTS.website_url],
-                            responseType: "code",
-                        },
-                    },
-                },
-            },
+                            redirectSignIn: [G_SAM_OUTPUTS.website_url],
+                            redirectSignOut: [G_SAM_OUTPUTS.website_url],
+                            responseType: "code"
+                        }
+                    }
+                }
+            }
         });
     }
 
@@ -57,11 +39,11 @@ export class Api {
             dataType: "json",
             headers: {
                 "x-csrf-token": this.csrf_token,
-                "x-guest-id": this.guest_id,
+                "x-guest-id": this.guest_id
             },
             error: (response_headers: JQuery.jqXHR, text_status: string) => {
                 throw new Error(text_status); // TODO
-            },
+            }
         };
         const session = await fetchAuthSession();
         const access_token = session.tokens?.accessToken.toString();

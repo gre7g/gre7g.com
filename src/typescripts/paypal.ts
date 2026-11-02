@@ -1,16 +1,14 @@
 import { loadScript, PayPalNamespace, OnApproveActions, OnApproveData } from "@paypal/paypal-js";
 
-import { G_API, G_UI } from "./main";
-
-const CLIENT_ID = "AasArFKKraJH8yr0s2bu_ZGbdhJv4zllQVGlJBunhxii-uq8eYyNbt6RmrTJ6ieomtWKhkJn9-80-ez4";
+import { G_API, G_UI, G_SAM_OUTPUTS } from "./main";
 
 export function load_paypal() {
     loadScript({
-        clientId: CLIENT_ID,
+        clientId: G_SAM_OUTPUTS.paypal_client_id,
         buyerCountry: "US",
         currency: "USD",
         components: "buttons",
-        enableFunding: "venmo,paylater,card",
+        enableFunding: "venmo,paylater,card"
     }).then((paypal: PayPalNamespace | null) => {
         if (paypal && paypal.Buttons) {
             const paypal_buttons = paypal.Buttons({
@@ -60,7 +58,7 @@ export function load_paypal() {
                         console.error(error);
                         // resultMessage(`Sorry, your transaction could not be processed...<br><br>${error}`);
                     }
-                },
+                }
             });
             paypal_buttons.render("#place_order");
         }

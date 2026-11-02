@@ -60,13 +60,15 @@ class BaseTestCase(TestCase):
     api_endpoint: ClassVar[str]
     audit_log: ClassVar[str]
     carts_table_name: ClassVar[str]
-    cloud_front_distribution: ClassVar[str]
     cognito_host_name: ClassVar[str]
     cognito_login_url: ClassVar[str]
     orders_table_name: ClassVar[str]
+    paypal_client_id: ClassVar[str]
     products_table_name: ClassVar[str]
     user_pool: ClassVar[str]
     user_pool_client: ClassVar[str]
+    web_distribution: ClassVar[str]
+    web_file_storage: ClassVar[str]
     website_url: ClassVar[str]
 
     # Database tables
