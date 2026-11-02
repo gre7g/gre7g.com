@@ -43,8 +43,6 @@ from gre7g_utils import (
 # Constants:
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)
 
-# Types:
-ProductIdAndQty = tuple[str, int]
 
 class ConfirmOrder(LambdaBase):
     """Confirm order"""
@@ -138,42 +136,33 @@ class ConfirmOrder(LambdaBase):
             # actor could have put more stuff into the cart during the checkout process. The PayPal record will show
             # what they actually paid for.
             products = []
-            physical_ids_and_qtys: list[ProductIdAndQty] = []
 
             for item in purchase_unit["items"]:
                 # We will take the product objects from the products table, but keep a couple things from the PayPal
                 # record, namely quantity and cost_per. Although it's unlikely that the price would change between
                 # checkout and order confirmation, it is possible, and we want to record what the user paid, not the
                 # latest price.
-                product_listing = Product.get(self.products_table, item["sku"])
+                product_id = item["sku"]
+                product_listing = Product.get(self.products_table, product_id)
                 quantity = int(item["quantity"])
                 unit_amount = item["unit_amount"]
                 assert unit_amount["currency_code"] == CURRENCY
 
                 if item["category"] == ItemCategory.PHYSICAL_GOODS:
-                    physical_ids_and_qtys.append((item["sku"], quantity))
+                    try:
+                        self.products_table.update_item(
+                            Key={"product_id": product_id},
+                            UpdateExpression="SET quantity = quantity - :purchased",
+                            ConditionExpression="quantity >= :purchased",
+                            ExpressionAttributeValues={":purchased": quantity},
+                        )
+                    except self.products_table.meta.client.exceptions.ConditionalCheckFailedException:
+                        LOG.error("Insufficient stock for product %r", product_listing)
+                        # TODO: email an admin, this is important!
 
                 product_listing.quantity = quantity
                 product_listing.cost_per = float(unit_amount["value"])
                 products.append(product_listing)
-
-            # If there were any physical items, update the quantities in the database
-            if physical_ids_and_qtys:
-                updates = [
-                    {
-                        "Update": {
-                            "TableName": self.products_table.name,
-                            "Key": {"product_id": product_id},
-                            "UpdateExpression": "SET quantity = quantity - :purchased",
-                            "ExpressionAttributeValues": {":purchased": quantity},
-                        }
-                    }
-                    for product_id, quantity in physical_ids_and_qtys
-                ]
-                # TODO: the following call will throw botocore.exceptions.ClientError with
-                # error.response["Error"]["Code"] == "TransactionCanceledException" if the transaction fails. This is an
-                # important error, and we should email the administrator if it happens.
-                self.products_table.meta.client.transact_write_items(TransactItems=updates)
 
             amount = purchase_unit["amount"]
             assert amount["currency_code"] == CURRENCY
