@@ -35,6 +35,7 @@ RW_POLICY = "DynamoDBCrudPolicy"
 RO_POLICY = "DynamoDBReadPolicy"
 DELAY_SERVER_START = 0.2
 ENV_VAR_CONSTS = {
+    "AUDIT_LOG_STORAGE": "AUDIT_LOG",
     "CSRF_SECRET_KEY": "sooper sekret key for local testing only",
     "PAYPAL_SANDBOX": "True",
     "PAYPAL_CLIENT_ID": os.getenv("SANDBOX_PAYPAL_CLIENT_ID"),
@@ -227,6 +228,7 @@ class HackBoto:
 
     def put_object(self, Bucket: str, Key: str, Body: str) -> None:
         """Save an object in s3"""
+        LOG.info("s3.put_object(%s=%r)", Key, Body)
         self.s3_objects[Key] = Body
 
     def list_objects_v2(self, Bucket: str, Prefix: str) -> dict[str, Any]:

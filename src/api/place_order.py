@@ -16,11 +16,10 @@ from paypalserversdk.models.order_request import OrderRequest
 from typing import Any
 from uuid import uuid1
 
-from gre7g_utils import LambdaBase, Cart, AuthenticationRequired, ProductMix, AuthException, PHYSICAL_SHIPPING, Product
+from gre7g_utils import LambdaBase, Cart, AuthenticationRequired, ProductMix, AuthException, PHYSICAL_SHIPPING, Product, AuditLogEvent, CURRENCY
 
 # Constants:
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)
-CURRENCY = "USD"
 
 
 class PlaceOrder(LambdaBase):
@@ -73,8 +72,7 @@ class PlaceOrder(LambdaBase):
         total_cost = subtotal_cost + shipping_cost
         breakdown = AmountBreakdown(Money(CURRENCY, subtotal_cost), Money(CURRENCY, shipping_cost))
 
-        order_dict = {
-            "body": OrderRequest(
+        order_request = OrderRequest(
                 CheckoutPaymentIntent.CAPTURE,
                 [
                     PurchaseUnitRequest(
@@ -82,12 +80,12 @@ class PlaceOrder(LambdaBase):
                     )
                 ],
             )
-        }
+        self.audit_log(AuditLogEvent.PLACE_ORDER, order_request=APIHelper.to_dictionary(order_request))
 
         # Submit order to PayPal
-        result = self.get_paypal_controller().create_order(order_dict)
+        response = self.get_paypal_controller().create_order({"body": order_request})
 
-        return APIHelper.to_dictionary(result.body)
+        return APIHelper.to_dictionary(response.body)
 
 
 lambda_handler = PlaceOrder.lambda_handler()

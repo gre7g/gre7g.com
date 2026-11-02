@@ -35,12 +35,11 @@ from gre7g_utils import (
     Order,
     UserId,
     Product,
-    ProductStatus,
+    ProductStatus,AuditLogEvent, CURRENCY
 )
 
 # Constants:
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)
-CURRENCY = "USD"
 
 
 class ConfirmOrder(LambdaBase):
@@ -58,7 +57,6 @@ class ConfirmOrder(LambdaBase):
     #     for product in cart.products:
     #         # WARNING: ITEM COSTS MUST BE LOOKED UP FROM THE PRODUCT DIRECTORY! The user writes the cart data, so these
     #         # prices would be easy to change.
-    #         product_listing = Product.get(self.products_table, product.product_id)
     #         physical_goods = product_listing.media in ["paperback", "jewelry"]
     #         subtotal_cost += product_listing.cost_per * product.quantity
     #
@@ -81,7 +79,6 @@ class ConfirmOrder(LambdaBase):
     #     shipping_cost = PHYSICAL_SHIPPING if mix in [ProductMix.ALL_PHYSICAL, ProductMix.MIX_OF_TYPES] else 0.00
     #     total_cost = subtotal_cost + shipping_cost
     #     breakdown = AmountBreakdown(Money(CURRENCY, subtotal_cost), Money(CURRENCY, shipping_cost))
-    #     notes = ["%s: order placed" % datetime.now().strftime("%m/%d/%Y %H:%M")]
     #
     #     order = Order(user_id, products, subtotal_cost, shipping_cost, total_cost, notes=notes)
     #     order_dict = {
@@ -99,37 +96,79 @@ class ConfirmOrder(LambdaBase):
 
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Confirm order"""
+        user_id = self.user_id or self.guest_id
         order_id = self.path_parameters["order_id"]
-        result = self.get_paypal_controller().capture_order({"id": order_id, "prefer": "return=representation"})
-        from pprint import pprint
 
-        pprint(APIHelper.to_dictionary(result.body))
+        assert user_id
+        assert order_id
+        assert self.products_table
+        assert self.orders_table
+
+        # Fetch order from PayPal
+        response = self.get_paypal_controller().capture_order({"id": order_id, "prefer": "return=representation"})
+        result: dict[str, Any] = APIHelper.to_dictionary(response.body)
+        assert result["status"] == "COMPLETED"
+
+        # The result dictionary holds a bunch of stuff we don't really care about. No big deal, but it seems like a
+        # waste to log it all, so I'll take a moment to delete it.
+        result.pop("links", None)
+        result.pop("payment_source", None)
+        purchase_unit: list[dict[str, Any]]
+        for purchase_unit in result.get("purchase_units", []):
+            purchase_unit.pop("payee", None)
+            captures: list[dict[str, Any]] = purchase_unit.get("payments", {}).get("captures", [])
+            for capture in captures:
+                assert capture["status"] == "COMPLETED"
+                capture.pop("links", None)
+                capture.pop("seller_protection", None)
+
+        # Log what we've received
+        self.audit_log(AuditLogEvent.CONFIRM_ORDER, order=result)
+
+        # There's only going to be one purchase unit, I think, but it's a list, so we'll loop over it.
+        for purchase_unit in result.get("purchase_units", []):
+            # Create a list of product objects for the order. We also need a list of which products are physical
+            # objects. Physical objects have to be tracked in our inventory.
+            #
+            # Note: Although they're likely equivalent, we will not turn the shopping cart into the order. A malicious
+            # actor could have put more stuff into the cart during the checkout process. The PayPal record will show
+            # what they actually paid for.
+            products = []
+            physical_product_ids = []
+
+            for item in purchase_unit["items"]:
+                # We will take the product objects from the products table, but keep a couple things from the PayPal
+                # record, namely quantity and cost_per. Although it's unlikely that the price would change between
+                # checkout and order confirmation, it is possible, and we want to record what the user paid, not the
+                # latest price.
+                product_listing = Product.get(self.products_table, item["sku"])
+
+                if item["category"] == ItemCategory.PHYSICAL_GOODS:
+                    physical_product_ids.append(item["sku"])
+
+                product_listing.quantity = int(item["quantity"])
+                unit_amount = item["unit_amount"]
+                assert unit_amount["currency_code"] == CURRENCY
+                product_listing.cost_per = float(unit_amount["value"])
+                products.append(product)
+
+            # If there were any physical items, update the quantities in the database
+            if physical_product_ids:
+                # In a transaction, find all the records in self.products_table where {"product_id": product_id} and update quantity-=1, rolling back if any fail
+
+            amount = purchase_unit["amount"]
+            assert amount["currency_code"] == CURRENCY
+            breakdown = amount["breakdown"]
+            subtotal = breakdown["item_total"]
+            assert subtotal["currency_code"] == CURRENCY
+            shipping = breakdown["shipping"]
+            assert shipping["currency_code"] == CURRENCY
+            notes = ["%s: order placed" % datetime.now().strftime("%m/%d/%Y %H:%M")]
+            order = Order(user_id, products, float(subtotal["value"]), float(shipping["value"]), float(amount["value"]), order_id=purchase_unit["reference_id"], notes=notes)
+            order.put(self.orders_table)
         a = {
-            "create_time": "2026-11-01T19:55:45Z",
-            "id": "9VW41488W5981982P",
-            "intent": "CAPTURE",
-            "links": [...],
-            "payer": {
-                "address": {"country_code": "US"},
-                "email_address": "sb-f6pza23450164@personal.example.com",
-                "name": {"given_name": "John", "surname": "Doe"},
-                "payer_id": "NXC8NXJ92ZM36",
-            },
-            "payment_source": {...},
             "purchase_units": [
                 {
-                    "amount": {
-                        "breakdown": {
-                            "handling": {...},
-                            "insurance": {...},
-                            "item_total": {"currency_code": "USD", "value": "13.99"},
-                            "shipping": {"currency_code": "USD", "value": "5.99"},
-                            "shipping_discount": {...},
-                        },
-                        "currency_code": "USD",
-                        "value": "19.98",
-                    },
-                    "description": "IGNORE THIS STRING. IT IS NOT RELIABLE.",
                     "items": [
                         {
                             "category": "PHYSICAL_GOODS",
@@ -141,46 +180,11 @@ class ConfirmOrder(LambdaBase):
                             "unit_amount": {"currency_code": "USD", "value": "13.99"},
                         }
                     ],
-                    "payee": {...},
-                    "payments": {
-                        "captures": [
-                            {
-                                "amount": {"currency_code": "USD", "value": "19.98"},
-                                "create_time": "2026-11-01T19:55:54Z",
-                                "disbursement_mode": "INSTANT",
-                                "final_capture": True,
-                                "id": "1M723936WL388890M",
-                                "links": [...],
-                                "seller_protection": {...},
-                                "seller_receivable_breakdown": {
-                                    "gross_amount": {"currency_code": "USD", "value": "19.98"},
-                                    "net_amount": {"currency_code": "USD", "value": "18.79"},
-                                    "paypal_fee": {"currency_code": "USD", "value": "1.19"},
-                                },
-                                "status": "COMPLETED",
-                                "update_time": "2026-11-01T19:55:54Z",
-                            }
-                        ]
-                    },
-                    "reference_id": "3909bacad62e11f1b2a964d69adcd141",
-                    "shipping": {
-                        "address": {
-                            "address_line_1": "1 Main St",
-                            "admin_area_1": "CA",
-                            "admin_area_2": "San Jose",
-                            "country_code": "US",
-                            "postal_code": "95131",
-                        },
-                        "name": {"full_name": "John Doe"},
-                    },
                 }
             ],
-            "status": "COMPLETED",
-            "update_time": "2026-11-01T19:55:54Z",
         }
         return {}
 
-        # user_id = self.user_id or self.guest_id
         #
         # assert user_id
         # assert self.carts_table

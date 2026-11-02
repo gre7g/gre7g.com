@@ -47,6 +47,7 @@ CSRF_LIFETIME = 300  # 5 minutes
 CSRF_HEADER = "x-csrf-token"
 PAGE_EXPIRED = 419
 PHYSICAL_SHIPPING = 5.99  # $5.99 for shipping paperbacks and jewelry in the US
+CURRENCY = "USD"
 
 
 def currency(value: float) -> Decimal:
@@ -89,6 +90,8 @@ class AuditLogEvent(StrEnum):
     """Audit log event types"""
 
     REGISTER_CLICK = auto()
+    PLACE_ORDER = auto()
+    CONFIRM_ORDER = auto()
 
 
 class ProductMix(StrEnum):

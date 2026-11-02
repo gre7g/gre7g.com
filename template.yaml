@@ -413,6 +413,7 @@ Resources:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
           CARTS_TABLE: !Ref CartsTable
           PRODUCTS_TABLE: !Ref ProductsTable
+          AUDIT_LOG_STORAGE: !Ref AuditLogStorage
           CSRF_SECRET_KEY: !Ref CsrfSecretKey
           PAYPAL_SANDBOX: !Ref PaypalSandbox
           PAYPAL_CLIENT_ID: !Ref PaypalClientId

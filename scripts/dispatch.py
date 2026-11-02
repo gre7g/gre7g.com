@@ -548,4 +548,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-# TODO set secret string as a random parameter and generate it before deploy
