@@ -2,6 +2,8 @@ import { loadScript, PayPalNamespace, OnApproveActions, OnApproveData } from "@p
 
 import { G_API, G_UI, G_SAM_OUTPUTS } from "./main";
 
+let G_SAVED_ERR_MSG = "";
+
 export function load_paypal() {
     loadScript({
         clientId: G_SAM_OUTPUTS.paypal_client_id,
@@ -18,50 +20,39 @@ export function load_paypal() {
                 async createOrder() {
                     try {
                         const order_data = await G_API.post("/api/v1/order", {});
-                        if (order_data.id) {
-                            return order_data.id;
-                        }
-
-                        const error_detail = order_data?.details?.[0];
-                        const error_message = error_detail
-                            ? `${error_detail.issue} ${error_detail.description} (${order_data.debug_id})`
-                            : JSON.stringify(order_data);
-                        throw new Error(error_message);
-                    } catch (error) {
-                        console.error(error);
+                        return order_data.id;
+                    } catch (response) {
+                        G_SAVED_ERR_MSG = response.statusText ?? JSON.stringify(response);
+                        return null;
                     }
                 },
 
-                onShippingChange(data, actions) {
-                    return data.shipping_address?.country_code === "US" ? actions.resolve() : actions.reject();
+                async onShippingAddressChange(data, actions) {
+                    if (data.shippingAddress.countryCode !== "US") {
+                        await actions.reject();
+                    }
                 },
 
                 async onApprove(data: OnApproveData, actions: OnApproveActions) {
-                    try {
-                        const order_data = await G_API.put(`/api/v1/order/${data.orderID}`, {});
-                        const error_detail = order_data?.details?.[0];
+                    await G_API.put(`/api/v1/order/${data.orderID}`, {});
+                },
 
-                        if (error_detail?.issue === "INSTRUMENT_DECLINED") {
-                            return actions.restart();
-                        } else if (error_detail) {
-                            throw new Error(`${error_detail.description} (${order_data.debug_id})`);
-                        } else if (!order_data.purchase_units) {
-                            throw new Error(JSON.stringify(order_data));
-                        } else {
-                            console.log("success", order_data);
-                            //                   const transaction =
-                            //                       order_data?.purchase_units?.[0]?.payments?.captures?.[0] ||
-                            //                       order_data?.purchase_units?.[0]?.payments?.authorizations?.[0];
-                            //                   resultMessage(
-                            //                       `Transaction ${transaction.status}: ${transaction.id}<br>
-                            // <br>See console for all available details`,
-                            //                   );
-                            //                   console.log("Capture result", order_data, JSON.stringify(order_data, null, 2));
-                        }
-                    } catch (error) {
-                        console.error(error);
-                        // resultMessage(`Sorry, your transaction could not be processed...<br><br>${error}`);
+                async onCancel(data) {
+                    const status = $("#checkout-status");
+                    status.text("Order cancelled");
+                    status.show();
+                },
+                async onError(error) {
+                    let message: string;
+                    if (error instanceof Error) {
+                        message =
+                            error.message == "Expected an order id to be passed" ? G_SAVED_ERR_MSG : error.message;
+                    } else {
+                        message = JSON.stringify(error);
                     }
+                    const status = $("#checkout-status");
+                    status.text(message);
+                    status.show();
                 },
             });
             paypal_buttons.render("#place_order");

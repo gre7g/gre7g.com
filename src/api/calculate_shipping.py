@@ -26,7 +26,7 @@ class CalculateShipping(LambdaBase):
         mix = self.get_cart_mix(cart)
 
         shipping_cost = PHYSICAL_SHIPPING if mix in [ProductMix.ALL_PHYSICAL, ProductMix.MIX_OF_TYPES] else 0.00
-        if user_id:
+        if self.user_id:
             user_status = "logged_in"
         else:
             user_status = "must_log_in" if mix in [ProductMix.ALL_DIGITAL, ProductMix.MIX_OF_TYPES] else "may_log_in"

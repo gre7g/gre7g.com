@@ -39,11 +39,8 @@ export class Api {
             dataType: "json",
             headers: {
                 "x-csrf-token": this.csrf_token,
-                "x-guest-id": this.guest_id
+                "x-guest-id": this.guest_id,
             },
-            error: (response_headers: JQuery.jqXHR, text_status: string) => {
-                throw new Error(text_status); // TODO
-            }
         };
         const session = await fetchAuthSession();
         const access_token = session.tokens?.accessToken.toString();

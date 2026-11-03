@@ -104,6 +104,7 @@ export class CheckoutUI extends CartUI {
 
     override async update() {
         await super.update();
+        $("#checkout-status").hide();
 
         // Calculate subtotal
         let subtotal = 0.0;

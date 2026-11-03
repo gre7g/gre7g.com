@@ -30,6 +30,7 @@ Policies = list[tuple[PolicyName, TableName]]
 # Constants:
 LOG = logging.getLogger(__name__)
 SUB_REF = re.compile(r"!(Ref|Sub|GetAtt|If|Equals)\b")
+SET_SEARCH = re.compile(r"SET (\w+) = (.+)")
 PARAMETERS = re.compile(r"\{(\w+)}")
 RW_POLICY = "DynamoDBCrudPolicy"
 RO_POLICY = "DynamoDBReadPolicy"
@@ -47,6 +48,10 @@ ENV_VAR_CONSTS = {
 def hack_jwt_decode(token, key, algorithms, issuer, options) -> dict[str, str]:
     """Bypasses JWT verification and decoding"""
     return {"sub": token}
+
+
+class ConditionFailed(Exception):
+    pass
 
 
 class RequestHandler(BaseHTTPRequestHandler):
@@ -87,8 +92,12 @@ class Table:
     keys: list[str] = field(default_factory=list)
     records: dict = field(default_factory=dict)
     policy: str = ""
+    meta: Mock = field(default_factory=Mock)
 
     SECRET_OVERRIDE: ClassVar[bool] = False
+
+    def __post_init__(self):
+        self.meta.client.exceptions.ConditionalCheckFailedException = ConditionFailed
 
     def _key(self, key_dict: dict) -> tuple:
         """Represent a key as a tuple"""
@@ -130,6 +139,21 @@ class Table:
     def scan(self):
         """Scan all records in a database"""
         return {"Items": list(self.records.values())}
+
+    def update_item(self, Key: dict, UpdateExpression: str, ConditionExpression: str, ExpressionAttributeValues: dict) -> None:
+        if (self.policy != RW_POLICY) and not self.SECRET_OVERRIDE:
+            raise ClientError({"Error": {"Code": "AccessDeniedException", "Message": "Permission Denied"}}, "get_item")
+        key = self._key(Key)
+        record = self.records[key]
+        for old, value in ExpressionAttributeValues.items():
+            UpdateExpression = UpdateExpression.replace(old, str(value))
+            ConditionExpression = ConditionExpression.replace(old, str(value))
+        match = SET_SEARCH.search(UpdateExpression)
+        assert match
+        if eval(ConditionExpression, locals=record):
+            record[match.group(1)] = eval(match.group(2), locals=record)
+        else:
+            raise ConditionFailed()
 
 
 @dataclass

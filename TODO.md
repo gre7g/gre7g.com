@@ -6,7 +6,7 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
-- [X] Don't allow customers to buy physical items with a shipping country other than US
+- [ ] Don't allow customers to buy physical items with a shipping country other than US
 
 Moderate Urgency
 ----------------
@@ -15,6 +15,7 @@ Moderate Urgency
       description, and it doesn't like the length and mark-up.
 - [ ] e-mail the administrator if we are unable to decrement the inventory quantities in confirm_order.py
 - [X] Split library between app and testing modules.
+- [ ] Managed login
 
 Basic Features
 --------------
@@ -27,6 +28,8 @@ Basic Features
 - [ ] Show a sitemap
 - [ ] Shopping cart needs:
   - [ ] Quantity, price per, remove from cart, update amount
+- [ ] Show current order and any downloads
+- [ ] Show previous orders (logged in only)
 
 Low Urgency
 -----------
