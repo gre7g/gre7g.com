@@ -9,7 +9,7 @@ from secrets import token_hex
 from time import time
 
 from gre7g_utils import CSRF_HEADER, PAGE_EXPIRED
-from integration_base import BaseTestCase, Validate, SKIP_LOCAL, NO_CLOUD
+from lib.local.integration_base import BaseTestCase, Validate, SKIP_LOCAL, NO_CLOUD
 
 # Constants:
 LOG = logging.getLogger(__name__)
@@ -22,10 +22,12 @@ class TestMisc(BaseTestCase):
         """Should reject access with a bad method"""
         for path, methods in [
             ("/api/v1/cart", ["DELETE"]),
+            ("/api/v1/cart/shipping", ["GET", "PUT", "DELETE"]),
             ("/api/v1/click_id", ["GET", "PUT", "DELETE"]),
             ("/api/v1/download/order1_id", ["POST", "PUT", "DELETE"]),
             ("/api/v1/guest", ["GET", "DELETE"]),
-            ("/api/v1/order", ["POST", "PUT", "DELETE"]),
+            ("/api/v1/order", ["PUT", "DELETE"]),
+            ("/api/v1/order/order1_id", ["GET", "POST", "DELETE"]),
             ("/api/v1/products", ["POST", "PUT", "DELETE"]),
         ]:
             for method in methods:

@@ -140,7 +140,9 @@ class Table:
         """Scan all records in a database"""
         return {"Items": list(self.records.values())}
 
-    def update_item(self, Key: dict, UpdateExpression: str, ConditionExpression: str, ExpressionAttributeValues: dict) -> None:
+    def update_item(
+        self, Key: dict, UpdateExpression: str, ConditionExpression: str, ExpressionAttributeValues: dict
+    ) -> None:
         if (self.policy != RW_POLICY) and not self.SECRET_OVERRIDE:
             raise ClientError({"Error": {"Code": "AccessDeniedException", "Message": "Permission Denied"}}, "get_item")
         key = self._key(Key)

@@ -11,3 +11,7 @@ exclude = ["boto3_hack", "integration_base"]
 disallow_untyped_defs = true
 mypy_path = "lib/deploy"
 explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = "paypalserversdk.*"
+ignore_missing_imports = true

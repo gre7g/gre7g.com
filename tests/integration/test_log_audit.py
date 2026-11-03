@@ -1,32 +1,52 @@
 """Test adding an audit event"""
 
+from dataclasses import dataclass, field
 from http import HTTPStatus
 import logging
+from typing import Callable, Any
+from unittest.mock import patch
 
 from .base_test_classes import BaseTestCase
-from gre7g_utils import AuditLogEvent
+import gre7g_utils
 
 # Constants:
 LOG = logging.getLogger(__name__)
 
 
+@dataclass
+class MockThread:
+    """Mock thread"""
+
+    target: Callable
+    args: tuple = ()
+    kwargs: dict[str, Any] = field(default_factory=dict)
+    daemon: bool = False
+
+    def start(self) -> None:
+        """Start the thread"""
+        self.target(*self.args, **self.kwargs)
+
+
 class TestLogAudit(BaseTestCase):
     """Test adding an audit event"""
 
-    def test_happy_path(self) -> None:
+    @patch("gre7g_utils.Thread")
+    def test_happy_path(self, *args) -> None:
         """Test adding an audit event"""
+        gre7g_utils.Thread = MockThread
+
         response = self.post(
             "/api/v1/click_id",
             auth_user=self.regular_user,
             guest_user="some-guest-id",
             json={"click_id": "some click id"},
         )
-        assert response.status_code == HTTPStatus.OK
+        assert response.status_code == HTTPStatus.CREATED
 
         objects = self.get_all_audit_objects()
         try:
             needle = {
-                "event": AuditLogEvent.REGISTER_CLICK.value,
+                "event": gre7g_utils.AuditLogEvent.REGISTER_CLICK.value,
                 "user_id": self.regular_user.user_id,
                 "guest_id": "some-guest-id",
                 "click_id": "some click id",

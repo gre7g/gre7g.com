@@ -118,6 +118,14 @@ components:
           schema:
             $ref: "#/components/schemas/error-message"
 
+  parameters:
+    order_id:
+      name: order_id
+      in: path
+      required: true
+      schema:
+        type: string
+
 paths:
   /api/v1/cart:
     get:
@@ -238,11 +246,7 @@ paths:
       summary: Download a file
       description: Request a digital download from a previous purchase
       parameters:
-        - in: path
-          name: order_id
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/order_id"
       responses:
         "200":
           description: Successful download
@@ -412,16 +416,12 @@ paths:
                 required:
                   - status
 
-  /api/v1/order/<order_id>:
+  /api/v1/order/{order_id}:
     put:
       summary: Confirm an order
       description: Verify that an order processed successfully
       parameters:
-        - name: order_id
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/order_id"
       requestBody:
         required: true
         content:

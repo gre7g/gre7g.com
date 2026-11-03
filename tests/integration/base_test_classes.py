@@ -6,7 +6,7 @@ import json
 from typing import Any
 
 from gre7g_utils import Cart, UserId, Product, ProductId, Order, OrderId, Timestamp
-import integration_base
+from lib.local import integration_base
 
 # Types:
 AuditObj = dict[str, Any]
@@ -15,7 +15,7 @@ AuditObj = dict[str, Any]
 class BaseTestCase(integration_base.BaseTestCase):
     """Base class for integration tests"""
 
-    PRODUCT1 = Product("Skeleton Crew", "aa", "books/skeleton-crew", ProductId("p1"), 1, 13.99)
+    PRODUCT1 = Product("Skeleton Crew", "aa", "books/skeleton-crew", ProductId("p1"), 1, 13.99, media="paperback")
     P_DICT1 = {
         "name": "Skeleton Crew",
         "description": "aa",
@@ -23,12 +23,14 @@ class BaseTestCase(integration_base.BaseTestCase):
         "product_id": "p1",
         "quantity": 1,
         "cost_per": 13.99,
+        "images": [],
         "downloads": [],
+        "media": "paperback",
         "status": "available",
         "parent_id": None,
         "child_ids": [],
     }
-    PRODUCT2 = Product("Long Way Home", "bb", "books/long-way-home", ProductId("p2"), 1, 18.49)
+    PRODUCT2 = Product("Long Way Home", "bb", "books/long-way-home", ProductId("p2"), 1, 18.49, media="paperback")
     P_DICT2 = {
         "name": "Long Way Home",
         "description": "bb",
@@ -36,12 +38,16 @@ class BaseTestCase(integration_base.BaseTestCase):
         "cost_per": 18.49,
         "listing_path": "books/long-way-home",
         "product_id": "p2",
+        "images": [],
         "downloads": [],
+        "media": "paperback",
         "status": "available",
         "parent_id": None,
         "child_ids": [],
     }
-    PRODUCT3 = Product("Small World", "cc", "books/small-world", ProductId("p3"), 1, 15.99, ["test.zip"])
+    PRODUCT3 = Product(
+        "Small World", "cc", "books/small-world", ProductId("p3"), 1, 15.99, downloads=["test.zip"], media="audiobook"
+    )
     P_DICT3 = {
         "name": "Small World",
         "description": "cc",
@@ -49,12 +55,14 @@ class BaseTestCase(integration_base.BaseTestCase):
         "cost_per": 15.99,
         "listing_path": "books/small-world",
         "product_id": "p3",
+        "images": [],
         "downloads": ["test.zip"],
+        "media": "audiobook",
         "status": "available",
         "parent_id": None,
         "child_ids": [],
     }
-    PRODUCT4 = Product("Long Way Home", "dd", "books/long-way-home", ProductId("p2"), 2, 18.49)
+    PRODUCT4 = Product("Long Way Home", "dd", "books/long-way-home", ProductId("p2"), 2, 18.49, media="paperback")
     P_DICT4 = {
         "name": "Long Way Home",
         "description": "dd",
@@ -62,7 +70,9 @@ class BaseTestCase(integration_base.BaseTestCase):
         "cost_per": 18.49,
         "listing_path": "books/long-way-home",
         "product_id": "p2",
+        "images": [],
         "downloads": [],
+        "media": "paperback",
         "status": "available",
         "parent_id": None,
         "child_ids": [],
@@ -88,9 +98,9 @@ class BaseTestCase(integration_base.BaseTestCase):
             UserId(self.regular_user.user_id),
             [self.PRODUCT1],
             13.99,
-            0.00,
             5.00,
             18.99,
+            0.00,
             OrderId("order1_id"),
             Timestamp("recently"),
         )
@@ -98,9 +108,9 @@ class BaseTestCase(integration_base.BaseTestCase):
             UserId(self.regular_user.user_id),
             [self.PRODUCT3],
             18.49,
-            -2.00,
             5.00,
             21.49,
+            -2.00,
             OrderId("order2_id"),
             Timestamp("long ago"),
         )

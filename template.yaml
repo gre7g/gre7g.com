@@ -53,6 +53,7 @@ Resources:
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
       UserPoolName: !Sub ${AWS::StackName}-user-pool
+      UserPoolTier: ESSENTIALS
       UsernameAttributes:
         - email
       AutoVerifiedAttributes:
@@ -71,7 +72,7 @@ Resources:
     Properties:
       ClientName: !Sub ${AWS::StackName}-user-pool-client
       UserPoolId: !Ref UserPool
-#      GenerateSecret: false
+      GenerateSecret: false
       ExplicitAuthFlows:
         - ALLOW_USER_PASSWORD_AUTH
         - ALLOW_REFRESH_TOKEN_AUTH
@@ -79,11 +80,25 @@ Resources:
         - code
       AllowedOAuthScopes:
         - openid
+        - email
+        - profile
       AllowedOAuthFlowsUserPoolClient: true
       CallbackURLs:
         - https://%%CLOUDFRONT_DOMAIN%%
+      LogoutURLs:
+        - https://%%CLOUDFRONT_DOMAIN%%
       SupportedIdentityProviders:
         - COGNITO
+
+  LoginBranding:
+    Type: AWS::Cognito::ManagedLoginBranding
+    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    Properties:
+      Name: !Sub ${AWS::StackName}-login-branding
+      UserPoolId: !Ref UserPool
+      ClientId: !Ref UserPoolClient
+      UseCognitoProvidedValues: true
 
   Api:
     Type: AWS::Serverless::HttpApi
