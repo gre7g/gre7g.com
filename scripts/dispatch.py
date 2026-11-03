@@ -49,6 +49,7 @@ DELETE_OLDER = timedelta(days=30)
 WEB_PORT = 8080
 SEARCH_MINIFY = re.compile(r"^\s*minify: (\w+)", re.M)
 SEARCH_PRETTIER_EXT = re.compile(r"\.(ts|html|json)$", re.M)
+SEARCH_PRETTIER_NOT = re.compile(r" notes/")
 
 # Globals
 G_PY_TESTER = ["pytest"]
@@ -338,7 +339,11 @@ class Dispatch:
         assert self.npx_path
         process = Popen([self.npx_path, "prettier", str(ROOT_PATH), "--check"], text=True, stdout=PIPE, stderr=PIPE)
         _, stderr = process.communicate()
-        warnings = [line for line in stderr.splitlines() if SEARCH_PRETTIER_EXT.search(line)]
+        warnings = [
+            line
+            for line in stderr.splitlines()
+            if SEARCH_PRETTIER_EXT.search(line) and not SEARCH_PRETTIER_NOT.search(line)
+        ]
         if warnings:
             print("Prettier found issues:")
             print("\n".join(warnings))

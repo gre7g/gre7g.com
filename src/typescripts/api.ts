@@ -24,11 +24,11 @@ export class Api {
                             scopes: ["openid"],
                             redirectSignIn: [G_SAM_OUTPUTS.website_url],
                             redirectSignOut: [G_SAM_OUTPUTS.website_url],
-                            responseType: "code"
-                        }
-                    }
-                }
-            }
+                            responseType: "code",
+                        },
+                    },
+                },
+            },
         });
     }
 
