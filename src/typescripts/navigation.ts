@@ -1,13 +1,18 @@
 import { G_PRODUCTS, G_UI } from "./main";
-import { $ } from "jquery";
-import ClickEvent = JQuery.ClickEvent;
 
 export class Navigator {
-    async navigate_internal(event: ClickEvent) {
-        event.preventDefault();
-        const href = $(event.currentTarget!).attr("href");
-        history.pushState(null, "", href);
-        await this.go(href!);
+    async navigate(event: NavigateEvent) {
+        const navigator = this;
+        if (event.userInitiated && event.canIntercept && !event.downloadRequest && !event.formData) {
+            const target_url = new URL(event.destination.url);
+            event.intercept({
+                async handler() {
+                    event.preventDefault();
+                    history.pushState(null, "", target_url);
+                    await navigator.go(target_url.pathname);
+                },
+            });
+        }
     }
 
     async go(path: string): Promise<void> {

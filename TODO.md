@@ -6,9 +6,9 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
+- [ ] Managed login
 - [ ] Don't allow customers to buy physical items with a shipping country other than US
 - [ ] Is the audit log working on a thread?
-- [ ] Switch internal/external link modification over to navigation interception
 
 Moderate Urgency
 ----------------
@@ -16,7 +16,6 @@ Moderate Urgency
       than the HTML description that we have in the current description field. PayPal wants something for an item
       description, and it doesn't like the length and mark-up.
 - [ ] e-mail the administrator if we are unable to decrement the inventory quantities in confirm_order.py
-- [ ] Managed login
 
 Basic Features
 --------------
@@ -34,6 +33,8 @@ Basic Features
 
 Low Urgency
 -----------
+- [ ] Refactor gre7g_util into lambda and database utilities
+- [ ] Does code= get removed from the URL after login?
 - [ ] In the dispatch script, I have a check that won't treat "No changes to deploy." as an error. However, if I have to
       re-execute a deploy command because we weren't logged in, then I still treat the "No changes to deploy." status as
       an error.
@@ -41,11 +42,10 @@ Low Urgency
 - [ ] Add code coverage for Typescript
 - [ ] Add something to monitor progress on code coverage
 - [ ] Go through .ts files and add more comments, function headers, etc.
-- [ ] Refactor gre7g_util into lambda and database utilities
-- [ ] Does code= get removed from the URL after login?
 
 Old and Completed
 -----------------
+- [X] Switch internal/external link modification over to navigation interception
 - [X] First POST to guest isn't triggering a retry. I think it's returning a 403 instead of 417.
 - [X] Delete old .js files in s3
 - [X] Split library between app and testing modules.

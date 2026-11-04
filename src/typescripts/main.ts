@@ -74,8 +74,8 @@ export class Main {
         $(window).on("popstate", async () => {
             await G_NAVIGATOR.go(window.location.pathname);
         });
-        $("a.internal").on("click", async (event) => {
-            await G_NAVIGATOR.navigate_internal(event);
+        navigation.addEventListener("navigate", (event) => {
+            G_NAVIGATOR.navigate(event);
         });
         $("#add-to-cart").on("click", async () => {
             await this.add_to_cart();
