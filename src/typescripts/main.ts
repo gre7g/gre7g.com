@@ -83,6 +83,9 @@ export class Main {
         $("#checkout-button").on("click", async () => {
             await this.checkout();
         });
+        $(".login").on("click", () => {
+            window.location.href = G_SAM_OUTPUTS.cognito_login_url;
+        });
         load_paypal();
     }
 }

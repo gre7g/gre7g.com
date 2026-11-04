@@ -229,7 +229,7 @@ class Dispatch:
                 "--stack-name",
                 self.stack_name,
                 "--parameter-overrides",
-                ",".join(f"{key}={value}" for key, value in parameters.items()),
+                " ".join(f"{key}={value}" for key, value in parameters.items()),
             ]
         )
         self.describe()

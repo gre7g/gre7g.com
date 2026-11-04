@@ -39,6 +39,11 @@ components:
           description: |
             CAUTION: This field is informational and should never be considered authoritative! The user could PUT any 
             cost when they update their cart, but we MUST refer to authoritative price during check-out.
+        images:
+          type: array
+          items:
+            type: string
+            description: URL of an image file
         downloads:
           type: array
           description: Filenames for digital downloads associated with this item

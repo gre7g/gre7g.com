@@ -95,7 +95,6 @@ Resources:
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
     Properties:
-      Name: !Sub ${AWS::StackName}-login-branding
       UserPoolId: !Ref UserPool
       ClientId: !Ref UserPoolClient
       UseCognitoProvidedValues: true
