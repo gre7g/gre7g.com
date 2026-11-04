@@ -217,26 +217,30 @@ class Dispatch:
         web_file_storage = dest_dict.get("outputs", {}).get("web_file_storage")
         if web_file_storage:
             assert self.aws_path, "unable to find AWS"
-            self.login_call([
-                self.aws_path,
-                "s3",
-                "rm",
-                f"s3://{web_file_storage}/assets/",
-                "--recursive",
-                "--exclude",
-                "*",
-                "--include",
-                "*.js"
-            ])
+            self.login_call(
+                [
+                    self.aws_path,
+                    "s3",
+                    "rm",
+                    f"s3://{web_file_storage}/assets/",
+                    "--recursive",
+                    "--exclude",
+                    "*",
+                    "--include",
+                    "*.js",
+                ]
+            )
 
-    def deploy(self, dest_dict: dict) -> None:
+    def deploy(self, dest_dict: dict, production: bool) -> None:
         """Deploy the stack, update the `dest_dict`"""
         assert self.sam_path, "unable to find AWS sam"
+        client_id = os.getenv("LIVE_PAYPAL_CLIENT_ID" if production else "SANDBOX_PAYPAL_CLIENT_ID")
+        client_secret = os.getenv("LIVE_PAYPAL_CLIENT_SECRET" if production else "SANDBOX_PAYPAL_CLIENT_SECRET")
         parameters = {
             "CsrfSecretKey": token_hex(),
             "PaypalSandbox": "False",
-            "PaypalClientId": os.getenv("LIVE_PAYPAL_CLIENT_ID"),
-            "PaypalClientSecret": os.getenv("LIVE_PAYPAL_CLIENT_SECRET"),
+            "PaypalClientId": client_id,
+            "PaypalClientSecret": client_secret,
             "EnableDeletionProtection": str(self.name_set == "PROD").lower(),
         }
         self.login_call(
@@ -433,7 +437,7 @@ class Dispatch:
                 )
                 if not ((self.hash_str == stack.get("hash")) and stack.get("up")):
                     self.delete_old_js(stack)
-                    self.deploy(stack)
+                    self.deploy(stack, False)
                     audit_log.info("deploy success")
                     stack["up"] = True
                 passed = self.integration_tests(self.stack_name)
@@ -464,7 +468,7 @@ class Dispatch:
                 production = self.save_state["production"]
                 if self.hash_str != self.save_state.setdefault("production", {}).get("hash"):
                     self.delete_old_js(production)
-                    self.deploy(production)
+                    self.deploy(production, True)
                     audit_log.info("deploy success")
                 passed = self.integration_tests("PROD")
                 production["tests-passed"] = passed

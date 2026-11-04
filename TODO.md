@@ -7,7 +7,8 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 High Urgency
 ------------
 - [ ] Don't allow customers to buy physical items with a shipping country other than US
-- [ ] First POST to guest isn't triggering a retry. I think it's returning a 403 instead of 417.
+- [ ] Is the audit log working on a thread?
+- [ ] Switch internal/external link modification over to navigation interception
 
 Moderate Urgency
 ----------------
@@ -15,7 +16,6 @@ Moderate Urgency
       than the HTML description that we have in the current description field. PayPal wants something for an item
       description, and it doesn't like the length and mark-up.
 - [ ] e-mail the administrator if we are unable to decrement the inventory quantities in confirm_order.py
-- [X] Split library between app and testing modules.
 - [ ] Managed login
 
 Basic Features
@@ -40,9 +40,12 @@ Low Urgency
 - [ ] Add code coverage for Python
 - [ ] Add code coverage for Typescript
 - [ ] Add something to monitor progress on code coverage
-- [ ] Delete old .js files in s3
 - [ ] Go through .ts files and add more comments, function headers, etc.
 - [ ] Refactor gre7g_util into lambda and database utilities
+- [ ] Does code= get removed from the URL after login?
 
 Old and Completed
 -----------------
+- [X] First POST to guest isn't triggering a retry. I think it's returning a 403 instead of 417.
+- [X] Delete old .js files in s3
+- [X] Split library between app and testing modules.
