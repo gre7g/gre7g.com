@@ -212,6 +212,23 @@ class Dispatch:
         self.login_call([self.aws_path, "s3", "rm", f"s3://{web_file_storage}", "--recursive"])
         self.check_call([self.sam_path, "delete", "--stack-name", self.stack_name])
 
+    def delete_old_js(self, dest_dict: dict) -> None:
+        """Delete old JS files from the S3 bucket"""
+        web_file_storage = dest_dict.get("outputs", {}).get("web_file_storage")
+        if web_file_storage:
+            assert self.aws_path, "unable to find AWS"
+            self.login_call([
+                self.aws_path,
+                "s3",
+                "rm",
+                f"s3://{web_file_storage}/assets/",
+                "--recursive",
+                "--exclude",
+                "*",
+                "--include",
+                "*.js"
+            ])
+
     def deploy(self, dest_dict: dict) -> None:
         """Deploy the stack, update the `dest_dict`"""
         assert self.sam_path, "unable to find AWS sam"
@@ -415,6 +432,7 @@ class Dispatch:
                     self.save_state.setdefault("dev-stack", {}).setdefault("recent", {}).setdefault(self.name_set, {})
                 )
                 if not ((self.hash_str == stack.get("hash")) and stack.get("up")):
+                    self.delete_old_js(stack)
                     self.deploy(stack)
                     audit_log.info("deploy success")
                     stack["up"] = True
@@ -445,6 +463,7 @@ class Dispatch:
                 audit_log.info("build success: %r", success)
                 production = self.save_state["production"]
                 if self.hash_str != self.save_state.setdefault("production", {}).get("hash"):
+                    self.delete_old_js(production)
                     self.deploy(production)
                     audit_log.info("deploy success")
                 passed = self.integration_tests("PROD")

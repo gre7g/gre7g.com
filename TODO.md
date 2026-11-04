@@ -7,6 +7,7 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 High Urgency
 ------------
 - [ ] Don't allow customers to buy physical items with a shipping country other than US
+- [ ] First POST to guest isn't triggering a retry. I think it's returning a 403 instead of 417.
 
 Moderate Urgency
 ----------------
@@ -41,6 +42,7 @@ Low Urgency
 - [ ] Add something to monitor progress on code coverage
 - [ ] Delete old .js files in s3
 - [ ] Go through .ts files and add more comments, function headers, etc.
+- [ ] Refactor gre7g_util into lambda and database utilities
 
 Old and Completed
 -----------------

@@ -7,6 +7,7 @@ from typing import Callable, Any
 from unittest.mock import patch
 
 from .base_test_classes import BaseTestCase
+from lib.local.integration_base import CLOUD_ONLY, NO_CLOUD
 import gre7g_utils
 
 # Constants:
@@ -30,11 +31,7 @@ class MockThread:
 class TestLogAudit(BaseTestCase):
     """Test adding an audit event"""
 
-    @patch("gre7g_utils.Thread")
-    def test_happy_path(self, *args) -> None:
-        """Test adding an audit event"""
-        gre7g_utils.Thread = MockThread
-
+    def add_audit_event(self):
         response = self.post(
             "/api/v1/click_id",
             auth_user=self.regular_user,
@@ -54,3 +51,15 @@ class TestLogAudit(BaseTestCase):
             assert self.obj_in_audit_objects(needle, objects)
         finally:
             self.delete_audit_objects(objects)
+
+    @NO_CLOUD
+    @patch("gre7g_utils.Thread")
+    def test_simulation(self, *_args) -> None:
+        """Test adding an audit event in simulation"""
+        gre7g_utils.Thread = MockThread
+        self.add_audit_event()
+
+    @CLOUD_ONLY
+    def test_cloud(self) -> None:
+        """Test adding an audit event in the cloud"""
+        self.add_audit_event()
