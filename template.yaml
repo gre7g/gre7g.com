@@ -269,6 +269,7 @@ Resources:
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
+          CARTS_TABLE: !Ref CartsTable
           CSRF_SECRET_KEY: !Ref CsrfSecretKey
       Layers:
         - !Ref Lib
@@ -417,11 +418,14 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-place-order
       CodeUri: src/api
       Handler: place_order.lambda_handler
+      Timeout: 30  # Writing to s3 can take more than 3s
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref CartsTable
         - DynamoDBReadPolicy:
             TableName: !Ref ProductsTable
+        - S3CrudPolicy:
+            BucketName: !Ref AuditLogStorage
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
@@ -450,16 +454,20 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-confirm-order
       CodeUri: src/api
       Handler: confirm_order.lambda_handler
+      Timeout: 30  # Writing to s3 can take more than 3s
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref CartsTable
-        - DynamoDBReadPolicy:
+        - DynamoDBCrudPolicy:
             TableName: !Ref OrdersTable
         - DynamoDBCrudPolicy:
             TableName: !Ref ProductsTable
+        - S3CrudPolicy:
+            BucketName: !Ref AuditLogStorage
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
+          AUDIT_LOG_STORAGE: !Ref AuditLogStorage
           CARTS_TABLE: !Ref CartsTable
           ORDERS_TABLE: !Ref OrdersTable
           PRODUCTS_TABLE: !Ref ProductsTable
@@ -559,8 +567,8 @@ Resources:
           - PathPattern: /api/*
             TargetOriginId: ApiOrigin
             ViewerProtocolPolicy: https-only
-            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
-            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad  # CachingDisabled
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac  # AllViewerExceptHostHeader
             AllowedMethods: [DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT]
 
 Outputs:
@@ -584,7 +592,7 @@ Outputs:
 
   CognitoLoginURL:
     Description: Used by the HTML script
-    Value: !Sub "https://${AWS::StackName}-auth.auth.${AWS::Region}.amazoncognito.com/login?client_id=${UserPoolClient}&response_type=code&scope=openid&redirect_uri=https://${WebDistribution.DomainName}"
+    Value: !Sub "https://${AWS::StackName}-auth.auth.${AWS::Region}.amazoncognito.com/login?client_id=${UserPoolClient}&response_type=code&scope=openid&redirect_uri=https://${WebDistribution.DomainName}/login"
 
   OrdersTableName:
     Description: Used by integration tests

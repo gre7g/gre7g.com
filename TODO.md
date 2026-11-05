@@ -9,6 +9,7 @@ High Urgency
 - [ ] Managed login
 - [ ] Don't allow customers to buy physical items with a shipping country other than US
 - [ ] Is the audit log working on a thread?
+- [ ] 419 error on PUT resulted in a follow-up GET!
 
 Moderate Urgency
 ----------------
@@ -16,6 +17,7 @@ Moderate Urgency
       than the HTML description that we have in the current description field. PayPal wants something for an item
       description, and it doesn't like the length and mark-up.
 - [ ] e-mail the administrator if we are unable to decrement the inventory quantities in confirm_order.py
+- [ ] URL history is broken (at least on cloud)
 
 Basic Features
 --------------
@@ -42,6 +44,9 @@ Low Urgency
 - [ ] Add code coverage for Typescript
 - [ ] Add something to monitor progress on code coverage
 - [ ] Go through .ts files and add more comments, function headers, etc.
+- [ ] Create another static analysis for the template file to check if there are permissions, timeouts, and environment
+      variables available to the functions. Could even re-sort the items? Could we put decorators or comments on 
+      functions to identify which resources they require?
 
 Old and Completed
 -----------------

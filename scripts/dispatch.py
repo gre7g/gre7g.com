@@ -238,7 +238,7 @@ class Dispatch:
         client_secret = os.getenv("LIVE_PAYPAL_CLIENT_SECRET" if production else "SANDBOX_PAYPAL_CLIENT_SECRET")
         parameters = {
             "CsrfSecretKey": token_hex(),
-            "PaypalSandbox": "False",
+            "PaypalSandbox": str(not production),
             "PaypalClientId": client_id,
             "PaypalClientSecret": client_secret,
             "EnableDeletionProtection": str(self.name_set == "PROD").lower(),
@@ -304,7 +304,7 @@ class Dispatch:
         del client_config["LastModifiedDate"]
 
         # Replace the callback URLs
-        client_config["CallbackURLs"] = [outputs.get("website_url")]
+        client_config["CallbackURLs"] = [f"{outputs.get("website_url")}/login"]
 
         # Write the configuration to a temporary file
         with NamedTemporaryFile(mode="wt", delete_on_close=False) as temp_file:

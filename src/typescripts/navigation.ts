@@ -1,3 +1,5 @@
+import { signInWithRedirect } from "aws-amplify/auth";
+
 import { G_PRODUCTS, G_UI } from "./main";
 
 export class Navigator {
@@ -18,6 +20,9 @@ export class Navigator {
     async go(path: string): Promise<void> {
         if (path == "/shop") {
             console.log("Show shop"); // TODO
+        } else if (path == "/login") {
+            await signInWithRedirect();
+            await G_UI.show("products");
         } else if (path == "/gre7g/appearances") {
             console.log("Show appearances"); // TODO
         } else if (path == "/gre7g/contact") {

@@ -66,7 +66,7 @@ class PlaceOrder(LambdaBase):
             else:
                 item = Item(
                     name=product_listing.name,
-                    unit_amount=Money(CURRENCY, product_listing.cost_per),
+                    unit_amount=Money(CURRENCY, "%0.2f" % product_listing.cost_per),
                     quantity=str(product.quantity),
                     description=product_listing.description,
                     sku=product_listing.product_id,
@@ -80,11 +80,15 @@ class PlaceOrder(LambdaBase):
 
         shipping_cost = PHYSICAL_SHIPPING if mix in [ProductMix.ALL_PHYSICAL, ProductMix.MIX_OF_TYPES] else 0.00
         total_cost = subtotal_cost + shipping_cost
-        breakdown = AmountBreakdown(Money(CURRENCY, subtotal_cost), Money(CURRENCY, shipping_cost))
+        breakdown = AmountBreakdown(Money(CURRENCY, "%0.2f" % subtotal_cost), Money(CURRENCY, "%0.2f" % shipping_cost))
 
         order_request = OrderRequest(
             CheckoutPaymentIntent.CAPTURE,
-            [PurchaseUnitRequest(AmountWithBreakdown(CURRENCY, total_cost, breakdown), str(uuid1()), items=item_list)],
+            [
+                PurchaseUnitRequest(
+                    AmountWithBreakdown(CURRENCY, "%0.2f" % total_cost, breakdown), str(uuid1()), items=item_list
+                )
+            ],
         )
         self.audit_log(AuditLogEvent.PLACE_ORDER, order_request=APIHelper.to_dictionary(order_request))
 
