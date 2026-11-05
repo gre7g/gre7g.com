@@ -24,22 +24,17 @@ class AuditLogEvent(StrEnum):
     CART_MERGE = auto()
 
 
-def audit_log(event: AuditLogEvent, **kwargs: Any) -> None:
+def audit_log(event: AuditLogEvent, **kwargs: Any) -> Thread:
     """Log an event to the audit log"""
     now = datetime.now(UTC)
     data = {"timestamp": now.isoformat(), "event": event.value}
-    # thread = Thread(
-    #     target=boto3.client("s3").put_object,
-    #     kwargs={
-    #         "Bucket": os.environ["AUDIT_LOG_STORAGE"],
-    #         "Key": f"custom/{now.strftime('%Y-%m')}/{str(uuid1())}.json",
-    #         "Body": json.dumps(data | kwargs),
-    #     },
-    #     daemon=False,
-    # )
-    # thread.start()
-    boto3.client("s3").put_object(
-        Bucket=os.environ["AUDIT_LOG_STORAGE"],
-        Key=f"custom/{now.strftime('%Y-%m')}/{str(uuid1())}.json",
-        Body=json.dumps(data | kwargs),
+    thread = Thread(
+        target=boto3.client("s3").put_object,
+        kwargs={
+            "Bucket": os.environ["AUDIT_LOG_STORAGE"],
+            "Key": f"custom/{now.strftime('%Y-%m')}/{str(uuid1())}.json",
+            "Body": json.dumps(data | kwargs),
+        },
     )
+    thread.start()
+    return thread

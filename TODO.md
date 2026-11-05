@@ -6,9 +6,8 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
-- [X] Managed login
 - [ ] Don't allow customers to buy physical items with a shipping country other than US
-- [ ] Is the audit log working on a thread?
+- [X] Is the audit log working on a thread?
 - [ ] 419 error on PUT resulted in a follow-up GET!
 
 Moderate Urgency
@@ -35,8 +34,6 @@ Basic Features
 
 Low Urgency
 -----------
-- [X] Refactor gre7g_util into lambda and database utilities
-- [X] Does code= get removed from the URL after login?
 - [ ] In the dispatch script, I have a check that won't treat "No changes to deploy." as an error. However, if I have to
       re-execute a deploy command because we weren't logged in, then I still treat the "No changes to deploy." status as
       an error.
@@ -50,6 +47,9 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] Refactor gre7g_util into lambda and database utilities
+- [X] Does code= get removed from the URL after login?
+- [X] Managed login
 - [X] Switch internal/external link modification over to navigation interception
 - [X] First POST to guest isn't triggering a retry. I think it's returning a 403 instead of 417.
 - [X] Delete old .js files in s3

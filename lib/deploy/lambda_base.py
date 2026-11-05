@@ -24,6 +24,7 @@ from paypalserversdk.logging.configuration.api_logging_configuration import (
 from paypalserversdk.controllers.orders_controller import OrdersController
 from paypalserversdk.paypal_serversdk_client import PaypalServersdkClient
 from secrets import token_hex
+from threading import Thread
 from time import time
 from types_boto3_dynamodb.service_resource import Table as DynamoDBTable
 from typing import Any, Callable
@@ -82,6 +83,8 @@ class LambdaBase(ABC):
     user_id: UserId | None = None
     guest_id: UserId | None = None
     body: dict[str, Any] = field(default_factory=dict)
+
+    threads: list[Thread] = field(default_factory=list)
 
     AUTH_REQUIRED = AuthenticationRequired.NONE
 
@@ -195,6 +198,9 @@ class LambdaBase(ABC):
             status = HTTPStatus.INTERNAL_SERVER_ERROR
             body = {"message": str(error)}
 
+        for thread in self.threads:
+            thread.join()
+
         csrf_token = f"{int(time() + CSRF_LIFETIME)}-{token_hex()}-"
         message = f"{csrf_token}{source_ip}".encode("ascii")
         csrf_token += hmac.new(self.secret_key, message, sha3_256).hexdigest()
@@ -226,7 +232,7 @@ class LambdaBase(ABC):
 
     def audit_log(self, event: AuditLogEvent, **kwargs: Any) -> None:
         """Log an event to the audit log"""
-        audit_log(event, user_id=self.user_id, guest_id=self.guest_id, **kwargs)
+        self.threads.append(audit_log(event, user_id=self.user_id, guest_id=self.guest_id, **kwargs))
 
     @staticmethod
     def get_cart_mix(cart: Cart) -> ProductMix:
