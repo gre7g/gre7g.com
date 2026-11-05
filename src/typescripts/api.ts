@@ -22,7 +22,7 @@ export class Api {
                         oauth: {
                             domain: G_SAM_OUTPUTS.cognito_host_name,
                             scopes: ["openid"],
-                            redirectSignIn: [G_SAM_OUTPUTS.website_url],
+                            redirectSignIn: [`${G_SAM_OUTPUTS.website_url}/login`],
                             redirectSignOut: [G_SAM_OUTPUTS.website_url],
                             responseType: "code",
                         },

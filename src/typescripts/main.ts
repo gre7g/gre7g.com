@@ -1,4 +1,5 @@
 import { $ } from "jquery";
+import { signInWithRedirect } from "aws-amplify/auth";
 
 import { Api } from "./api";
 import { Cart } from "./cart";
@@ -83,8 +84,8 @@ export class Main {
         $("#checkout-button").on("click", async () => {
             await this.checkout();
         });
-        $(".login").on("click", () => {
-            window.location.href = G_SAM_OUTPUTS.cognito_login_url;
+        $(".login").on("click", async () => {
+            await signInWithRedirect();
         });
         load_paypal();
     }
