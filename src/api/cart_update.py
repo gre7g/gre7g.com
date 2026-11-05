@@ -1,4 +1,8 @@
-"""Update shopping cart"""
+"""
+Update shopping cart
+
+REQUIRES: CartsRW
+"""
 
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.typing import LambdaContext

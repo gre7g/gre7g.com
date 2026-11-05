@@ -1,4 +1,8 @@
-"""Place order"""
+"""
+Place order
+
+REQUIRES: CartsRead, ProductsRead, AuditsRW
+"""
 
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.typing import LambdaContext

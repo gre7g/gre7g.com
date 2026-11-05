@@ -92,6 +92,7 @@ class AuditLogEvent(StrEnum):
     REGISTER_CLICK = auto()
     PLACE_ORDER = auto()
     CONFIRM_ORDER = auto()
+    CART_MERGE = auto()
 
 
 class ProductMix(StrEnum):

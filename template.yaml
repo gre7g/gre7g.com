@@ -366,12 +366,16 @@ Resources:
       FunctionName: !Sub ${AWS::StackName}-merge-guest
       CodeUri: src/api
       Handler: merge_guest.lambda_handler
+      Timeout: 30  # Writing to s3 can take more than 3s
       Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref AuditLogStorage
         - DynamoDBCrudPolicy:
             TableName: !Ref CartsTable
       Environment:
         Variables:
           JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
+          AUDIT_LOG_STORAGE: !Ref AuditLogStorage
           CARTS_TABLE: !Ref CartsTable
           CSRF_SECRET_KEY: !Ref CsrfSecretKey
       Layers:

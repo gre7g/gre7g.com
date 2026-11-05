@@ -1,4 +1,8 @@
-"""Download a file"""
+"""
+Download a file
+
+REQUIRES: OrdersRead, DownloadsRead
+"""
 
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.utilities.typing import LambdaContext

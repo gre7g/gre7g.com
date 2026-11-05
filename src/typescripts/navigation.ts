@@ -21,7 +21,7 @@ export class Navigator {
         if (path == "/shop") {
             console.log("Show shop"); // TODO
         } else if (path == "/login") {
-            await signInWithRedirect();
+            window.history.replaceState(null, "", "/login");
             await G_UI.show("products");
         } else if (path == "/gre7g/appearances") {
             console.log("Show appearances"); // TODO

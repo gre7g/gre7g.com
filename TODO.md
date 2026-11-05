@@ -6,7 +6,7 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
-- [ ] Managed login
+- [X] Managed login
 - [ ] Don't allow customers to buy physical items with a shipping country other than US
 - [ ] Is the audit log working on a thread?
 - [ ] 419 error on PUT resulted in a follow-up GET!
@@ -36,7 +36,7 @@ Basic Features
 Low Urgency
 -----------
 - [ ] Refactor gre7g_util into lambda and database utilities
-- [ ] Does code= get removed from the URL after login?
+- [X] Does code= get removed from the URL after login?
 - [ ] In the dispatch script, I have a check that won't treat "No changes to deploy." as an error. However, if I have to
       re-execute a deploy command because we weren't logged in, then I still treat the "No changes to deploy." status as
       an error.
