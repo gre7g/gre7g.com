@@ -15,8 +15,8 @@ from unittest import TestCase, skipIf
 from unittest.mock import Mock
 import yaml
 
+from lambda_base import CSRF_HEADER, PAGE_EXPIRED
 from lib.local.boto3_hack import HackBoto, Table
-from gre7g_utils import CSRF_HEADER, PAGE_EXPIRED
 from lib.local.outputs import get_outputs_dict
 from lib.local.users import CognitoUser, REG_USER_ID, ADMIN_USER_ID, ADMIN_GROUP_NAME
 from lib.local.web_server import WebBrowser

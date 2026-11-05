@@ -10,7 +10,8 @@ import logging
 import os
 from typing import Any
 
-from gre7g_utils import LambdaBase, Product
+from database import Product
+from lambda_base import LambdaBase
 
 # Constants:
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)

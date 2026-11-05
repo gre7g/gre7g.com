@@ -1,6 +1,6 @@
 from types_boto3_dynamodb.service_resource import Table as DynamoDBTable
 
-from gre7g_utils import Product, ProductId, Cart, UserId, ProductStatus, Order, OrderId, Timestamp
+from database import Product, ProductId, Cart, UserId, ProductStatus, Order, OrderId, Timestamp
 
 
 def write_default_data_to_db(

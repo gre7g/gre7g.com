@@ -35,7 +35,7 @@ Basic Features
 
 Low Urgency
 -----------
-- [ ] Refactor gre7g_util into lambda and database utilities
+- [X] Refactor gre7g_util into lambda and database utilities
 - [X] Does code= get removed from the URL after login?
 - [ ] In the dispatch script, I have a check that won't treat "No changes to deploy." as an error. However, if I have to
       re-execute a deploy command because we weren't logged in, then I still treat the "No changes to deploy." status as

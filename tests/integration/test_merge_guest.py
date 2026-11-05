@@ -4,7 +4,7 @@ from http import HTTPStatus
 import logging
 
 from .base_test_classes import BaseTestCase
-from gre7g_utils import Cart, UserId
+from database import Cart, UserId
 
 # Constants:
 LOG = logging.getLogger(__name__)

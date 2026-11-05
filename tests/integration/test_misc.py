@@ -8,7 +8,7 @@ import os
 from secrets import token_hex
 from time import time
 
-from gre7g_utils import CSRF_HEADER, PAGE_EXPIRED
+from lambda_base import CSRF_HEADER, PAGE_EXPIRED
 from lib.local.integration_base import BaseTestCase, Validate, SKIP_LOCAL, NO_CLOUD
 
 # Constants:

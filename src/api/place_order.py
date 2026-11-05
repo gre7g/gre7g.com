@@ -20,17 +20,9 @@ from paypalserversdk.models.order_request import OrderRequest
 from typing import Any
 from uuid import uuid1
 
-from gre7g_utils import (
-    LambdaBase,
-    Cart,
-    AuthenticationRequired,
-    ProductMix,
-    AuthException,
-    PHYSICAL_SHIPPING,
-    Product,
-    AuditLogEvent,
-    CURRENCY,
-)
+from audit_log import AuditLogEvent
+from database import Cart, Product
+from lambda_base import LambdaBase, AuthenticationRequired, ProductMix, AuthException, PHYSICAL_SHIPPING, CURRENCY
 
 # Constants:
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)

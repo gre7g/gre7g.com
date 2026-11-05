@@ -60,10 +60,10 @@ paths = [str(LIB_PATH), str(ROOT_PATH)]
 sys.path.extend(paths)
 os.environ["PYTHONPATH"] = os.pathsep.join(paths)
 
+from database import UserId
 from lib.local.audit import configure_audit_log, SourceHash, AUDIT_LOG
 from lib.local.boto3_hack import HackBoto
 from lib.local.db_defaults import write_default_data_to_db
-from gre7g_utils import UserId
 from lib.local.outputs import get_outputs_dict
 from lib.local.users import REG_USER_ID, ADMIN_USER_ID, ADMIN_GROUP_NAME, CognitoUser, USER_EMAIL
 from lib.local.web_server import WebBrowser

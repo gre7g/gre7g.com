@@ -11,7 +11,7 @@ import os
 from typing import Any
 from uuid import uuid1
 
-from gre7g_utils import LambdaBase
+from lambda_base import LambdaBase
 
 # Constants:
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)

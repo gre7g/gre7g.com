@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 from .base_test_classes import BaseTestCase
 from lib.local.integration_base import CLOUD_ONLY, NO_CLOUD
-import gre7g_utils
+import audit_log
 
 # Constants:
 LOG = logging.getLogger(__name__)
@@ -43,7 +43,7 @@ class TestLogAudit(BaseTestCase):
         objects = self.get_all_audit_objects()
         try:
             needle = {
-                "event": gre7g_utils.AuditLogEvent.REGISTER_CLICK.value,
+                "event": audit_log.AuditLogEvent.REGISTER_CLICK.value,
                 "user_id": self.regular_user.user_id,
                 "guest_id": "some-guest-id",
                 "click_id": "some click id",
@@ -53,10 +53,10 @@ class TestLogAudit(BaseTestCase):
             self.delete_audit_objects(objects)
 
     @NO_CLOUD
-    @patch("gre7g_utils.Thread")
+    @patch("audit_log.Thread")
     def test_simulation(self, *_args) -> None:
         """Test adding an audit event in simulation"""
-        gre7g_utils.Thread = MockThread
+        audit_log.Thread = MockThread
         self.add_audit_event()
 
     @CLOUD_ONLY

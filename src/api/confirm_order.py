@@ -13,7 +13,8 @@ from paypalserversdk.api_helper import APIHelper
 from paypalserversdk.models.item_category import ItemCategory
 from typing import Any
 
-from gre7g_utils import LambdaBase, AuthenticationRequired, Order, Product, AuditLogEvent, CURRENCY, UserId
+from database import Order, Product, UserId
+from lambda_base import LambdaBase, AuthenticationRequired, AuditLogEvent, CURRENCY
 
 # Constants:
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)
