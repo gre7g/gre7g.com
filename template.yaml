@@ -556,6 +556,9 @@ Resources:
             CustomOriginConfig:
               OriginProtocolPolicy: https-only
         CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
           - ErrorCode: 404
             ResponseCode: 200
             ResponsePagePath: /index.html
