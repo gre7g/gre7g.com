@@ -1,16 +1,13 @@
-import { signInWithRedirect } from "aws-amplify/auth";
-
 import { G_PRODUCTS, G_UI } from "./main";
 
 export class Navigator {
     async navigate(event: NavigateEvent) {
         const navigator = this;
-        if (event.userInitiated && event.canIntercept && !event.downloadRequest && !event.formData) {
+        if (event.canIntercept && !event.downloadRequest && !event.formData && event.userInitiated) {
             const target_url = new URL(event.destination.url);
             event.intercept({
                 async handler() {
                     event.preventDefault();
-                    history.pushState(null, "", target_url);
                     await navigator.go(target_url.pathname);
                 },
             });
@@ -21,7 +18,7 @@ export class Navigator {
         if (path == "/shop") {
             console.log("Show shop"); // TODO
         } else if (path == "/login") {
-            window.history.replaceState(null, "", "/login");
+            history.replaceState(null, "", "/login");
             await G_UI.show("products");
         } else if (path == "/gre7g/appearances") {
             console.log("Show appearances"); // TODO

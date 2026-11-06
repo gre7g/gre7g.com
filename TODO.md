@@ -6,9 +6,7 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
-- [ ] Don't allow customers to buy physical items with a shipping country other than US
-- [X] Is the audit log working on a thread?
-- [ ] 419 error on PUT resulted in a follow-up GET!
+- [ ] Thank you screen showing a summary and downloads
 
 Moderate Urgency
 ----------------
@@ -16,7 +14,6 @@ Moderate Urgency
       than the HTML description that we have in the current description field. PayPal wants something for an item
       description, and it doesn't like the length and mark-up.
 - [ ] e-mail the administrator if we are unable to decrement the inventory quantities in confirm_order.py
-- [ ] URL history is broken (at least on cloud)
 
 Basic Features
 --------------
@@ -44,9 +41,14 @@ Low Urgency
 - [ ] Create another static analysis for the template file to check if there are permissions, timeouts, and environment
       variables available to the functions. Could even re-sort the items? Could we put decorators or comments on 
       functions to identify which resources they require?
+- [X] Stop using secrets manager for password generation and do it yourself
 
 Old and Completed
 -----------------
+- [X] URL history is broken (at least on cloud)
+- [X] Don't allow customers to buy physical items with a shipping country other than US
+- [X] Is the audit log working on a thread?
+- [X] 419 error on PUT resulted in a follow-up GET!
 - [X] Refactor gre7g_util into lambda and database utilities
 - [X] Does code= get removed from the URL after login?
 - [X] Managed login

@@ -3,6 +3,8 @@
 import boto3
 from dataclasses import dataclass, field
 import logging
+from secrets import choice, randbelow
+from string import ascii_uppercase, ascii_lowercase, digits
 from typing import Any, NewType
 
 # Constants:
@@ -13,6 +15,14 @@ ADMIN_EMAIL = "admin@example.test"
 # Randomly chosen values:
 REG_USER_ID = "f65b7878-a973-11f1-874a-64d69adcd141"
 ADMIN_USER_ID = "0a0ae688-a974-11f1-a41f-64d69adcd141"
+
+# Password constants:
+PASS_LENGTH = 32
+SYMBOLS = "^$*.[]{}()?\"!@#%&/\\,><':;|_~`=-"
+MIN_UPPER = 1
+MIN_LOWER = 1
+MIN_DIGITS = 1
+MIN_SYMBOLS = 1
 
 # Types:
 RegularUser = NewType("RegularUser", "CognitoUser")
@@ -37,7 +47,30 @@ class CognitoUser:
     def __post_init__(self) -> None:
         """Post initialization code"""
         if self.password is None:
-            self.password = boto3.client("secretsmanager").get_random_password()["RandomPassword"]
+            self.password = self.random_password()
+
+    @staticmethod
+    def random_password() -> str:
+        """Generate a random password that meets AWS Cognito requirements"""
+        while True:
+            # The following code favors lowercase, but I like lowercase, and with a 32 character length, there's still
+            # tons of entropy.
+            num_upper = randbelow(8) + MIN_UPPER
+            num_digits = randbelow(8) + MIN_DIGITS
+            num_symbols = randbelow(8) + MIN_SYMBOLS
+            num_lower = PASS_LENGTH - num_upper - num_digits - num_symbols
+            if num_lower >= MIN_LOWER:
+                break  # should always be
+        characters = (
+            [choice(ascii_uppercase) for _ in range(num_upper)]
+            + [choice(ascii_lowercase) for _ in range(num_lower)]
+            + [choice(digits) for _ in range(num_digits)]
+            + [choice(SYMBOLS) for _ in range(num_symbols)]
+        )
+        for index in range(PASS_LENGTH):
+            swap_index = randbelow(PASS_LENGTH)
+            characters[index], characters[swap_index] = characters[swap_index], characters[index]
+        return "".join(characters)
 
     def delete(self) -> None:
         """Delete user from Cognito"""
