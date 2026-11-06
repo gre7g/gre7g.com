@@ -432,7 +432,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/empty"
+              type: object
+              properties:
+                order_ids:
+                  type: array
+                  items:
+                    type: string
+              additionalProperties: false
+              required:
+                - order_ids
       responses:
         "200":
           description: Successful confirmation

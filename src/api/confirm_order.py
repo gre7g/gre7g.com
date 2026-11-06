@@ -40,7 +40,7 @@ class ConfirmOrder(LambdaBase):
                 capture.pop("links", None)
                 capture.pop("seller_protection", None)
 
-    def process_purchase_unit(self, user_id: UserId, purchase_unit: dict[str, Any]) -> None:
+    def process_purchase_unit(self, user_id: UserId, purchase_unit: dict[str, Any]) -> Order:
         """Process a purchase unit from PayPal"""
         assert self.products_table
         assert self.orders_table
@@ -107,6 +107,7 @@ class ConfirmOrder(LambdaBase):
             notes=notes,
         )
         order.put(self.orders_table)
+        return order
 
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Confirm order"""
@@ -127,13 +128,15 @@ class ConfirmOrder(LambdaBase):
         self.audit_log(AuditLogEvent.CONFIRM_ORDER, order=result)
 
         # There's only going to be one purchase unit, I think, but it's a list, so we'll loop over it.
+        order_ids: list[str] = []
         for purchase_unit in result.get("purchase_units", []):
-            self.process_purchase_unit(user_id, purchase_unit)
+            order = self.process_purchase_unit(user_id, purchase_unit)
+            order_id.append(order.order_id)
 
         # Clear the shopping cart
         self.carts_table.delete_item(Key={"user_id": user_id})
 
-        return {}
+        return {"order_ids": order_ids}
 
 
 lambda_handler = ConfirmOrder.lambda_handler()

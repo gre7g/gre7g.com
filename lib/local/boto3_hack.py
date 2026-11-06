@@ -6,32 +6,25 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from http import HTTPStatus
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from importlib import import_module
 import jwt
 import logging
 import os
-from pathlib import Path
 import re
 from time import sleep
 from threading import Thread
 from typing import NewType, ClassVar, Any
 from unittest.mock import Mock
 from urllib.parse import urlencode, urlsplit
-import yaml
+
+from lib.local.template import Template, ResourceName, Function
 
 # Types:
-EnvVar = NewType("EnvVar", str)
-TableName = NewType("TableName", str)
-PolicyName = NewType("PolicyName", str)
 UserId = NewType("UserId", str)
 GroupId = NewType("GroupId", str)
-Policies = list[tuple[PolicyName, TableName]]
 
 # Constants:
 LOG = logging.getLogger(__name__)
-SUB_REF = re.compile(r"!(Ref|Sub|GetAtt|If|Equals)\b")
 SET_SEARCH = re.compile(r"SET (\w+) = (.+)")
-PARAMETERS = re.compile(r"\{(\w+)}")
 RW_POLICY = "DynamoDBCrudPolicy"
 RO_POLICY = "DynamoDBReadPolicy"
 DELAY_SERVER_START = 0.2
@@ -159,52 +152,19 @@ class Table:
 
 
 @dataclass
-class Function:
-    """Represents a lambda function in the `template.yaml` file"""
-
-    code_uri: str
-    handler: str
-    path: re.Pattern[str]
-    method: str
-    policies: Policies = field(default_factory=Policies)
-    env_vars: dict[EnvVar, TableName] = field(default_factory=dict)
-
-    def __call__(self, event, context) -> dict:
-        """Call the lambda function"""
-        path = f"{self.code_uri.replace("/", ".")}.{self.handler}".split(".")
-        module = path[:-1]
-        function = path[-1]
-        return getattr(import_module(".".join(module)), function)(event, context)
-
-
-@dataclass
-class HackBoto:
+class HackBoto(Template):
     """Hacked replacement for boto3"""
 
-    template: Path
     users: dict[UserId, list[GroupId]] = field(default_factory=dict)
-    tables: dict[TableName, Table] = field(default_factory=dict)
-    functions: list[Function] = field(default_factory=list)
+    tables: dict[ResourceName, Table] = field(default_factory=dict)
     s3_objects: dict[str, str] = field(default_factory=dict)
-
-    @staticmethod
-    def compile_path(path: str) -> re.Pattern[str]:
-        """Generates a regular expression pattern for fetching parameters out of an URL path"""
-        pattern = PARAMETERS.sub(r"(?P<\1>[\\w-]+)", path)
-        return re.compile(f"^{pattern}$")
 
     def apply_hack(self):
         """Apply the hack so boto3 runs locally instead of contacting the cloud"""
-        # Read template file
-        with self.template.open("rt") as file_obj:
-            template_str = file_obj.read()
-
-        # The yaml library doesn't deal well with !Ref, !Sub, !GetAtt, !If, and !Equals, but that's okay. We don't need
-        # them, so just strip them out.
-        template = yaml.load(SUB_REF.sub("", template_str), yaml.Loader)
+        self.load()
 
         # Loop over the resources and find the tables and serverless functions
-        for key, value in template["Resources"].items():
+        for key, value in self.template_dict["Resources"].items():
             properties = value.get("Properties", {})
             match value["Type"]:
                 case "AWS::DynamoDB::Table":
@@ -214,29 +174,11 @@ class HackBoto:
                     # Create the table
                     self.tables[key] = Table(keys)
 
-                case "AWS::Serverless::Function":
-                    # Find policies
-                    policies = Policies()
-                    for item in properties.get("Policies", []):
-                        policy = next(iter(item))
-                        if "TableName" in item[policy]:  # Not all policies are for dynamodb tables
-                            policies.append((PolicyName(policy), TableName(item[policy]["TableName"])))
-
-                    # Find environment variables
-                    api_props = properties["Events"]["ApiEvent"]["Properties"]
-                    env_vars = properties.get("Environment", {}).get("Variables", {})
-                    for var_name in env_vars:
-                        if var_name in ENV_VAR_CONSTS:
-                            env_vars[var_name] = ENV_VAR_CONSTS[var_name]
-                    function = Function(
-                        properties["CodeUri"],
-                        properties["Handler"],
-                        self.compile_path(api_props["Path"]),
-                        api_props["Method"],
-                        policies,
-                        env_vars,
-                    )
-                    self.functions.append(function)
+        # Replace some environment variables with constants
+        for function in self.functions:
+            for var_name in function.env_vars:
+                if var_name in ENV_VAR_CONSTS:
+                    function.env_vars[var_name] = ENV_VAR_CONSTS[var_name]  # noqa
 
         boto3.resource = self
         boto3.client = self
@@ -248,7 +190,7 @@ class HackBoto:
         assert resource in ["dynamodb", "s3"]
         return self
 
-    def Table(self, name: TableName) -> Table:
+    def Table(self, name: ResourceName) -> Table:
         """Fetch a dynamodb table by name"""
         return self.tables[name]
 
