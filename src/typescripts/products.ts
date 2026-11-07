@@ -2,6 +2,7 @@ import { G_API, G_PRODUCTS, G_UI } from "./main";
 
 export interface Product {
     name: string;
+    short_desc: string;
     description: string;
     listing_path: string;
     product_id: string;

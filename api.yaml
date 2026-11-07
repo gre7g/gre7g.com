@@ -25,6 +25,8 @@ components:
       properties:
         name:
           type: string
+        short_desc:
+          type: string
         description:
           type: string
         listing_path:

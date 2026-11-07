@@ -64,7 +64,7 @@ class PlaceOrder(LambdaBase):
                     name=product_listing.name,
                     unit_amount=Money(CURRENCY, "%0.2f" % product_listing.cost_per),
                     quantity=str(product.quantity),
-                    description=product_listing.description,
+                    description=product_listing.short_desc,
                     sku=product_listing.product_id,
                     category=ItemCategory.PHYSICAL_GOODS if physical_goods else ItemCategory.DIGITAL_GOODS,
                 )

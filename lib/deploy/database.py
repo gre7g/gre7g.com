@@ -72,6 +72,7 @@ class Product(Upgradeable):
     """A product for sale, sold, or in a shopping cart"""
 
     name: str
+    short_desc: str
     description: str
     listing_path: str
     product_id: ProductId = field(default_factory=lambda: ProductId(str(uuid1())))
@@ -90,6 +91,7 @@ class Product(Upgradeable):
         """Generate an object from a dict"""
         value_dict = cls.upgrade(value_dict)
         name = value_dict["name"]
+        short_desc = value_dict["short_desc"]
         description = value_dict["description"]
         listing_path = value_dict["listing_path"]
         product_id = value_dict["product_id"]
@@ -102,6 +104,7 @@ class Product(Upgradeable):
         parent_id = value_dict["parent_id"]
         child_ids = value_dict["child_ids"]
         assert isinstance(name, str)
+        assert isinstance(short_desc, str)
         assert isinstance(description, str)
         assert isinstance(listing_path, str)
         assert isinstance(product_id, str)
@@ -115,6 +118,7 @@ class Product(Upgradeable):
         assert isinstance(child_ids, list)
         return cls(
             name,
+            short_desc,
             description,
             listing_path,
             ProductId(product_id),
@@ -132,6 +136,7 @@ class Product(Upgradeable):
         """Convert the object to a client version's dict"""
         return {
             "name": self.name,
+            "short_desc": self.short_desc,
             "description": self.description,
             "listing_path": self.listing_path,
             "product_id": self.product_id,

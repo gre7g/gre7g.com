@@ -9,7 +9,7 @@ from .base_test_classes import BaseTestCase
 LOG = logging.getLogger(__name__)
 
 
-class TestCartFetch(BaseTestCase):
+class TestGetProducts(BaseTestCase):
     """Should return all the products"""
 
     def test_happy_path(self):

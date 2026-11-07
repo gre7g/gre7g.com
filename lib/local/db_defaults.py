@@ -9,6 +9,7 @@ def write_default_data_to_db(
     products = [
         Product(
             "Kanti Cycle 1: Skeleton Crew",
+            "Kanti Cycle 1: Skeleton Crew",
             """
             <p>
                 A slave raised believing himself free, a criminal even before his birth. Everyone thinks Kanti is 
@@ -32,6 +33,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Skeleton Crew − paperback",
+            "Kanti Cycle 1: Skeleton Crew (paperback, action/adventure sci-fi novel)",
             "<p>220 pages, Illustrated</p>",
             "/books/skeleton-crew/paperback",
             ProductId("kc1-paperback"),
@@ -43,6 +45,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Skeleton Crew − ebook",
+            "Kanti Cycle 1: Skeleton Crew (paperback, action/adventure sci-fi novel)",
             """
             <p>220 pages, Illustrated</p>
             <p>Download includes all three DRM-free versions:</p>
@@ -63,6 +66,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Skeleton Crew − audiobook",
+            "Kanti Cycle 1: Skeleton Crew (paperback, action/adventure sci-fi novel)",
             """
             <p>6 hours, 52 minutes</p>
             <p>Voiced by the amazing Piers Ryman</p>
@@ -78,6 +82,7 @@ def write_default_data_to_db(
             parent_id=ProductId("kc1"),
         ),
         Product(
+            "Kanti Cycle 2: Small World",
             "Kanti Cycle 2: Small World",
             """
             <p>
@@ -100,6 +105,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Small World − paperback",
+            "Kanti Cycle 2: Small World (paperback, action/adventure sci-fi novel)",
             "<p>300 pages, Illustrated</p>",
             "/books/small-world/paperback",
             ProductId("kc2-paperback"),
@@ -111,6 +117,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Small World − ebook",
+            "Kanti Cycle 2: Small World (ebook, action/adventure sci-fi novel)",
             """
             <p>300 pages, Illustrated</p>
             <p>Download includes all three DRM-free versions:</p>
@@ -131,6 +138,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Small World − audiobook",
+            "Kanti Cycle 2: Small World (audiobook, action/adventure sci-fi novel)",
             """
             <p>7 hours, 49 minutes</p>
             <p>Voiced by the amazing Piers Ryman</p>
@@ -146,6 +154,7 @@ def write_default_data_to_db(
             parent_id=ProductId("kc2"),
         ),
         Product(
+            "Kanti Cycle 3: Fair Trade",
             "Kanti Cycle 3: Fair Trade",
             """
             <p>
@@ -171,6 +180,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Fair Trade − paperback",
+            "Kanti Cycle 3: Fair Trade (paperback, action/adventure sci-fi novel)",
             "<p>334 pages, Illustrated</p>",
             "/books/fair-trade/paperback",
             ProductId("kc3-paperback"),
@@ -182,6 +192,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Fair Trade − ebook",
+            "Kanti Cycle 3: Fair Trade (ebook, action/adventure sci-fi novel)",
             """
             <p>334 pages, Illustrated</p>
             <p>Download includes all three DRM-free versions:</p>
@@ -202,6 +213,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Fair Trade − audiobook",
+            "Kanti Cycle 3: Fair Trade (audiobook, action/adventure sci-fi novel)",
             """
             <p>12 hours, 43 minutes</p>
             <p>Voiced by the amazing Piers Ryman</p>
@@ -217,6 +229,7 @@ def write_default_data_to_db(
             parent_id=ProductId("kc3"),
         ),
         Product(
+            "Kanti Cycle 3.5: Nobody Left Behind",
             "Kanti Cycle 3.5: Nobody Left Behind",
             """
             <p>
@@ -244,6 +257,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Nobody Left Behind − paperback",
+            "Kanti Cycle 3.5: Nobody Left Behind (paperback, action/adventure sci-fi novel)",
             "<p>228 pages, Illustrated</p>",
             "/books/nobody-left-behind/paperback",
             ProductId("kc3.5-paperback"),
@@ -255,6 +269,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Nobody Left Behind − ebook",
+            "Kanti Cycle 3.5: Nobody Left Behind (ebook, action/adventure sci-fi novel)",
             """
             <p>228 pages, Illustrated</p>
             <p>Download includes all three DRM-free versions:</p>
@@ -275,6 +290,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Nobody Left Behind − audiobook",
+            "Kanti Cycle 3.5: Nobody Left Behind (audiobook, action/adventure sci-fi novel)",
             """
             <p>? hours, ? minutes</p>
             <p>Voiced by the amazing Piers Ryman</p>
@@ -290,6 +306,7 @@ def write_default_data_to_db(
             parent_id=ProductId("kc3.5"),
         ),
         Product(
+            "Tori Mysteries 1: Reaper's Lottery",
             "Tori Mysteries 1: Reaper's Lottery",
             """
             <p>
@@ -317,6 +334,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Reaper's Lottery − paperback",
+            "The Tori Mysteries 1: Reaper's Lottery (paperback, mystery sci-fi novel)",
             "<p>432 pages, Illustrated</p>",
             "/books/reapers-lottery/paperback",
             ProductId("tm1-paperback"),
@@ -328,6 +346,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Reaper's Lottery − ebook",
+            "The Tori Mysteries 1: Reaper's Lottery (ebook, mystery sci-fi novel)",
             """
             <p>432 pages, Illustrated</p>
             <p>Download includes all three DRM-free versions:</p>
@@ -348,6 +367,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Reaper's Lottery − audiobook",
+            "The Tori Mysteries 1: Reaper's Lottery (audiobook, mystery sci-fi novel)",
             """
             <p>10 hours, 58 minutes</p>
             <p>Voiced by the amazing Piers Ryman</p>
@@ -363,6 +383,7 @@ def write_default_data_to_db(
             parent_id=ProductId("tm1"),
         ),
         Product(
+            "Tori Mysteries 2: Executioner's Gambit",
             "Tori Mysteries 2: Executioner's Gambit",
             """
             <p>
@@ -389,6 +410,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Executioner's Gambit − paperback",
+            "The Tori Mysteries 2: Executioner's Gambit (paperback, mystery sci-fi novel)",
             "<p>493 pages, Illustrated</p>",
             "/books/executioners-gambit/paperback",
             ProductId("tm2-paperback"),
@@ -400,6 +422,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Executioner's Gambit − ebook",
+            "The Tori Mysteries 2: Executioner's Gambit (ebook, mystery sci-fi novel)",
             """
             <p>493 pages, Illustrated</p>
             <p>Download includes all three DRM-free versions:</p>
@@ -420,6 +443,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Executioner's Gambit − audiobook",
+            "The Tori Mysteries 2: Executioner's Gambit (audiobook, mystery sci-fi novel)",
             """
             <p>14 hours, 2 minutes</p>
             <p>Voiced by the amazing Piers Ryman</p>
@@ -435,6 +459,7 @@ def write_default_data_to_db(
             parent_id=ProductId("tm2"),
         ),
         Product(
+            "Long Way Home",
             "Long Way Home",
             """
             <p>
@@ -459,6 +484,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Long Way Home − paperback",
+            "Long Way Home (paperback, erotica/adventure sci-fi novel)",
             "<p>292 pages, Explicit Illustrations</p>",
             "/books/long-way-home/paperback",
             ProductId("lwh-paperback"),
@@ -470,6 +496,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Long Way Home − ebook",
+            "Long Way Home (ebook, erotica/adventure sci-fi novel)",
             """
             <p>292 pages, Explicit Illustrations</p>
             <p>Download includes all three DRM-free versions:</p>
@@ -490,6 +517,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Long Way Home − audiobook",
+            "Long Way Home (audiobook, erotica/adventure sci-fi novel)",
             """
             <p>8 hours, 45 minutes</p>
             <p>Voiced by the amazing Piers Ryman</p>
@@ -505,6 +533,7 @@ def write_default_data_to_db(
             parent_id=ProductId("lwh"),
         ),
         Product(
+            "Tales of Hayven Celestia 1",
             "Tales of Hayven Celestia 1",
             """
             <p>
@@ -538,6 +567,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Tales of Hayven Celestia 1 − paperback",
+            "Tales of Hayven Celestia 1 (paperback, short-stories sci-fi anthology)",
             "<p>419 pages, Illustrated</p>",
             "/books/tales-of-hayven-celestia-1/paperback",
             ProductId("tohc1-paperback"),
@@ -549,6 +579,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Tales of Hayven Celestia 1 − ebook",
+            "Tales of Hayven Celestia 1 (ebook, short-stories sci-fi anthology)",
             """
             <p>419 pages, Illustrated</p>
             <p>Download includes all three DRM-free versions:</p>
@@ -569,6 +600,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Tales of Hayven Celestia 1 − audiobook",
+            "Tales of Hayven Celestia 1 (audiobook, short-stories sci-fi anthology)",
             """
             <p>19 hours, 58 minutes</p>
             <p>Voiced by the amazing Piers Ryman</p>
@@ -584,6 +616,7 @@ def write_default_data_to_db(
             parent_id=ProductId("tohc1"),
         ),
         Product(
+            "Tales of Hayven Celestia 2",
             "Tales of Hayven Celestia 2",
             """
             <p>
@@ -603,6 +636,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Tales of Hayven Celestia 2 − paperback",
+            "Tales of Hayven Celestia 2 (paperback, short-stories sci-fi anthology)",
             "<p>353 pages, Illustrated</p>",
             "/books/tales-of-hayven-celestia-2/paperback",
             ProductId("tohc2-paperback"),
@@ -613,6 +647,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Tales of Hayven Celestia 2 − ebook",
+            "Tales of Hayven Celestia 2 (ebook, short-stories sci-fi anthology)",
             """
             <p>353 pages, Illustrated</p>
             <p>Download includes all three DRM-free versions:</p>
@@ -633,7 +668,7 @@ def write_default_data_to_db(
         ),
         Product(
             "Sparkly HC Lapel Pin",
-            """
+            "Hayven Celestia, sparkly enamel lapel pin (jewelry)" """
             <p>
                 Show your Hayven Celestia pride with this sparkly lapel pin featuring the Planetary Acquisitions Inc. 
                 corporate logo of a krakun claw gripping an unsuspecting world. The peaceful world behind the golden 
