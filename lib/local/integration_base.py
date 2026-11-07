@@ -37,7 +37,9 @@ logging.basicConfig(level=logging.INFO)
 for mouthy_log in ["boto3", "botocore", "urllib3"]:
     logging.getLogger(mouthy_log).setLevel(logging.WARNING)
 if STACK_NAME in [RUN_LOCALLY, RUN_BRIEF]:
-    HackBoto(TEMPLATE_YAML, {REG_USER_ID: [], ADMIN_USER_ID: [ADMIN_GROUP_NAME]}).apply_hack()  # type: ignore
+    HackBoto(
+        path=TEMPLATE_YAML, users={REG_USER_ID: [], ADMIN_USER_ID: [ADMIN_GROUP_NAME]}
+    ).apply_hack()  # type: ignore
 
 
 class Validate(Enum):

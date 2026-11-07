@@ -234,12 +234,13 @@ class HackBoto(Template):
     def apply_policies(self, function: Function) -> None:
         """Apply a function's security policies to the tables"""
         # Set the environment variables
-        for env_var, table in function.env_vars.items():
-            os.environ[env_var] = table
+        for env_var, resource_name in function.env_vars.items():
+            os.environ[env_var] = resource_name
 
         # Set the policies
-        for policy, table in function.policies:
-            self.tables[table].policy = policy
+        for policy, resource_name in function.policies:
+            if resource_name in self.tables:
+                self.tables[resource_name].policy = policy
 
     def call_func(self, path: str, method: str, headers, body: str, params: dict | str = "") -> dict:
         """Execute a lambda function from a web server request"""

@@ -27,6 +27,10 @@ class MockThread:
         """Start the thread"""
         self.target(*self.args, **self.kwargs)
 
+    def join(self):
+        """Thread is already done, so yeah"""
+        pass
+
 
 class TestLogAudit(BaseTestCase):
     """Test adding an audit event"""
