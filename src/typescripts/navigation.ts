@@ -14,7 +14,10 @@ export class Navigator {
         }
     }
 
-    async go(path: string): Promise<void> {
+    async go(path: string, save?: boolean): Promise<void> {
+        if (save) {
+            history.pushState(null, "", path);
+        }
         if (path == "/shop") {
             console.log("Show shop"); // TODO
         } else if (path == "/login") {
@@ -39,7 +42,12 @@ export class Navigator {
         } else if (G_PRODUCTS.has_path(path)) {
             await G_PRODUCTS.show_path(path);
         } else {
-            await G_UI.show("products");
+            const parts = path.split("/");
+            if (parts.length == 3 && parts[1] == "order") {
+                console.log(`Show order ${parts[2]}`);
+            } else {
+                await G_UI.show("products");
+            }
         }
     }
 }

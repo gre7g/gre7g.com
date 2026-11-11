@@ -549,7 +549,10 @@ def main():
     # Run a webserver?
     if args.command in ["regular", "admin", "webserver"]:
         compile_ts(False)
-        HackBoto(TEMPLATE_YAML, {REG_USER_ID: [], ADMIN_USER_ID: [ADMIN_GROUP_NAME]}).apply_hack()  # type: ignore
+        HackBoto(
+            path=TEMPLATE_YAML,
+            users={REG_USER_ID: [], ADMIN_USER_ID: [ADMIN_GROUP_NAME]},  # type: ignore
+        ).apply_hack()
         user_ids = {"regular": REG_USER_ID, "admin": ADMIN_USER_ID, "webserver": None}
         user_id = user_ids[args.command]
         setup_sample_data(

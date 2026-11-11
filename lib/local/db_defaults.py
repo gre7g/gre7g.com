@@ -668,7 +668,8 @@ def write_default_data_to_db(
         ),
         Product(
             "Sparkly HC Lapel Pin",
-            "Hayven Celestia, sparkly enamel lapel pin (jewelry)" """
+            "Hayven Celestia, sparkly enamel lapel pin (jewelry)",
+            """
             <p>
                 Show your Hayven Celestia pride with this sparkly lapel pin featuring the Planetary Acquisitions Inc. 
                 corporate logo of a krakun claw gripping an unsuspecting world. The peaceful world behind the golden 

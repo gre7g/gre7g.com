@@ -42,8 +42,7 @@ export class Main {
     async add_to_cart() {
         if (G_UI.sections.product.product) {
             await G_CART.add(G_UI.sections.product.product);
-            history.pushState(null, "", "/cart");
-            await G_NAVIGATOR.go("/cart");
+            await G_NAVIGATOR.go("/cart", true);
         }
     }
 

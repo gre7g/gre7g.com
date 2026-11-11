@@ -54,7 +54,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         """Handle a generic request"""
         content = self.rfile.read(int(self.headers["Content-Length"] or 0))
         parsed = urlsplit(self.path)
-        response = boto3.resource.call_func(parsed.path, method, self.headers, content, parsed.query)
+        response = boto3.resource.call_func(parsed.path, method, self.headers, content, parsed.query)  # noqa
         self.send_response(response["statusCode"], response.get("message"))
         for key, value in response["headers"].items():
             self.send_header(key, value)
@@ -264,7 +264,7 @@ class HackBoto(Template):
                     self.apply_policies(function)
 
                     user_id = headers.get("authorization")
-                    if user_id and user_id.startswith("Bearer "):
+                    if user_id and user_id.startswith("bearer "):
                         user_id = user_id[7:]
                     user = self.users.get(user_id)
                     if user:
@@ -279,9 +279,10 @@ class HackBoto(Template):
 
         return {"statusCode": HTTPStatus.NOT_FOUND, "headers": {"content-type": "application/json"}}
 
-    def launch_server(self, port: int) -> None:
+    @staticmethod
+    def launch_server(port: int) -> None:
         """Run the web server as a daemon"""
-        httpd = HTTPServer(("", port), RequestHandler)
+        httpd = HTTPServer(("", port), RequestHandler)  # noqa
         thread = Thread(target=httpd.serve_forever, daemon=True)
         thread.start()
         sleep(DELAY_SERVER_START)

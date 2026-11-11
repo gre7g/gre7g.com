@@ -1,8 +1,9 @@
-import { $ } from "jquery";
 import { Amplify } from "aws-amplify";
-import { signInWithRedirect, fetchAuthSession } from "aws-amplify/auth";
+import { fetchAuthSession } from "aws-amplify/auth";
 
 import { G_SAM_OUTPUTS } from "./main";
+
+const PAGE_EXPIRED = 419;
 
 /**
  * The Api class handles authentication, AJAX requests to the API, CSRF tokens, and request retries.
@@ -32,43 +33,41 @@ export class Api {
         });
     }
 
-    private async common(path: string): Promise<Record<string, any>> {
-        let return_value = {
-            url: path,
-            contentType: "application/json",
-            dataType: "json",
-            headers: {
-                "x-csrf-token": this.csrf_token,
-                "x-guest-id": this.guest_id,
-            },
+    private async single_request(method: string, path: string, data?: Record<string, any>): Promise<Response> {
+        let headers: Record<string, any> = {
+            "content-type": "application/json",
+            accept: "application/json",
+            "x-csrf-token": this.csrf_token,
+            "x-guest-id": this.guest_id,
         };
         const session = await fetchAuthSession();
         const access_token = session.tokens?.accessToken.toString();
         if (access_token) {
-            (return_value as any).headers["Authorization"] = `Bearer ${access_token}`;
+            headers.authorization = `bearer ${access_token}`;
         }
-        return return_value;
+        let params: Record<string, any> = { method, headers };
+        if (data) {
+            params.data = JSON.stringify(data);
+        }
+        const response = await fetch(path, params);
+        const token = response.headers.get("x-csrf-token");
+        if (token) {
+            this.csrf_token = token;
+        }
+        return response;
     }
 
     private async request(method: string, path: string, data?: Record<string, any>) {
-        let common = await this.common(path);
-        if (data) {
-            common.data = JSON.stringify(data);
+        let response = await this.single_request(method, path, data);
+        if (response.status == PAGE_EXPIRED) {
+            // The CSRF token is invalid or expired. We've updated it, so let's retry.
+            response = await this.single_request(method, path, data);
         }
-        const success = (response: any, text_status: JQuery.Ajax.SuccessTextStatus, response_headers: JQuery.jqXHR) => {
-            this.csrf_token = response_headers.getResponseHeader("x-csrf-token")!;
-            return response;
-        };
-        const page_expired = async (response_headers: JQuery.jqXHR) => {
-            // 419 indicates that the CSRF token is invalid or expired, so let's update and try again
-            this.csrf_token = response_headers.getResponseHeader("x-csrf-token")!;
-            common = await this.common(path);
-            if (data) {
-                common.data = data;
-            }
-            return await $.ajax({ method: method, success: success, ...common });
-        };
-        return await $.ajax({ method: method, statusCode: { 200: success, 419: page_expired }, ...common });
+        if (response.ok) {
+            return await response.json();
+        } else {
+            throw new Error(response.statusText);
+        }
     }
 
     async get(path: string) {

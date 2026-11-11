@@ -44,7 +44,7 @@ class TestMisc(BaseTestCase):
         """Should reject access with a bad authentication"""
         response = self.get(
             "/api/v1/download/order1_id",
-            headers={"Authorization": "Bearer one.two.three"},
+            headers={"authorization": "bearer one.two.three"},
             validate=Validate.NOTHING,
         )
         assert response.status_code == HTTPStatus.FORBIDDEN

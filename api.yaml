@@ -436,13 +436,11 @@ paths:
             schema:
               type: object
               properties:
-                order_ids:
-                  type: array
-                  items:
-                    type: string
+                order_id:
+                  type: string
               additionalProperties: false
               required:
-                - order_ids
+                - order_id
       responses:
         "200":
           description: Successful confirmation

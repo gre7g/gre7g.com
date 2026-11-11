@@ -98,7 +98,7 @@ class LambdaBase(ABC):
         self.user_id = None
         auth_header = (event.get("headers") or {}).get("authorization", "")
         try:
-            if auth_header.startswith("Bearer "):
+            if auth_header.startswith("bearer "):
                 token = auth_header[7:]
                 uri = os.environ.get("JWKS_URI")
                 assert uri

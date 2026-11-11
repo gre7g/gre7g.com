@@ -112,7 +112,7 @@ class BaseTestCase(TestCase):
         if validate != Validate.CSRF_ONLY:
             rq_headers[CSRF_HEADER] = self.csrf_token
         if auth_user:
-            rq_headers["authorization"] = f"Bearer {auth_user.id_token}"
+            rq_headers["authorization"] = f"bearer {auth_user.id_token}"
         if guest_user:
             rq_headers["x-guest-id"] = guest_user
         if STACK_NAME == RUN_BRIEF:
