@@ -56,7 +56,7 @@ class PlaceOrder(LambdaBase):
             # WARNING: ITEM COSTS MUST BE LOOKED UP FROM THE PRODUCT DIRECTORY! The user writes the cart data, so these
             # prices would be easy to alter.
             product_listing = Product.get(self.products_table, product.product_id)
-            physical_goods = product_listing.media in ["paperback", "jewelry"]
+            physical_goods = self.physical_item(product_listing.media)
             if physical_goods and (product_listing.quantity < product.quantity):
                 out_of_stock.append(product.product_id)
             else:

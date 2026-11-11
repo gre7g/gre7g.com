@@ -5,7 +5,7 @@ from datetime import datetime, UTC
 import json
 from typing import Any
 
-from database import Cart, UserId, Product, ProductId, Order, OrderId, Timestamp
+from database import Cart, UserId, Product, ProductId, Order, OrderId, Timestamp, Filename
 from lib.local import integration_base
 
 # Types:
@@ -25,7 +25,7 @@ class BaseTestCase(integration_base.BaseTestCase):
         "quantity": 1,
         "cost_per": 13.99,
         "images": [],
-        "downloads": [],
+        "downloads": {},
         "media": "paperback",
         "status": "available",
         "parent_id": None,
@@ -41,7 +41,7 @@ class BaseTestCase(integration_base.BaseTestCase):
         "listing_path": "books/long-way-home",
         "product_id": "p2",
         "images": [],
-        "downloads": [],
+        "downloads": {},
         "media": "paperback",
         "status": "available",
         "parent_id": None,
@@ -55,7 +55,7 @@ class BaseTestCase(integration_base.BaseTestCase):
         ProductId("p3"),
         1,
         15.99,
-        downloads=["test.zip"],
+        downloads={Filename("test.zip"): None},
         media="audiobook",
     )
     P_DICT3 = {
@@ -67,7 +67,7 @@ class BaseTestCase(integration_base.BaseTestCase):
         "listing_path": "books/small-world",
         "product_id": "p3",
         "images": [],
-        "downloads": ["test.zip"],
+        "downloads": {"test.zip": None},
         "media": "audiobook",
         "status": "available",
         "parent_id": None,
@@ -83,7 +83,7 @@ class BaseTestCase(integration_base.BaseTestCase):
         "listing_path": "books/long-way-home",
         "product_id": "p2",
         "images": [],
-        "downloads": [],
+        "downloads": {},
         "media": "paperback",
         "status": "available",
         "parent_id": None,

@@ -140,11 +140,12 @@ class ConfirmOrder(LambdaBase):
         self.audit_log(AuditLogEvent.CONFIRM_ORDER, order=result)
 
         order = self.process_purchase_units(user_id, result.get("purchase_units", []))
+        self.sign_downloads(order)
 
         # Clear the shopping cart
         self.carts_table.delete_item(Key={"user_id": user_id})
 
-        return {"order_id": order.order_id}
+        return {"order": order.to_client_dict()}
 
 
 lambda_handler = ConfirmOrder.lambda_handler()

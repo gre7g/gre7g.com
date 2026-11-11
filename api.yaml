@@ -20,6 +20,39 @@ components:
       type: object
       additionalProperties: false
 
+    order:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/product"
+        subtotal_cost:
+          type: number
+        shipping_cost:
+          type: number
+        total_cost:
+          type: number
+        discount:
+          type: number
+        order_id:
+          type: string
+        timestamp:
+          type: string
+        notes:
+          type: array
+          items:
+            type: string
+      additionalProperties: false
+      required:
+        - products
+        - subtotal_cost
+        - shipping_cost
+        - total_cost
+        - discount
+        - order_id
+        - timestamp
+
     product:
       type: object
       properties:
@@ -47,10 +80,11 @@ components:
             type: string
             description: URL of an image file
         downloads:
-          type: array
-          description: Filenames for digital downloads associated with this item
-          items:
+          type: object
+          description: Keys are filenames, values are null or signed URL strings
+          additionalProperties:
             type: string
+            nullable: true
         media:
           type: string
           description: paperback, ebook, etc.
@@ -248,34 +282,6 @@ paths:
         "500":
           $ref: "#/components/responses/500-internal-server-error"
 
-  /api/v1/download/{order_id}:
-    get:
-      summary: Download a file
-      description: Request a digital download from a previous purchase
-      parameters:
-        - $ref: "#/components/parameters/order_id"
-      responses:
-        "200":
-          description: Successful download
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  files:
-                    type: object
-                    additionalProperties:
-                      type: string
-                additionalProperties: false
-                required:
-                  - files
-        "401":
-          $ref: "#/components/responses/401-unauthorized"
-        "403":
-          $ref: "#/components/responses/403-forbidden"
-        "500":
-          $ref: "#/components/responses/500-internal-server-error"
-
   /api/v1/guest:
     post:
       summary: Create a guest authorization
@@ -423,7 +429,7 @@ paths:
                 required:
                   - status
 
-  /api/v1/order/{order_id}:
+  /api/v1/order/{order_id}:  # Note: That's a PayPal order_id, not ours
     put:
       summary: Confirm an order
       description: Verify that an order processed successfully
@@ -436,8 +442,8 @@ paths:
             schema:
               type: object
               properties:
-                order_id:
-                  type: string
+                order:
+                  $ref: "#/components/schemas/order"
               additionalProperties: false
               required:
                 - order_id

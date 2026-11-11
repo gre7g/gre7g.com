@@ -27,10 +27,10 @@ from secrets import token_hex
 from threading import Thread
 from time import time
 from types_boto3_dynamodb.service_resource import Table as DynamoDBTable
-from typing import Any, Callable
+from typing import Any, Callable, NewType
 
 from audit_log import AuditLogEvent, audit_log
-from database import UserId, Cart
+from database import UserId, Cart, Product, Order
 
 # Constants:
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)
@@ -40,6 +40,8 @@ CSRF_HEADER = "x-csrf-token"
 PAGE_EXPIRED = 419
 PHYSICAL_SHIPPING = 5.99  # $5.99 for shipping paperbacks and jewelry in the US
 CURRENCY = "USD"
+DOWNLOAD_WINDOW = 3600  # 1 hour authentication to download the files
+GLACIER_LAKE_BUCKET = "gre7g-com-downloads"
 
 
 class AuthException(Exception):
@@ -235,11 +237,15 @@ class LambdaBase(ABC):
         self.threads.append(audit_log(event, user_id=self.user_id, guest_id=self.guest_id, **kwargs))
 
     @staticmethod
-    def get_cart_mix(cart: Cart) -> ProductMix:
+    def physical_item(media: str) -> bool:
+        """Return True if the media type is a physical item"""
+        return media in ["paperback", "jewelry"]
+
+    def get_cart_mix(self, cart: Cart) -> ProductMix:
         """Return what mix of items we have"""
         mix = ProductMix.NONE
         for product in cart.products:
-            if product.media in ["paperback", "jewelry"]:
+            if self.physical_item(product.media):
                 mix = (
                     ProductMix.ALL_PHYSICAL
                     if mix in [ProductMix.NONE, ProductMix.ALL_PHYSICAL]
@@ -289,5 +295,13 @@ class LambdaBase(ABC):
 
         return paypal.orders
 
-
-# TODO: put descriptions for paypal orders in db
+    @staticmethod
+    def sign_downloads(order: Order) -> None:
+        """Attach signed URLs to an order"""
+        for product in order.products:
+            for filename in product.downloads:
+                product.downloads[filename] = boto3.client("s3").generate_presigned_url(
+                    "get_object",
+                    Params={"Bucket": GLACIER_LAKE_BUCKET, "Key": filename},
+                    ExpiresIn=DOWNLOAD_WINDOW,
+                )

@@ -308,34 +308,6 @@ Resources:
             Method: post
             ApiId: !Ref Api
 
-  DownloadFunction:
-    Type: AWS::Serverless::Function
-    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
-    Properties:
-      FunctionName: !Sub ${AWS::StackName}-download
-      CodeUri: src/api
-      Handler: download.lambda_handler
-      Policies:
-        - DynamoDBReadPolicy:
-            TableName: !Ref OrdersTable
-        - S3ReadPolicy:
-            BucketName: gre7g-com-downloads
-      Environment:
-        Variables:
-          JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
-          ORDERS_TABLE: !Ref OrdersTable
-          CSRF_SECRET_KEY: !Ref CsrfSecretKey
-      Layers:
-        - !Ref Lib
-      Events:
-        ApiEvent:
-          Type: HttpApi
-          Properties:
-            Path: /api/v1/download/{order_id}
-            Method: get
-            ApiId: !Ref Api
-
   CreateGuestFunction:
     Type: AWS::Serverless::Function
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]

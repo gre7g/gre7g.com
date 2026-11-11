@@ -24,7 +24,6 @@ class TestMisc(BaseTestCase):
             ("/api/v1/cart", ["DELETE"]),
             ("/api/v1/cart/shipping", ["GET", "PUT", "DELETE"]),
             ("/api/v1/click_id", ["GET", "PUT", "DELETE"]),
-            ("/api/v1/download/order1_id", ["POST", "PUT", "DELETE"]),
             ("/api/v1/guest", ["GET", "DELETE"]),
             ("/api/v1/order", ["PUT", "DELETE"]),
             ("/api/v1/order/order1_id", ["GET", "POST", "DELETE"]),
@@ -43,7 +42,7 @@ class TestMisc(BaseTestCase):
     def test_bad_auth(self):
         """Should reject access with a bad authentication"""
         response = self.get(
-            "/api/v1/download/order1_id",
+            "/api/v1/order",
             headers={"authorization": "bearer one.two.three"},
             validate=Validate.NOTHING,
         )

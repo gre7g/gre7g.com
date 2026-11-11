@@ -38,9 +38,9 @@ ENV_VAR_CONSTS = {
 }
 
 
-def hack_jwt_decode(token, key, algorithms, issuer, options) -> dict[str, str]:
+def hack_jwt_decode(token, key, algorithms, issuer, options) -> dict[str, str] | None:
     """Bypasses JWT verification and decoding"""
-    return {"sub": token}
+    return {"sub": token} if "-" in token else None
 
 
 class ConditionFailed(Exception):

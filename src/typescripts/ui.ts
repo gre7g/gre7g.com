@@ -1,4 +1,5 @@
 import { G_API, G_CART, G_PRODUCTS } from "./main";
+import { Order } from "./orders";
 import { Product } from "./products";
 
 class ListSection {
@@ -161,6 +162,28 @@ share your address, and I won't spam you.`);
     }
 }
 
+class OrderUI extends ListSection {
+    order: Order | null = null;
+    constructor(section: JQuery<HTMLElement>) {
+        super(section);
+    }
+    async update() {
+        if (this.order) {
+            this.unordered_list.empty();
+            const populate_item = (product: Product) => {
+                if (!product.parent_id) {
+                    const new_item = this.list_item.clone();
+                    new_item.find("a").attr("href", product.listing_path);
+                    new_item.find(".product-name").text(product.name);
+                    new_item.find(".media").text(product.media);
+                    this.unordered_list.append(new_item);
+                }
+            };
+            Object.values(this.order.products).forEach(populate_item);
+        }
+    }
+}
+
 export class UI {
     current_section = "products";
     sections = {
@@ -168,6 +191,7 @@ export class UI {
         product: new ProductUI($("#product-listing")),
         cart: new CartUI($("#cart")),
         checkout: new CheckoutUI($("#checkout")),
+        order: new OrderUI($("#order")),
     };
 
     async show(section: string) {

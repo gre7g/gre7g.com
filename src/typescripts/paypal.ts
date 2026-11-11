@@ -1,6 +1,7 @@
 import { loadScript, PayPalNamespace, OnApproveActions, OnApproveData } from "@paypal/paypal-js";
 
 import { G_API, G_UI, G_SAM_OUTPUTS, G_NAVIGATOR } from "./main";
+import {Order} from "./orders";
 
 let G_SAVED_ERR_MSG = "";
 
@@ -37,8 +38,8 @@ export function load_paypal() {
                 async onApprove(data: OnApproveData, actions: OnApproveActions) {
                     // Note: data.orderID is PayPal's order ID and order_id is ours. I suppose I could have used theirs
                     // as ours, but marries the code to theirs.
-                    const order_id = await G_API.put(`/api/v1/order/${data.orderID}`, {});
-                    await G_NAVIGATOR.go(`/order/${order_id}`, true);
+                    const order: Order = await G_API.put(`/api/v1/order/${data.orderID}`, {});
+                    await G_NAVIGATOR.go(`/order/${order.order_id}`, true);
                 },
 
                 async onCancel(data) {

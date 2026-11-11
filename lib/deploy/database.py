@@ -16,7 +16,8 @@ UserId = NewType("UserId", str)
 OrderId = NewType("OrderId", str)
 ProductId = NewType("ProductId", str)
 Timestamp = NewType("Timestamp", str)
-
+Filename = NewType("Filename", str)
+PresignedUrl = NewType("PresignedUrl", str)
 
 # Constants:
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)
@@ -79,7 +80,7 @@ class Product(Upgradeable):
     quantity: int = 0
     cost_per: float = 0.00
     images: list[str] = field(default_factory=list)
-    downloads: list[str] = field(default_factory=list)
+    downloads: dict[Filename, PresignedUrl | None] = field(default_factory=dict)
     media: str = ""
     status: ProductStatus = ProductStatus.AVAILABLE
     parent_id: str | None = None
@@ -111,7 +112,7 @@ class Product(Upgradeable):
         assert isinstance(quantity, int | Decimal)
         assert isinstance(cost_per, float | Decimal)
         assert isinstance(images, list)
-        assert isinstance(downloads, list)
+        assert isinstance(downloads, dict)
         assert isinstance(media, str)
         assert isinstance(status, str)
         assert isinstance(parent_id, str | None)
