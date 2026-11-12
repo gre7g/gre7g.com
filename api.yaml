@@ -429,8 +429,24 @@ paths:
                 required:
                   - status
 
-  /api/v1/order/{order_id}:  # Note: That's a PayPal order_id, not ours
-    put:
+  /api/v1/order/{order_id}:
+    get:
+      summary: Fetch an order
+      parameters:
+        - $ref: "#/components/parameters/order_id"
+      responses:
+        "200":
+          description: Successful fetch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/order"
+        "403":
+          $ref: "#/components/responses/403-forbidden"
+        "500":
+          $ref: "#/components/responses/500-internal-server-error"
+
+    put:  # Note: The order_id parameter is a PayPal order_id, not ours
       summary: Confirm an order
       description: Verify that an order processed successfully
       parameters:

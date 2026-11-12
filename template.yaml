@@ -360,6 +360,32 @@ Resources:
             Method: put
             ApiId: !Ref Api
 
+  GetOrderFunction:
+    Type: AWS::Serverless::Function
+    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-get-order
+      CodeUri: src/api
+      Handler: get_order.lambda_handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref OrdersTable
+      Environment:
+        Variables:
+          JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
+          ORDERS_TABLE: !Ref OrdersTable
+          CSRF_SECRET_KEY: !Ref CsrfSecretKey
+      Layers:
+        - !Ref Lib
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /api/v1/order/{order_id}
+            Method: get
+            ApiId: !Ref Api
+
   GetOrdersFunction:
     Type: AWS::Serverless::Function
     DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]

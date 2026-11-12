@@ -5,7 +5,7 @@ from botocore.exceptions import ClientError
 from dataclasses import dataclass, field
 from decimal import Decimal
 from http import HTTPStatus
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import HTTPServer
 import jwt
 import logging
 import os
@@ -14,9 +14,10 @@ from time import sleep
 from threading import Thread
 from typing import NewType, ClassVar, Any
 from unittest.mock import Mock
-from urllib.parse import urlencode, urlsplit
+from urllib.parse import urlencode
 
 from lib.local.template import Template, ResourceName, Function
+from lib.local.web_server import HttpRequestHandler
 
 # Types:
 UserId = NewType("UserId", str)
@@ -45,37 +46,6 @@ def hack_jwt_decode(token, key, algorithms, issuer, options) -> dict[str, str] |
 
 class ConditionFailed(Exception):
     pass
-
-
-class RequestHandler(BaseHTTPRequestHandler):
-    """Handles requests from the local webserver"""
-
-    def call_func(self, method: str):
-        """Handle a generic request"""
-        content = self.rfile.read(int(self.headers["Content-Length"] or 0))
-        parsed = urlsplit(self.path)
-        response = boto3.resource.call_func(parsed.path, method, self.headers, content, parsed.query)  # noqa
-        self.send_response(response["statusCode"], response.get("message"))
-        for key, value in response["headers"].items():
-            self.send_header(key, value)
-        self.end_headers()
-        self.wfile.write(response["body"].encode())
-
-    def do_GET(self):
-        """Handle a GET request"""
-        self.call_func("get")
-
-    def do_POST(self):
-        """Handle a POST request"""
-        self.call_func("post")
-
-    def do_DELETE(self):
-        """Handle a DELETE request"""
-        self.call_func("delete")
-
-    def do_PUT(self):
-        """Handle a PUT request"""
-        self.call_func("put")
 
 
 @dataclass
@@ -282,7 +252,7 @@ class HackBoto(Template):
     @staticmethod
     def launch_server(port: int) -> None:
         """Run the web server as a daemon"""
-        httpd = HTTPServer(("", port), RequestHandler)  # noqa
+        httpd = HTTPServer(("", port), HttpRequestHandler)  # noqa
         thread = Thread(target=httpd.serve_forever, daemon=True)
         thread.start()
         sleep(DELAY_SERVER_START)

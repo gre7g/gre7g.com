@@ -9,7 +9,7 @@ export interface Product {
     quantity: number;
     cost_per: number;
     images: string[];
-    downloads: string[];
+    downloads: Record<string, string>;
     media: string;
     status: "available" | "sold_out" | "ordered" | "canceled" | "shipped" | "partial" | "downloaded" | "refunded";
     parent_id: string | null;

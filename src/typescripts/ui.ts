@@ -23,7 +23,6 @@ class ProductsUI extends ListSection {
                 new_item.find("a").attr("href", product.listing_path);
                 new_item.find("img").attr("src", product.images[0]);
                 new_item.find(".product-name").text(product.name);
-                new_item.find(".media").text(product.media);
                 this.unordered_list.append(new_item);
             }
         };
@@ -162,22 +161,45 @@ share your address, and I won't spam you.`);
     }
 }
 
+class DownloadsUI extends ListSection {
+    async update(unordered_list: JQuery<HTMLElement>, downloads: Record<string, string>) {
+        unordered_list.empty();
+        const populate_item = (value: [string, string]) => {
+            let [filename, url] = value;
+            const new_item = this.list_item.clone();
+            const a = new_item.find("a");
+            a.attr("href", url);
+            a.text(filename);
+            unordered_list.append(new_item);
+        };
+        Object.entries(downloads).forEach(populate_item);
+    }
+}
+
 class OrderUI extends ListSection {
     order: Order | null = null;
-    constructor(section: JQuery<HTMLElement>) {
+    downloads: DownloadsUI;
+
+    constructor(section: JQuery<HTMLElement>, downloads: JQuery<HTMLElement>) {
+        const downloads_ui = new DownloadsUI(downloads);
         super(section);
+        this.downloads = downloads_ui;
     }
+
     async update() {
         if (this.order) {
             this.unordered_list.empty();
-            const populate_item = (product: Product) => {
-                if (!product.parent_id) {
-                    const new_item = this.list_item.clone();
-                    new_item.find("a").attr("href", product.listing_path);
-                    new_item.find(".product-name").text(product.name);
-                    new_item.find(".media").text(product.media);
-                    this.unordered_list.append(new_item);
+            const populate_item = async (product: Product) => {
+                const new_item = this.list_item.clone();
+                new_item.find("a").attr("href", product.listing_path);
+                new_item.find(".product-name").text(product.name);
+                const section = new_item.find(".downloads");
+                if (Object.keys(product.downloads).length) {
+                    await this.downloads.update(section.find("ul"), product.downloads);
+                } else {
+                    section.hide();
                 }
+                this.unordered_list.append(new_item);
             };
             Object.values(this.order.products).forEach(populate_item);
         }
@@ -191,7 +213,7 @@ export class UI {
         product: new ProductUI($("#product-listing")),
         cart: new CartUI($("#cart")),
         checkout: new CheckoutUI($("#checkout")),
-        order: new OrderUI($("#order")),
+        order: new OrderUI($("#order"), $(".downloads")),
     };
 
     async show(section: string) {

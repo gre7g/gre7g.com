@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "types": ["jquery"],
+        "types": ["jquery", "vite/config"],
         "target": "ES2022",
         "module": "ESNext",
         "moduleResolution": "bundler",

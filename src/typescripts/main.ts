@@ -1,5 +1,4 @@
 import { $ } from "jquery";
-import { signInWithRedirect } from "aws-amplify/auth";
 
 import { Api } from "./api";
 import { Cart } from "./cart";
@@ -66,6 +65,7 @@ export class Main {
 
         const response: Response = await fetch(CONFIG_URL);
         G_SAM_OUTPUTS = await response.json();
+        G_API.dummy_auth = new URLSearchParams(window.location.search).get("auth") ?? "";
         G_API.load();
         await G_PRODUCTS.load();
         await G_CART.load();
@@ -84,7 +84,7 @@ export class Main {
             await this.checkout();
         });
         $(".login").on("click", async () => {
-            await signInWithRedirect();
+            await G_API.login();
         });
         load_paypal();
     }

@@ -1,37 +1,58 @@
 import { Amplify } from "aws-amplify";
-import { fetchAuthSession } from "aws-amplify/auth";
+import { fetchAuthSession, signInWithRedirect } from "aws-amplify/auth";
 
 import { G_SAM_OUTPUTS } from "./main";
 
 const PAGE_EXPIRED = 419;
 
-/**
- * The Api class handles authentication, AJAX requests to the API, CSRF tokens, and request retries.
- */
-export class Api {
-    csrf_token: string = "";
-    guest_id: string = "";
+class AuthLayer {
+    use_dummy_auth = import.meta.env.VITE_USE_DUMMY_AUTH === "true";
+    dummy_auth: string = "";
+
+    async login() {
+        if (!this.use_dummy_auth) {
+            await signInWithRedirect();
+        }
+    }
 
     load() {
-        // Configure Amplify
-        Amplify.configure({
-            Auth: {
-                Cognito: {
-                    userPoolId: G_SAM_OUTPUTS.user_pool,
-                    userPoolClientId: G_SAM_OUTPUTS.user_pool_client,
-                    loginWith: {
-                        oauth: {
-                            domain: G_SAM_OUTPUTS.cognito_host_name,
-                            scopes: ["openid"],
-                            redirectSignIn: [`${G_SAM_OUTPUTS.website_url}/login`],
-                            redirectSignOut: [G_SAM_OUTPUTS.website_url],
-                            responseType: "code",
+        if (!this.use_dummy_auth) {
+            // Configure Amplify
+            Amplify.configure({
+                Auth: {
+                    Cognito: {
+                        userPoolId: G_SAM_OUTPUTS.user_pool,
+                        userPoolClientId: G_SAM_OUTPUTS.user_pool_client,
+                        loginWith: {
+                            oauth: {
+                                domain: G_SAM_OUTPUTS.cognito_host_name,
+                                scopes: ["openid"],
+                                redirectSignIn: [`${G_SAM_OUTPUTS.website_url}/login`],
+                                redirectSignOut: [G_SAM_OUTPUTS.website_url],
+                                responseType: "code",
+                            },
                         },
                     },
                 },
-            },
-        });
+            });
+        }
     }
+
+    async get_session() {
+        if (this.use_dummy_auth) {
+            return { tokens: { accessToken: this.dummy_auth } };
+        } else {
+            return await fetchAuthSession();
+        }
+    }
+}
+
+/**
+ * The Api class handles authentication, AJAX requests to the API, CSRF tokens, and request retries.
+ */
+export class Api extends AuthLayer {
+    csrf_token: string = "";
+    guest_id: string = "";
 
     private async single_request(method: string, path: string, data?: Record<string, any>): Promise<Response> {
         let headers: Record<string, any> = {
@@ -40,7 +61,7 @@ export class Api {
             "x-csrf-token": this.csrf_token,
             "x-guest-id": this.guest_id,
         };
-        const session = await fetchAuthSession();
+        const session = await this.get_session();
         const access_token = session.tokens?.accessToken.toString();
         if (access_token) {
             headers.authorization = `bearer ${access_token}`;

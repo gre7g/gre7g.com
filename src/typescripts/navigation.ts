@@ -1,4 +1,4 @@
-import { G_PRODUCTS, G_UI } from "./main";
+import { G_API, G_PRODUCTS, G_UI } from "./main";
 
 export class Navigator {
     async navigate(event: NavigateEvent) {
@@ -44,7 +44,9 @@ export class Navigator {
         } else {
             const parts = path.split("/");
             if (parts.length == 3 && parts[1] == "order") {
-                console.log(`Show order ${parts[2]}`);
+                const order = await G_API.get(`/api/v1/order/${parts[2]}`);
+                G_UI.sections.order.order = order.order;
+                await G_UI.show("order");
             } else {
                 await G_UI.show("products");
             }

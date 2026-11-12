@@ -42,12 +42,10 @@ STATIC_TEST_PATH = TEST_PATH / "static"
 LIB_PATH = ROOT_PATH / "lib" / "deploy"
 STATIC_PATH = ROOT_PATH / "static"
 TEMPLATE_YAML = ROOT_PATH / "template.yaml"
-VITE_CONFIG_PATH = ROOT_PATH / "vite.config.ts"
 CONFIG_FILENAME = "config.json"
 UNIT_TESTER = ["unittest", "discover"]
 DELETE_OLDER = timedelta(days=30)
 WEB_PORT = 8080
-SEARCH_MINIFY = re.compile(r"^\s*minify: (\w+)", re.M)
 SEARCH_PRETTIER_EXT = re.compile(r"\.(ts|html|json)$", re.M)
 SEARCH_PRETTIER_NOT = re.compile(r" notes/")
 
@@ -64,21 +62,20 @@ from database import UserId
 from lib.local.audit import configure_audit_log, SourceHash, AUDIT_LOG
 from lib.local.boto3_hack import HackBoto
 from lib.local.db_defaults import write_default_data_to_db
+from lib.local import inventory
 from lib.local.outputs import get_outputs_dict
 from lib.local.users import REG_USER_ID, ADMIN_USER_ID, ADMIN_GROUP_NAME, CognitoUser, USER_EMAIL
 from lib.local.web_server import WebBrowser
 
 
-def compile_ts(minify: bool = True) -> None:
+def compile_ts(minify: bool = True, use_dummy_auth: bool = False) -> None:
     """Compile the Typescript code into Javascript"""
-    with VITE_CONFIG_PATH.open("rt") as file_obj:
-        text = file_obj.read()
-    match = SEARCH_MINIFY.search(text)
-    assert match
-    text = text[: match.start(1)] + str(minify).lower() + text[match.end(1) :]
-    with VITE_CONFIG_PATH.open("wt") as file_obj:
-        file_obj.write(text)
-    check_call([which("npx"), "vite", "build"], cwd=ROOT_PATH)
+    npx = which("npx")
+    assert npx
+    args = [npx, "vite", "build"]
+    if not minify:
+        args.extend(["--minify", "false"])
+    check_call(args, cwd=ROOT_PATH, env=os.environ | {"VITE_USE_DUMMY_AUTH": str(use_dummy_auth).lower()})
 
 
 # Note: Many of the functions below accept a `dest_dict` as a parameter. This is a dictionary pulled from
@@ -94,16 +91,20 @@ def compile_ts(minify: bool = True) -> None:
 #     "timestamp": str in ISO format,
 #     "up": bool,  (not present in production)
 # }
+def write_inventory(dest_dict: dict):
+    products_table = boto3.resource("dynamodb").Table(dest_dict["outputs"]["products_table_name"])
+    inventory.write_inventory(products_table)
+
+
 def setup_sample_data(dest_dict: dict) -> None:
     """Create some sample data in the databases for webserver mode"""
     # Databases
     dynamodb = boto3.resource("dynamodb")
     outputs = dest_dict["outputs"]
-    products_table = dynamodb.Table(outputs["products_table_name"])
     carts_table = dynamodb.Table(outputs["carts_table_name"])
     orders_table = dynamodb.Table(outputs["orders_table_name"])
     user_id = UserId(REG_USER_ID)
-    write_default_data_to_db(user_id, products_table, carts_table, orders_table)
+    write_default_data_to_db(user_id, carts_table, orders_table)
 
 
 @dataclass
@@ -425,7 +426,7 @@ class Dispatch:
             elif self.args.dev and (self.args.command == "up"):
                 self.static_tests()
                 self.typescript_tests()
-                compile_ts()
+                compile_ts(minify=False, use_dummy_auth=True)
                 audit_log = AUDIT_LOG
                 self.set_hash()
                 audit_log.info("dispatch %r on hash %s", self.args, self.hash_str)
@@ -444,6 +445,7 @@ class Dispatch:
                 stack["tests-passed"] = passed
                 audit_log.info("tests passed: %r", passed)
                 assert passed, "tests failed"
+                write_inventory(stack)
                 setup_sample_data(stack)
                 self.set_password(stack)
 
@@ -474,7 +476,7 @@ class Dispatch:
                 production["tests-passed"] = passed
                 audit_log.info("tests passed: %r", passed)
                 assert passed, "tests failed"
-                setup_sample_data(production)
+                write_inventory(production)
                 self.set_password(production)
 
         except Exception as error:
@@ -548,22 +550,23 @@ def main():
 
     # Run a webserver?
     if args.command in ["regular", "admin", "webserver"]:
-        compile_ts(False)
+        compile_ts(minify=False, use_dummy_auth=True)
         HackBoto(
             path=TEMPLATE_YAML,
             users={REG_USER_ID: [], ADMIN_USER_ID: [ADMIN_GROUP_NAME]},  # type: ignore
         ).apply_hack()
         user_ids = {"regular": REG_USER_ID, "admin": ADMIN_USER_ID, "webserver": None}
         user_id = user_ids[args.command]
-        setup_sample_data(
-            {
-                "outputs": {
-                    "carts_table_name": "CartsTable",
-                    "orders_table_name": "OrdersTable",
-                    "products_table_name": "ProductsTable",
-                }
+        stack = {
+            "outputs": {
+                "carts_table_name": "CartsTable",
+                "orders_table_name": "OrdersTable",
+                "products_table_name": "ProductsTable",
             }
-        )
+        }
+
+        write_inventory(stack)
+        setup_sample_data(stack)
         WebBrowser(WEB_PORT).run_main_thread(user_id)
     else:
         # No, build/deploy/test
