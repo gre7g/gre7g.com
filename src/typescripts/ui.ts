@@ -1,14 +1,23 @@
-import { G_API, G_CART, G_PRODUCTS } from "./main";
-import { Order } from "./orders";
+import { G_API, G_CART, G_PRODUCTS, G_UI } from "./main";
+import { Order, has_physical } from "./orders";
 import { Product } from "./products";
 
-class ListSection {
+class InertSection {
     section: JQuery<HTMLElement>;
+
+    constructor(section: JQuery<HTMLElement>) {
+        this.section = section;
+    }
+
+    update() {}
+}
+
+class ListSection extends InertSection {
     unordered_list: JQuery<HTMLElement>;
     list_item: JQuery<HTMLElement>;
 
     constructor(section: JQuery<HTMLElement>) {
-        this.section = section;
+        super(section);
         this.unordered_list = section.find("ul");
         this.list_item = section.find("li").detach();
     }
@@ -206,15 +215,52 @@ class OrderUI extends ListSection {
     }
 }
 
+class ThankYou extends OrderUI {
+    async update() {
+        super.update();
+
+        if (this.order) {
+            let message;
+            if (has_physical(this.order)) {
+                message = "We'll get those shipped right out to you!";
+            } else {
+                message = "You can download your purchases from the following links.";
+            }
+            this.section.find(".message").text(message);
+        }
+    }
+}
+
 export class UI {
     current_section = "products";
     sections = {
-        products: new ProductsUI($("#products")),
-        product: new ProductUI($("#product-listing")),
+        about: new InertSection($("#about")),
+        ai: new InertSection($("#ai")),
+        appearances: new InertSection($("#appearances")),
         cart: new CartUI($("#cart")),
         checkout: new CheckoutUI($("#checkout")),
-        order: new OrderUI($("#order"), $(".downloads")),
+        order: new OrderUI($("#order"), $("#order .downloads")),
+        privacy: new InertSection($("#privacy")),
+        product: new ProductUI($("#product-listing")),
+        products: new ProductsUI($("#products")),
+        sitemap: new InertSection($("#sitemap")),
+        thank_you: new ThankYou($("#thank-you"), $("#thank-you .downloads")),
     };
+
+    /**
+     * Sets the URL bar to path and show the UI section but do not decode the URL.
+     *
+     * Call bury() without adding code to decode the path in Navigator. This allows the user to hit Back to the previous
+     * page but not to bookmark the new page. Google searches haven't returned a standard name for this practice of
+     * creating ephemeral routes, but I prefer "burying the URL".
+     *
+     * @param section   UI section to display
+     * @param path      URL path to push
+     */
+    async bury_url(section: string, path: string) {
+        history.pushState(null, "", path);
+        await G_UI.show(section);
+    }
 
     async show(section: string) {
         this.current_section = section;

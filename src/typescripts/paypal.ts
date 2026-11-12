@@ -38,8 +38,8 @@ export function load_paypal() {
                 async onApprove(data: OnApproveData, actions: OnApproveActions) {
                     // Note: data.orderID is PayPal's order ID and order_id is ours. I suppose I could have used theirs
                     // as ours, but marries the code to theirs.
-                    const order: Order = await G_API.put(`/api/v1/order/${data.orderID}`, {});
-                    await G_NAVIGATOR.go(`/order/${order.order_id}`, true);
+                    G_UI.sections.thank_you.order = await G_API.put(`/api/v1/order/${data.orderID}`, {});
+                    await G_UI.bury_url("thank_you", "/thank-you")
                 },
 
                 async onCancel(data) {

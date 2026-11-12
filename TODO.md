@@ -6,28 +6,27 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
-- [ ] Thank you screen showing a summary and downloads
+- [X] Thank you screen showing a summary and downloads
 
 Moderate Urgency
 ----------------
-- [X] The products database entries should contain a description field that is longer than the item name but shorter 
-      than the HTML description that we have in the current description field. PayPal wants something for an item
-      description, and it doesn't like the length and mark-up.
 - [ ] e-mail the administrator if we are unable to decrement the inventory quantities in confirm_order.py
 
 Basic Features
 --------------
+- [X] Show AI policy
 - [ ] Show shop
-- [ ] Show upcoming appearances
+- [X] Show upcoming appearances
 - [ ] Show contact form
-- [ ] Show about the author
+- [X] Show about the author
 - [ ] Log out
 - [ ] Show privacy policy
 - [ ] Show a sitemap
 - [ ] Shopping cart needs:
   - [ ] Quantity, price per, remove from cart, update amount
-- [ ] Show current order and any downloads
+- [X] Show current order and any downloads
 - [ ] Show previous orders (logged in only)
+- [ ] Handle AJAX errors
 
 Low Urgency
 -----------
@@ -38,12 +37,15 @@ Low Urgency
 - [ ] Add code coverage for Typescript
 - [ ] Add something to monitor progress on code coverage
 - [ ] Go through .ts files and add more comments, function headers, etc.
-- [ ] Create another static analysis for the template file to check if there are permissions, timeouts, and environment
-      variables available to the functions. Could even re-sort the items? Could we put decorators or comments on 
-      functions to identify which resources they require?
 
 Old and Completed
 -----------------
+- [X] Create another static analysis for the template file to check if there are permissions, timeouts, and environment
+  variables available to the functions. Could even re-sort the items? Could we put decorators or comments on
+  functions to identify which resources they require?
+- [X] The products database entries should contain a description field that is longer than the item name but shorter
+  than the HTML description that we have in the current description field. PayPal wants something for an item
+  description, and it doesn't like the length and mark-up.
 - [X] Stop using secrets manager for password generation and do it yourself
 - [X] URL history is broken (at least on cloud)
 - [X] Don't allow customers to buy physical items with a shipping country other than US
