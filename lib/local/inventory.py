@@ -3,6 +3,16 @@ from types_boto3_dynamodb.service_resource import Table as DynamoDBTable
 from database import Product, ProductId, Filename
 
 # Constants:
+SKELETON_CREW = 9
+SMALL_WORLD = 3
+FAIR_TRADE = 5
+NOBODY_LEFT_BEHIND = 46
+REAPERS_LOTTERY = 9
+EXECUTIONERS_GAMBIT = 11
+TALES_OF_HAYVEN_CELESTIA_1 = 12
+TALES_OF_HAYVEN_CELESTIA_2 = 21
+HAYVEN_CELESTIA_PIN = 3
+
 PRODUCTS = [
         Product(
             "Kanti Cycle 1: Skeleton Crew",
@@ -34,7 +44,7 @@ PRODUCTS = [
             "<p>220 pages, Illustrated</p>",
             "/books/skeleton-crew/paperback",
             ProductId("kc1-paperback"),
-            9,
+            SKELETON_CREW,
             13.99,
             ["/static/images/products/skeleton-crew-1.png"],
             media="paperback",
@@ -189,7 +199,7 @@ PRODUCTS = [
             "<p>334 pages, Illustrated</p>",
             "/books/fair-trade/paperback",
             ProductId("kc3-paperback"),
-            5,
+            FAIR_TRADE,
             17.99,
             ["/static/images/products/fair-trade-1.png"],
             media="paperback",
@@ -270,7 +280,7 @@ PRODUCTS = [
             "<p>228 pages, Illustrated</p>",
             "/books/nobody-left-behind/paperback",
             ProductId("kc3.5-paperback"),
-            46,
+            NOBODY_LEFT_BEHIND,
             19.99,
             ["/static/images/products/nobody-left-behind-1.png"],
             media="paperback",
@@ -351,7 +361,7 @@ PRODUCTS = [
             "<p>432 pages, Illustrated</p>",
             "/books/reapers-lottery/paperback",
             ProductId("tm1-paperback"),
-            9,
+            REAPERS_LOTTERY,
             16.99,
             ["/static/images/products/reapers-lottery-1.png"],
             media="paperback",
@@ -431,7 +441,7 @@ PRODUCTS = [
             "<p>493 pages, Illustrated</p>",
             "/books/executioners-gambit/paperback",
             ProductId("tm2-paperback"),
-            11,
+            EXECUTIONERS_GAMBIT,
             22.99,
             ["/static/images/products/executioners-gambit-1.png"],
             media="paperback",
@@ -592,7 +602,7 @@ PRODUCTS = [
             "<p>419 pages, Illustrated</p>",
             "/books/tales-of-hayven-celestia-1/paperback",
             ProductId("tohc1-paperback"),
-            12,
+            TALES_OF_HAYVEN_CELESTIA_1,
             18.95,
             ["/static/images/products/tales-of-hayven-celestia-1-1.png"],
             media="paperback",
@@ -665,7 +675,7 @@ PRODUCTS = [
             "<p>353 pages, Illustrated</p>",
             "/books/tales-of-hayven-celestia-2/paperback",
             ProductId("tohc2-paperback"),
-            21,
+            TALES_OF_HAYVEN_CELESTIA_2,
             22.99,
             media="paperback",
             parent_id=ProductId("tohc2"),
@@ -707,7 +717,7 @@ PRODUCTS = [
             """,
             "/apparel/hayven-celestia-pin",
             ProductId("hc-pin"),
-            6,
+            HAYVEN_CELESTIA_PIN,
             13.00,
             ["/static/images/products/hayven-celestia-pin-1.png"],
             media="jewelry",

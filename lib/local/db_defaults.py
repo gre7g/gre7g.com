@@ -33,9 +33,12 @@ def write_default_data_to_db(user_id: UserId, carts_table: DynamoDBTable, orders
     eg.quantity = 1
     eg.status = ProductStatus.SHIPPED
     subtotal1 = rl.cost_per = eg.cost_per
-    nlb = find("kc3.5-audiobook")
-    nlb.quantity = 1
-    nlb.status = ProductStatus.REFUNDED
+    nlb1 = find("kc3.5-audiobook")
+    nlb1.quantity = 1
+    nlb1.status = ProductStatus.REFUNDED
+    nlb2 = find("kc3.5-ebook")
+    nlb2.quantity = 1
+    nlb2.status = ProductStatus.DOWNLOADED
 
     orders = [
         Order(
@@ -50,14 +53,14 @@ def write_default_data_to_db(user_id: UserId, carts_table: DynamoDBTable, orders
         ),
         Order(
             user_id,
-            [nlb],
-            nlb.cost_per,
+            [nlb1, nlb2],
+            nlb1.cost_per + nlb2.cost_per,
             0.00,
             0.00,
-            nlb.cost_per,
+            nlb1.cost_per + nlb2.cost_per,
             OrderId("order2_id"),
             Timestamp("2026-03-21T17:59:00.000Z"),
-            ["8:25am 3/22/2026: This is a placeholder item, so I'm refunding your order. Sorry about that!"],
+            ["8:25am 3/22/2026: This is a placeholder item, so I'm refunding your item. Sorry about that!"],
         ),
     ]
     orders_table.SECRET_OVERRIDE = True  # type: ignore [attr-defined]
