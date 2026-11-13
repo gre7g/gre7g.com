@@ -243,6 +243,8 @@ class Dispatch:
             "PaypalClientId": client_id,
             "PaypalClientSecret": client_secret,
             "EnableDeletionProtection": str(self.name_set == "PROD").lower(),
+            "GmailAppPassword": os.getenv("GMAIL_APP_PASSWORD"),
+            "GmailServer": "://gmail.com",
         }
         self.login_call(
             [
@@ -481,7 +483,7 @@ class Dispatch:
 
         except Exception as error:
             audit_log.error("failed: %s", error)
-            LOG.exception(error)
+            LOG.exception(str(error))
             passed = 1
         else:
             audit_log.info("complete")

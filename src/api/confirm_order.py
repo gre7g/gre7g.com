@@ -1,7 +1,7 @@
 """
 Confirm order
 
-REQUIRES: AuditRW, CartsRW, ProductsRW, OrdersRW
+REQUIRES: AuditRW, CartsRW, ProductsRW, OrdersRW, Gmail
 """
 
 from aws_lambda_powertools import Logger
@@ -15,6 +15,7 @@ from typing import Any
 from uuid import uuid1
 
 from database import Order, Product, UserId, OrderId
+from gmail import send_email_home
 from lambda_base import LambdaBase, AuthenticationRequired, AuditLogEvent, CURRENCY
 
 # Constants:
@@ -89,7 +90,9 @@ class ConfirmOrder(LambdaBase):
                                 "purchase_quantity": quantity,
                             },
                         )
-                        # TODO: email an admin, this is important!
+                        send_email_home(
+                            "Inventory Error", f'Insufficient stock of "{item["name"]}" to fulfill order {order_id}'
+                        )
 
                 product_listing.quantity = quantity
                 product_listing.cost_per = float(unit_amount["value"])

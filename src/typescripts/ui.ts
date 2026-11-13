@@ -24,7 +24,7 @@ class ListSection extends InertSection {
 }
 
 class ProductsUI extends ListSection {
-    async update() {
+    override async update() {
         this.unordered_list.empty();
         const populate_item = (product: Product) => {
             if (!product.parent_id) {
@@ -38,6 +38,8 @@ class ProductsUI extends ListSection {
         Object.values(G_PRODUCTS.product_list).forEach(populate_item);
     }
 }
+
+class ShopUI extends ProductsUI {}
 
 class ProductUI {
     section: JQuery<HTMLElement>;
@@ -97,7 +99,7 @@ class ProductUI {
 }
 
 class CartUI extends ListSection {
-    async update() {
+    override async update() {
         this.unordered_list.empty();
         const add_item = (product: Product) => {
             const new_item = this.list_item.clone();
@@ -171,7 +173,7 @@ share your address, and I won't spam you.`);
 }
 
 class DownloadsUI extends ListSection {
-    async update(unordered_list: JQuery<HTMLElement>, downloads: Record<string, string>) {
+    override async update(unordered_list: JQuery<HTMLElement>, downloads: Record<string, string>) {
         unordered_list.empty();
         const populate_item = (value: [string, string]) => {
             let [filename, url] = value;
@@ -195,7 +197,7 @@ class OrderUI extends ListSection {
         this.downloads = downloads_ui;
     }
 
-    async update() {
+    override async update() {
         if (this.order) {
             this.unordered_list.empty();
             const populate_item = async (product: Product) => {
@@ -215,8 +217,10 @@ class OrderUI extends ListSection {
     }
 }
 
+class OrdersUI extends ListSection {}  // TODO
+
 class ThankYou extends OrderUI {
-    async update() {
+    override async update() {
         super.update();
 
         if (this.order) {
@@ -239,10 +243,13 @@ export class UI {
         appearances: new InertSection($("#appearances")),
         cart: new CartUI($("#cart")),
         checkout: new CheckoutUI($("#checkout")),
+        contact: new InertSection($("#contact")),
         order: new OrderUI($("#order"), $("#order .downloads")),
+        orders: new OrdersUI($("#orders")),
         privacy: new InertSection($("#privacy")),
         product: new ProductUI($("#product-listing")),
         products: new ProductsUI($("#products")),
+        shop: new ShopUI($("#shop")),
         sitemap: new InertSection($("#sitemap")),
         thank_you: new ThankYou($("#thank-you"), $("#thank-you .downloads")),
     };

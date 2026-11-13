@@ -12,6 +12,7 @@ TEMPLATE_PATH = ROOT_PATH / "template.yaml"
 SEARCH_REQUIREMENTS = re.compile(r"^REQUIRES:\s+([\w\s,]+)", re.M)
 SEARCH_NAME = re.compile(r"\w+")
 S3_TIMEOUT = 30
+EMAIL_TIMEOUT = 30
 
 
 class TestTemplate(TestCase):
@@ -70,3 +71,7 @@ class TestTemplate(TestCase):
                     case "ProductsRW":
                         self.check_env_var(function, "PRODUCTS_TABLE")
                         self.check_policy(function, "DynamoDBCrudPolicy", "ProductsTable")
+                    case "Gmail":
+                        self.check_env_var(function, "GMAIL_APP_PASSWORD")
+                        self.check_env_var(function, "GMAIL_SERVER")
+                        self.check_timeout(function, EMAIL_TIMEOUT)

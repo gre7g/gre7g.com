@@ -32,7 +32,7 @@ export class Navigator {
                 await G_UI.show("about");
                 break;
             case "/gre7g/contact":
-                console.log("Show contact form"); // TODO
+                await G_UI.show("contact");
                 break;
             case "/login":
                 history.replaceState(null, "", "/login");
@@ -47,8 +47,15 @@ export class Navigator {
             case "/sitemap":
                 await G_UI.show("sitemap");
                 break;
-            case "/shop":
-                console.log("Show shop"); // TODO
+            case "/products":
+                await G_UI.show("products");
+                break;
+            case "/user/logout":
+                await G_API.logout();
+                await G_UI.show("shop");
+                break;
+            case "/user/orders":
+                await G_UI.show("orders");
                 break;
             case "/user/profile":
                 console.log("Show user profile"); // TODO
@@ -64,7 +71,7 @@ export class Navigator {
                         G_UI.sections.order.order = order.order;
                         await G_UI.show("order");
                     } else {
-                        await G_UI.show("products");
+                        await G_UI.show("shop");
                     }
                 }
         }

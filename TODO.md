@@ -6,25 +6,22 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
-- [X] Thank you screen showing a summary and downloads
+- [ ] Is everything logged on purchase completion (like fees)?
 
 Moderate Urgency
 ----------------
-- [ ] e-mail the administrator if we are unable to decrement the inventory quantities in confirm_order.py
+- [X] e-mail the administrator if we are unable to decrement the inventory quantities in confirm_order.py
 
 Basic Features
 --------------
-- [X] Show AI policy
-- [ ] Show shop
-- [X] Show upcoming appearances
+- [ ] Sign in if signed out, profile if signed in
+- [X] Show shop
 - [ ] Show contact form
-- [X] Show about the author
-- [ ] Log out
+- [X] Log out
 - [ ] Show privacy policy
 - [ ] Show a sitemap
 - [ ] Shopping cart needs:
-  - [ ] Quantity, price per, remove from cart, update amount
-- [X] Show current order and any downloads
+    - [ ] Quantity, price per, remove from cart, update amount
 - [ ] Show previous orders (logged in only)
 - [ ] Handle AJAX errors
 
@@ -37,15 +34,21 @@ Low Urgency
 - [ ] Add code coverage for Typescript
 - [ ] Add something to monitor progress on code coverage
 - [ ] Go through .ts files and add more comments, function headers, etc.
+- [ ] Breadcrumbs
 
 Old and Completed
 -----------------
+- [X] Thank you screen showing a summary and downloads
+- [X] Show AI policy
+- [X] Show upcoming appearances
+- [X] Show about the author
+- [X] Show current order and any downloads
 - [X] Create another static analysis for the template file to check if there are permissions, timeouts, and environment
-  variables available to the functions. Could even re-sort the items? Could we put decorators or comments on
-  functions to identify which resources they require?
+      variables available to the functions. Could even re-sort the items? Could we put decorators or comments on
+      functions to identify which resources they require?
 - [X] The products database entries should contain a description field that is longer than the item name but shorter
-  than the HTML description that we have in the current description field. PayPal wants something for an item
-  description, and it doesn't like the length and mark-up.
+      than the HTML description that we have in the current description field. PayPal wants something for an item
+      description, and it doesn't like the length and mark-up.
 - [X] Stop using secrets manager for password generation and do it yourself
 - [X] URL history is broken (at least on cloud)
 - [X] Don't allow customers to buy physical items with a shipping country other than US

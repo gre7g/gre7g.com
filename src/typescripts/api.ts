@@ -1,5 +1,5 @@
 import { Amplify } from "aws-amplify";
-import { fetchAuthSession, signInWithRedirect } from "aws-amplify/auth";
+import { fetchAuthSession, signInWithRedirect, signOut, AuthSession, AuthTokens } from "aws-amplify/auth";
 
 import { G_SAM_OUTPUTS } from "./main";
 
@@ -40,10 +40,32 @@ class AuthLayer {
 
     async get_session() {
         if (this.use_dummy_auth) {
-            return { tokens: { accessToken: this.dummy_auth } };
+            const tokens: AuthTokens = {
+                idToken: undefined,
+                accessToken: this.dummy_auth,
+                signInDetails: undefined,
+            };
+            const auth: AuthSession = {
+                tokens,
+                credentials: undefined,
+                identityId: undefined,
+                userSub: this.dummy_auth,
+            };
+            return auth;
         } else {
             return await fetchAuthSession();
         }
+    }
+
+    async logout() {
+        if (!this.use_dummy_auth) {
+            await signOut();
+        }
+    }
+
+    async logged_in(): Promise<boolean> {
+        const auth = await this.get_session();
+        return Boolean(auth.userSub);
     }
 }
 

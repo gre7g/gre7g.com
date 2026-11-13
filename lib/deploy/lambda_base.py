@@ -167,7 +167,7 @@ class LambdaBase(ABC):
             body = self.handler(event=event, context=context)
 
         except ClientError as error:
-            LOG.exception(error)
+            LOG.exception(str(error))
             if error.response["Error"]["Code"] == "ConditionalCheckFailedException":
                 status = HTTPStatus.BAD_REQUEST
                 body = {"message": "failed update condition"}
