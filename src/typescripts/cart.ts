@@ -1,8 +1,14 @@
 import { Product } from "./products";
-import { G_API } from "./main";
+import { G_API, G_PUBSUB } from "./main";
 
 export class Cart {
     contents: Product[] = [];
+
+    init() {
+        G_PUBSUB.subscribe("cart.empty", async () => {
+            await this.empty_cart();
+        });
+    }
 
     async load() {
         const guest_id = localStorage.getItem("guest_id");
@@ -38,5 +44,10 @@ export class Cart {
 
         // Save the cart
         await G_API.put("/api/v1/cart", { products: this.contents });
+        G_PUBSUB.publish("ui.update", undefined);
+    }
+
+    async empty_cart() {
+        this.contents = [];
     }
 }

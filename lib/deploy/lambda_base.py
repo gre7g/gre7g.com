@@ -305,3 +305,15 @@ class LambdaBase(ABC):
                     Params={"Bucket": GLACIER_LAKE_BUCKET, "Key": filename},
                     ExpiresIn=DOWNLOAD_WINDOW,
                 )
+
+    def get_email_by_sub(self) -> str | None:
+        try:
+            response = boto3.client("cognito-idp").admin_get_user(UserPoolId=os.getenv("USER_POOL"), Username=self.user_id)
+
+            for attr in response.get("UserAttributes", []):
+                if attr["Name"] == "email":
+                    return attr["Value"]
+        except Exception:
+            LOG.exception("Unable to fetch email")
+
+        return None

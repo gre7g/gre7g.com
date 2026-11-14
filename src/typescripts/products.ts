@@ -1,4 +1,4 @@
-import { G_API, G_PRODUCTS, G_UI } from "./main";
+import { G_API, G_PRODUCTS, G_PUBSUB, G_UI } from "./main";
 
 export interface Product {
     name: string;
@@ -32,6 +32,6 @@ export class Products {
 
     async show_path(path: string): Promise<void> {
         G_UI.sections.product.product = this.product_list[path];
-        await G_UI.show("product");
+        G_PUBSUB.publish("ui.show_section", { section: "product" });
     }
 }

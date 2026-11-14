@@ -81,7 +81,9 @@ class Template:
                 policies = Policies()
                 for item in properties.get("Policies", []):
                     policy = next(iter(item))
-                    if "TableName" in item[policy]:
+                    if policy == "Statement":
+                        policies.append((PolicyName(item[policy][0]["Action"][0]), ResourceName(item[policy][0]["Resource"])))
+                    elif "TableName" in item[policy]:
                         policies.append((PolicyName(policy), ResourceName(item[policy]["TableName"])))
                     elif "BucketName" in item[policy]:
                         policies.append((PolicyName(policy), ResourceName(item[policy]["BucketName"])))

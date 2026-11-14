@@ -1,4 +1,4 @@
-import { G_API, G_PRODUCTS, G_UI } from "./main";
+import { G_API, G_PRODUCTS, G_PUBSUB, G_UI } from "./main";
 
 export class Navigator {
     async navigate(event: NavigateEvent) {
@@ -20,42 +20,35 @@ export class Navigator {
         }
         switch (path) {
             case "/ai":
-                await G_UI.show("ai");
+                G_PUBSUB.publish("ui.show_section", { section: "ai" });
                 break;
             case "/appearances":
-                await G_UI.show("appearances");
+                G_PUBSUB.publish("ui.show_section", { section: "appearances" });
                 break;
             case "/cart":
-                await G_UI.show("cart");
+                G_PUBSUB.publish("ui.show_section", { section: "cart" });
                 break;
             case "/gre7g/about":
-                await G_UI.show("about");
+                G_PUBSUB.publish("ui.show_section", { section: "about" });
                 break;
             case "/gre7g/contact":
-                await G_UI.show("contact");
+                G_PUBSUB.publish("ui.show_section", { section: "contact" });
                 break;
             case "/login":
                 history.replaceState(null, "", "/login");
-                await G_UI.show("products");
-                break;
-            case "/logout":
-                console.log("Log the user out"); // TODO
+                G_PUBSUB.publish("ui.show_section", { section: "products" });
                 break;
             case "/privacy":
-                await G_UI.show("privacy");
+                G_PUBSUB.publish("ui.show_section", { section: "privacy" });
                 break;
             case "/sitemap":
-                await G_UI.show("sitemap");
+                G_PUBSUB.publish("ui.show_section", { section: "sitemap" });
                 break;
             case "/products":
-                await G_UI.show("products");
-                break;
-            case "/user/logout":
-                await G_API.logout();
-                await G_UI.show("shop");
+                G_PUBSUB.publish("ui.show_section", { section: "products" });
                 break;
             case "/user/orders":
-                await G_UI.show("orders");
+                G_PUBSUB.publish("ui.show_section", { section: "orders" });
                 break;
             case "/user/profile":
                 console.log("Show user profile"); // TODO
@@ -69,9 +62,9 @@ export class Navigator {
                         // URL: /order/{order_id}
                         const order = await G_API.get(`/api/v1/order/${parts[2]}`);
                         G_UI.sections.order.order = order.order;
-                        await G_UI.show("order");
+                        G_PUBSUB.publish("ui.show_section", { section: "order" });
                     } else {
-                        await G_UI.show("shop");
+                        G_PUBSUB.publish("ui.show_section", { section: "shop" });
                     }
                 }
         }

@@ -65,6 +65,8 @@ Resources:
         - email
       AutoVerifiedAttributes:
         - email
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
 
   UserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
@@ -238,6 +240,37 @@ Resources:
           Properties:
             Path: /api/v1/cart
             Method: put
+            ApiId: !Ref Api
+
+  ContactOwnerFunction:
+    Type: AWS::Serverless::Function
+    DeletionPolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    UpdateReplacePolicy: !If [DeletionProtectionEnabled, Retain, Delete]
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-contact-owner
+      CodeUri: src/api
+      Handler: contact_owner.lambda_handler
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - cognito-idp:AdminGetUser
+              Resource: !GetAtt UserPool.Arn
+      Environment:
+        Variables:
+          JWKS_URI: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/jwks.json"
+          CSRF_SECRET_KEY: !Ref CsrfSecretKey
+          GMAIL_APP_PASSWORD: !Ref GmailAppPassword
+          GMAIL_SERVER: !Ref GmailServer
+          USER_POOL: !Ref UserPool
+      Layers:
+        - !Ref Lib
+      Events:
+        ApiEvent:
+          Type: HttpApi
+          Properties:
+            Path: /api/v1/contact
+            Method: post
             ApiId: !Ref Api
 
   AssignOrderIdFunction:

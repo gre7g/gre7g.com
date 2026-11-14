@@ -282,6 +282,37 @@ paths:
         "500":
           $ref: "#/components/responses/500-internal-server-error"
 
+  /api/v1/contact:
+    post:
+      summary: Contact site owner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                message:
+                  type: string
+              additionalProperties: false
+              required:
+                - name
+                - email
+                - message
+      responses:
+        "201":
+          description: Comment posted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/empty"
+        "500":
+          $ref: "#/components/responses/500-internal-server-error"
+
   /api/v1/guest:
     post:
       summary: Create a guest authorization

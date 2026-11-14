@@ -82,6 +82,7 @@
                     <li id="discord">
                         <a href="https://discord.gg/bCN2493dTK" target="_blank" rel="noopener noreferrer">discord</a>
                     </li>
+                    <li class="login"><a></a></li>
                     <li id="profile">
                         <ul class="drop-down" style="display: none">
                             <li><a href="/user/profile">user profile</a></li>
@@ -89,7 +90,7 @@
                             <li><a href="/user/logout">logout</a></li>
                         </ul>
                     </li>
-                    <li id="cart_button"><a href="/cart">cart</a></li>
+                    <li id="cart_button"><a href="/cart"></a></li>
                 </ul>
             </nav>
         </header>
@@ -116,7 +117,7 @@
                 <h1>Contact Me</h1>
                 <div>
                     <label for="name">Your name:</label>
-                    <input id="name" type="text" />*
+                    <input id="name" type="text" placeholder="John Smith" />*
                 </div>
                 <div>
                     <label for="email">Your email:</label>
@@ -125,9 +126,10 @@
                 </div>
                 <div>
                     <label for="message">Your comments:</label>
-                    <textarea id="message"></textarea>*
+                    <textarea id="message" placeholder="Keep up the great work!"></textarea>*
                 </div>
                 <div><button>Submit</button></div>
+                <p class="message"></p>
             </form>
 
             <article id="about" style="display: none">
@@ -162,7 +164,7 @@
                 <div id="total">Total: <span></span></div>
                 <div id="login_status">
                     <span></span>
-                    <button class="login">Log In</button> or <button class="register">Create Account</button>
+                    <button class="login">Log In</button>
                 </div>
                 <div id="checkout-status" style="display: none"></div>
                 <div id="place_order"></div>
@@ -209,6 +211,7 @@
                             <ul>
                                 <li><a></a></li>
                             </ul>
+                            <p>Streaming from site coming soon!<!--TODO--></p>
                         </section>
                     </li>
                 </ul>
@@ -252,44 +255,49 @@
             <section id="privacy" style="display: none">
                 <h1>Privacy Policy</h1>
                 <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis placerat augue quam, eget eleifend
-                    nisl condimentum varius. Pellentesque vehicula nisl vel arcu ornare, in ultricies magna molestie.
-                    Etiam bibendum mi sit amet interdum aliquet. Vivamus molestie ipsum a lorem luctus, at condimentum
-                    tellus semper. Donec ac diam a libero faucibus cursus. Curabitur sagittis dui quis metus
-                    sollicitudin efficitur. Aliquam erat volutpat.
+                    Does anyone read these? I doubt they do, but they must be important since everyone has one. I'm not
+                    stealing one from another site, and I'm not hiring a lawyer, so I'll just put the policy in my own
+                    words.
+                </p>
+                <p>Your privacy is important to me.</p>
+                <p>
+                    If you visit my site, create an account, and/or purchase products from me, my server will get some
+                    of your personal information which could include your name, email address, and shipping address. I
+                    collect these so I can do things like mail products to you or provide digital downloads to you.
                 </p>
                 <p>
-                    Integer finibus commodo consectetur. In vulputate lorem eu ultrices volutpat. Duis eleifend erat non
-                    ligula aliquet, nec vestibulum sapien auctor. Suspendisse eget dictum orci. Cras lacinia massa vitae
-                    neque congue, id facilisis nibh dapibus. Etiam fermentum, metus ac commodo interdum, libero nisi
-                    facilisis arcu, sit amet cursus sapien mi et leo. Cras dapibus ante nisi, et pretium diam gravida
-                    et. Praesent pharetra lacus eget ante gravida, eu sagittis libero semper.
+                    Servers <em>can</em> collect a whole bunch of other information such as IP addresses, digital
+                    fingerprints, and tracking cookies to learn more about you like your race, income level, and even
+                    sexual orientation. I have no need for that sort of information, so my server code does not collect
+                    it.
                 </p>
                 <p>
-                    Aenean ullamcorper venenatis elit, eget vehicula metus ullamcorper nec. Vivamus ut sagittis turpis,
-                    vel tempus elit. Vestibulum venenatis tortor mollis consequat iaculis. Suspendisse in est turpis.
-                    Integer nec varius nulla. Ut tempor augue sed sem dapibus, ut venenatis nisi convallis. Proin
-                    aliquet ut diam in dictum. Aenean molestie vel magna et eleifend. Nam ut placerat enim. Nullam ut
-                    purus porta, imperdiet nunc vitae, gravida risus. Mauris pulvinar lacinia dui non auctor. Duis ac
-                    luctus lorem.
+                    My code does store a tracking cookie in your webserver, so I can keep a shopping cart for you
+                    without making you sign in. If you put something in your cart today and come back again tomorrow,
+                    you'll still see that item in your cart waiting for you. I don't share that tracking cookie with
+                    anyone, and none of the big corporations can access that data.
                 </p>
                 <p>
-                    Sed malesuada non lacus et accumsan. Vestibulum eget nisl nec sem varius fermentum non nec urna.
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed fermentum quam eros, nec dictum justo
-                    hendrerit a. Aliquam aliquet facilisis ligula, quis tristique diam tincidunt at. Etiam pellentesque
-                    mi ac risus dignissim elementum. Morbi vehicula magna nisl, quis cursus lacus consequat ut. Donec
-                    ultrices nisl augue, vitae laoreet felis faucibus at.
+                    I will not sell your personal information. I don't even know how to do that, honestly, and I hate
+                    being spammed as much as you do, so no, I won't contribute to that mess.
                 </p>
                 <p>
-                    Cras consectetur urna justo, eu vehicula erat hendrerit at. Praesent eu augue molestie, vestibulum
-                    eros a, tempor leo. Aenean velit justo, tempus eget sodales quis, dignissim eu ligula. Fusce aliquam
-                    ligula non nunc laoreet, sed porttitor magna convallis. Phasellus varius, diam id faucibus rutrum,
-                    nisl nunc tincidunt diam, a dignissim odio sem at dui. Donec velit metus, vehicula vel augue sit
-                    amet, tincidunt ultrices sapien. Quisque sed magna quis enim mattis semper ut vitae sem.
-                    Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Ut at
-                    ex sem. Donec eget mi ut magna ultricies cursus sed nec lectus. Maecenas tempor nisi id quam auctor,
-                    a vehicula massa fermentum.
+                    Who will I share your information with? Just the entities you might expect, really. If I have to
+                    mail you something, then your name and address are going on a package. If I need to give you a
+                    tracking code for your package, then it'll go through your PayPal account. For regular accounting,
+                    Rafe (my voice actor) will only receive anonymized IDs instead of your name. But otherwise, I keep
+                    your personal information secret unless you tell me I can share it.
                 </p>
+                <p>
+                    Will I spam your email address? I don't do that currently and don't plan to start, but it's entirely
+                    possible that I might have to contact you in the future about something important, so I'm hesitant
+                    to say <em>never</em>.
+                </p>
+                <p>
+                    If you have specific questions, please drop them on my <a href="/gre7g/contact">contact form</a> and
+                    be sure to include a valid e-mail address so I can reply.
+                </p>
+                <p>Thanks!</p>
             </section>
 
             <section id="sitemap" style="display: none">
@@ -297,9 +305,6 @@
                 <p>TODO</p>
             </section>
         </main>
-
-        <!-- temporary -->
-        <button class="login">Login</button>
 
         <footer>
             <nav>

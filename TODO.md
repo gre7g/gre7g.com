@@ -10,20 +10,19 @@ High Urgency
 
 Moderate Urgency
 ----------------
-- [X] e-mail the administrator if we are unable to decrement the inventory quantities in confirm_order.py
 
 Basic Features
 --------------
-- [ ] Sign in if signed out, profile if signed in
-- [X] Show shop
-- [ ] Show contact form
-- [X] Log out
-- [ ] Show privacy policy
+- [X] Sign in if signed out, profile if signed in
+- [X] Show contact form
+- [X] Show privacy policy
 - [ ] Show a sitemap
 - [ ] Shopping cart needs:
     - [ ] Quantity, price per, remove from cart, update amount
 - [ ] Show previous orders (logged in only)
 - [ ] Handle AJAX errors
+- [ ] CSS
+- [ ] Unit tests
 
 Low Urgency
 -----------
@@ -38,6 +37,9 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] e-mail the administrator if we are unable to decrement the inventory quantities in confirm_order.py
+- [X] Show shop
+- [X] Log out
 - [X] Thank you screen showing a summary and downloads
 - [X] Show AI policy
 - [X] Show upcoming appearances

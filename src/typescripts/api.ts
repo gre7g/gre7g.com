@@ -1,13 +1,26 @@
 import { Amplify } from "aws-amplify";
-import { fetchAuthSession, signInWithRedirect, signOut, AuthSession, AuthTokens } from "aws-amplify/auth";
+import { fetchAuthSession, signInWithRedirect, signOut, AuthSession } from "aws-amplify/auth";
 
-import { G_SAM_OUTPUTS } from "./main";
+import { G_PUBSUB, G_SAM_OUTPUTS } from "./main";
 
 const PAGE_EXPIRED = 419;
+
+interface DummyAuth {
+    tokens: {
+        accessToken: string;
+    };
+    userSub: string;
+}
 
 class AuthLayer {
     use_dummy_auth = import.meta.env.VITE_USE_DUMMY_AUTH === "true";
     dummy_auth: string = "";
+
+    init() {
+        G_PUBSUB.subscribe("user.logout", async () => {
+            await this.logout();
+        });
+    }
 
     async login() {
         if (!this.use_dummy_auth) {
@@ -38,20 +51,12 @@ class AuthLayer {
         }
     }
 
-    async get_session() {
+    async get_session(): Promise<AuthSession | DummyAuth> {
         if (this.use_dummy_auth) {
-            const tokens: AuthTokens = {
-                idToken: undefined,
-                accessToken: this.dummy_auth,
-                signInDetails: undefined,
-            };
-            const auth: AuthSession = {
-                tokens,
-                credentials: undefined,
-                identityId: undefined,
+            return {
+                tokens: { accessToken: this.dummy_auth },
                 userSub: this.dummy_auth,
             };
-            return auth;
         } else {
             return await fetchAuthSession();
         }

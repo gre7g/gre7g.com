@@ -75,3 +75,6 @@ class TestTemplate(TestCase):
                         self.check_env_var(function, "GMAIL_APP_PASSWORD")
                         self.check_env_var(function, "GMAIL_SERVER")
                         self.check_timeout(function, EMAIL_TIMEOUT)
+                    case "GetUser":
+                        self.check_env_var(function, "USER_POOL")
+                        self.check_policy(function, "cognito-idp:AdminGetUser", "UserPool.Arn")

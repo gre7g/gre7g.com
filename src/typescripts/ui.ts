@@ -1,4 +1,4 @@
-import { G_API, G_CART, G_PRODUCTS, G_UI } from "./main";
+import { G_API, G_CART, G_PRODUCTS, G_PUBSUB } from "./main";
 import { Order, has_physical } from "./orders";
 import { Product } from "./products";
 
@@ -173,17 +173,19 @@ share your address, and I won't spam you.`);
 }
 
 class DownloadsUI extends ListSection {
-    override async update(unordered_list: JQuery<HTMLElement>, downloads: Record<string, string>) {
-        unordered_list.empty();
+    downloads: Record<string, string> = {};
+
+    override async update() {
+        this.unordered_list.empty();
         const populate_item = (value: [string, string]) => {
             let [filename, url] = value;
             const new_item = this.list_item.clone();
             const a = new_item.find("a");
             a.attr("href", url);
             a.text(filename);
-            unordered_list.append(new_item);
+            this.unordered_list.append(new_item);
         };
-        Object.entries(downloads).forEach(populate_item);
+        Object.entries(this.downloads).forEach(populate_item);
     }
 }
 
@@ -206,7 +208,9 @@ class OrderUI extends ListSection {
                 new_item.find(".product-name").text(product.name);
                 const section = new_item.find(".downloads");
                 if (Object.keys(product.downloads).length) {
-                    await this.downloads.update(section.find("ul"), product.downloads);
+                    this.downloads.unordered_list = section.find("ul");
+                    this.downloads.downloads = product.downloads;
+                    await this.downloads.update();
                 } else {
                     section.hide();
                 }
@@ -217,7 +221,7 @@ class OrderUI extends ListSection {
     }
 }
 
-class OrdersUI extends ListSection {}  // TODO
+class OrdersUI extends ListSection {} // TODO
 
 class ThankYou extends OrderUI {
     override async update() {
@@ -254,6 +258,24 @@ export class UI {
         thank_you: new ThankYou($("#thank-you"), $("#thank-you .downloads")),
     };
 
+    init() {
+        G_PUBSUB.subscribe("cart.empty", async () => {
+            await this.update_header();
+        });
+        G_PUBSUB.subscribe("user.logout", async () => {
+            await this.update_header();
+        });
+        G_PUBSUB.subscribe("navigate.bury_url", async (params) => {
+            await this.bury_url(params.section, params.path);
+        });
+        G_PUBSUB.subscribe("ui.show_section", async (params) => {
+            await this.show(params.section);
+        });
+        G_PUBSUB.subscribe("ui.update", async () => {
+            await this.update_header();
+        });
+    }
+
     /**
      * Sets the URL bar to path and show the UI section but do not decode the URL.
      *
@@ -266,7 +288,7 @@ export class UI {
      */
     async bury_url(section: string, path: string) {
         history.pushState(null, "", path);
-        await G_UI.show(section);
+        G_PUBSUB.publish("ui.show_section", { section });
     }
 
     async show(section: string) {
@@ -278,5 +300,15 @@ export class UI {
                 await value.update();
             }
         }
+    }
+
+    async update_header() {
+        // Shopping cart contents
+        $("#cart_button a").text(G_CART.contents.length == 0 ? "" : G_CART.contents.length);
+
+        // Profile menu (if logged in) or login button (if not)
+        const logged_in = await G_API.logged_in();
+        $("#profile").toggle(logged_in);
+        $("#nav-bar .login").toggle(!logged_in);
     }
 }

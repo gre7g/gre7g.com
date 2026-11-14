@@ -1,7 +1,6 @@
 import { loadScript, PayPalNamespace, OnApproveActions, OnApproveData } from "@paypal/paypal-js";
 
-import { G_API, G_UI, G_SAM_OUTPUTS, G_NAVIGATOR } from "./main";
-import {Order} from "./orders";
+import { G_API, G_UI, G_SAM_OUTPUTS, G_CART, G_PUBSUB } from "./main";
 
 let G_SAVED_ERR_MSG = "";
 
@@ -39,7 +38,8 @@ export function load_paypal() {
                     // Note: data.orderID is PayPal's order ID and order_id is ours. I suppose I could have used theirs
                     // as ours, but marries the code to theirs.
                     G_UI.sections.thank_you.order = await G_API.put(`/api/v1/order/${data.orderID}`, {});
-                    await G_UI.bury_url("thank_you", "/thank-you")
+                    G_PUBSUB.publish("navigate.bury_url", { section: "thank_you", path: "/thank-you" });
+                    await G_CART.empty_cart();
                 },
 
                 async onCancel(data) {
