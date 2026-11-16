@@ -8,8 +8,9 @@ import os
 from secrets import token_hex
 from time import time
 
+from .base_test_classes import BaseTestCase
 from lambda_base import CSRF_HEADER, PAGE_EXPIRED
-from lib.local.integration_base import BaseTestCase, Validate, SKIP_LOCAL, NO_CLOUD
+from lib.local.integration_base import Validate, SKIP_LOCAL, NO_CLOUD
 
 # Constants:
 LOG = logging.getLogger(__name__)
@@ -20,23 +21,25 @@ class TestMisc(BaseTestCase):
 
     def test_bad_method(self):
         """Should reject access with a bad method"""
-        for path, methods in [
-            ("/api/v1/cart", ["DELETE"]),
-            ("/api/v1/cart/shipping", ["GET", "PUT", "DELETE"]),
-            ("/api/v1/click_id", ["GET", "PUT", "DELETE"]),
-            ("/api/v1/guest", ["GET", "DELETE"]),
-            ("/api/v1/order", ["PUT", "DELETE"]),
-            ("/api/v1/order/order1_id", ["GET", "POST", "DELETE"]),
-            ("/api/v1/products", ["POST", "PUT", "DELETE"]),
-        ]:
-            for method in methods:
-                response = self.request(
-                    method,
-                    path,
-                    auth_user=self.regular_user,
-                    validate=Validate.NOTHING,
-                )
-                assert response.status_code == HTTPStatus.NOT_FOUND
+        orders, order_dict = self.order_data()
+        with self.create_records([(self.orders_table, orders[0]), (self.orders_table, orders[1])]):
+            for path, methods in [
+                ("/api/v1/cart", ["DELETE"]),
+                ("/api/v1/cart/shipping", ["GET", "PUT", "DELETE"]),
+                ("/api/v1/click_id", ["GET", "PUT", "DELETE"]),
+                ("/api/v1/guest", ["GET", "DELETE"]),
+                ("/api/v1/order", ["PUT", "DELETE"]),
+                ("/api/v1/order/order1_id", ["POST", "DELETE"]),
+                ("/api/v1/products", ["POST", "PUT", "DELETE"]),
+            ]:
+                for method in methods:
+                    response = self.request(
+                        method,
+                        path,
+                        auth_user=self.regular_user,
+                        validate=Validate.NOTHING,
+                    )
+                    assert response.status_code == HTTPStatus.NOT_FOUND, f"Unexpected response to {method} {path}"
 
     @SKIP_LOCAL
     def test_bad_auth(self):

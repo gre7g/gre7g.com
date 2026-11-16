@@ -3,6 +3,7 @@ aws_lambda_powertools==3.38.0
 black==26.10.1
 boto3==1.43.123
 botocore-stubs==1.43.123
+coverage==7.17.3
 cryptography==50.0.2
 mypy==2.4.1
 openapi-core==0.23.1

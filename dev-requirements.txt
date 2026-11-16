@@ -2,6 +2,7 @@ aws_lambda_powertools==3.38.0
 black==26.10.1
 boto3==1.43.123
 boto3-stubs==1.43.123
+coverage==7.17.3
 cryptography==50.0.2
 paypal-server-sdk==2.4.0
 PyJWT==2.15.1

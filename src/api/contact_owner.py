@@ -5,8 +5,10 @@ REQUIRES: Gmail, GetUser
 """
 
 from aws_lambda_powertools import Logger
-import boto3
+from aws_lambda_powertools.utilities.typing import LambdaContext
 import logging
+import os
+from typing import Any
 
 from gmail import send_email_home
 from lambda_base import LambdaBase
@@ -38,3 +40,5 @@ Input e-mail: {email}
 Message:
 {message}""",
         )
+
+        return {}

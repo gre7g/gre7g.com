@@ -33,8 +33,8 @@ ENV_VAR_CONSTS = {
     "AUDIT_LOG_STORAGE": "AUDIT_LOG",
     "CSRF_SECRET_KEY": "sooper sekret key for local testing only",
     "PAYPAL_SANDBOX": "True",
-    "PAYPAL_CLIENT_ID": os.getenv("SANDBOX_PAYPAL_CLIENT_ID"),
-    "PAYPAL_CLIENT_SECRET": os.getenv("SANDBOX_PAYPAL_CLIENT_SECRET"),
+    "PAYPAL_CLIENT_ID": os.getenv("SANDBOX_PAYPAL_CLIENT_ID", "unittest client ID"),
+    "PAYPAL_CLIENT_SECRET": os.getenv("SANDBOX_PAYPAL_CLIENT_SECRET", "unittest client secret"),
     "GMAIL_APP_PASSWORD": "sooper sekcret gmail password for local testing only",
     "GMAIL_SERVER": "://localhost",
 }
