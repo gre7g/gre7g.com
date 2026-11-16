@@ -6,6 +6,9 @@ export class Navigator {
         G_PUBSUB.subscribe("navigate.go", async (params) => {
             await this.go(params.path, params.save);
         });
+        navigation.addEventListener("navigate", async (event) => {
+            await this.navigate(event);
+        });
     }
 
     async navigate(event: NavigateEvent) {

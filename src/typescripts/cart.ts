@@ -4,7 +4,7 @@ import { G_API, G_PUBSUB } from "./main";
 export class Cart {
     contents: Product[] = [];
 
-    init() {
+    init(check_out:JQuery<HTMLElement>) {
         G_PUBSUB.subscribe("cart.empty", async () => {
             await this.empty_cart();
         });
@@ -16,6 +16,9 @@ export class Cart {
         });
         G_PUBSUB.subscribe("cart.delete", async (params) => {
             this.delete(params.product_index);
+        });
+        check_out.on("click", async () => {
+            G_PUBSUB.publish("navigate.bury_url", { section: "checkout", path: "/cart/checkout" });
         });
     }
 
@@ -50,6 +53,7 @@ export class Cart {
             copy.quantity = 1;
             this.contents.push(copy);
         }
+        G_PUBSUB.publish("navigate.go", { path: "/cart", save: true });
 
         // Save the cart
         await G_API.put("/api/v1/cart", { products: this.contents });

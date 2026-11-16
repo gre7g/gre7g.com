@@ -13,6 +13,9 @@ export class Contact {
         G_PUBSUB.subscribe("ui.update", async () => {
             await this.update();
         });
+        this.section.find("button").on("click", async () => {
+            await this.submit();
+        });
     }
 
     async update() {
@@ -25,16 +28,15 @@ export class Contact {
         const name = $("#name").val();
         const email = $("#email").val();
         const message = $("#message").val();
-        const status = this.section.find(".message");
         if (name && message) {
             try {
                 await G_API.post("/api/v1/contact", { name, email, message });
-                status.text("Thank you for leaving me a comment!");
+                G_PUBSUB.publish("ui.show_info", { message: "Thank you for leaving me a comment!" });
             } catch (error) {
                 if (error instanceof Error) {
-                    status.text(error.message);
+                    G_PUBSUB.publish("ui.show_error", { message: error.message });
                 } else {
-                    status.text("Unable to leave comment");
+                    G_PUBSUB.publish("ui.show_error", { message: "Unable to leave comment" });
                 }
             }
         }

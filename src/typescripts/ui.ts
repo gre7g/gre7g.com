@@ -1,6 +1,7 @@
-import { G_API, G_CART, G_PRODUCTS, G_PUBSUB } from "./main";
+import { G_API, G_CART, G_PRODUCTS, G_PUBSUB, G_UI } from "./main";
 import { Order, has_physical } from "./orders";
 import { Product } from "./products";
+import { $ } from "jquery";
 
 class InertSection {
     section: JQuery<HTMLElement>;
@@ -11,6 +12,14 @@ class InertSection {
 
     init() {}
     update() {}
+
+    update_cost(select: JQuery<HTMLElement>, cost: number) {
+        const currency = new Intl.NumberFormat("default", {
+            style: "currency",
+            currency: "USD",
+        }).format(cost);
+        select.text(currency);
+    }
 }
 
 class ListSection extends InertSection {
@@ -44,6 +53,18 @@ class ShopUI extends ProductsUI {}
 
 class ProductUI extends InertSection {
     product: Product | null = null;
+
+    override init() {
+        this.section.find("button").on("click", () => {
+            this.add_to_cart();
+        });
+    }
+
+    add_to_cart() {
+        if (G_UI.sections.product.product) {
+            G_PUBSUB.publish("cart.add", { product: G_UI.sections.product.product });
+        }
+    }
 
     private price(): string {
         if (this.product?.child_ids.length == 0) {
@@ -104,17 +125,9 @@ class CartUI extends ListSection {
         });
     }
 
-    update_ext_cost(select: JQuery<HTMLElement>, product: Product, quantity: number) {
-        const currency = new Intl.NumberFormat("default", {
-            style: "currency",
-            currency: "USD",
-        }).format(product.cost_per * quantity);
-        select.text(currency);
-    }
-
     update_qty(product_index: number, quantity: number) {
         const select = this.section.find(`li:nth-child(${product_index + 1}) .ext-cost`);
-        this.update_ext_cost(select, G_CART.contents[product_index], quantity);
+        this.update_cost(select, G_CART.contents[product_index].cost_per * quantity);
     }
 
     override async update() {
@@ -130,7 +143,7 @@ class CartUI extends ListSection {
                 const product_index = input.closest("li").data("product_index");
                 G_PUBSUB.publish("cart.update_qty", { product_index, quantity: parseInt(input.val() ?? "0", 10) });
             });
-            this.update_ext_cost(new_item.find(".ext-cost"), product, product.quantity);
+            this.update_cost(new_item.find(".ext-cost"), product.cost_per * product.quantity);
             new_item.find("button").on("click", function () {
                 const product_index = $(this).closest("li").data("product_index");
                 G_PUBSUB.publish("cart.delete", { product_index });
@@ -143,6 +156,12 @@ class CartUI extends ListSection {
 export class CheckoutUI extends CartUI {
     total = 0.0;
 
+    override init() {
+        this.section.find("button.login").on("click", async () => {
+            await G_API.login();
+        });
+    }
+
     override async update() {
         await super.update();
         $("#checkout-status").hide();
@@ -153,27 +172,15 @@ export class CheckoutUI extends CartUI {
             subtotal += product.quantity * product.cost_per;
         };
         G_CART.contents.forEach(add_item);
-        let currency = new Intl.NumberFormat("default", {
-            style: "currency",
-            currency: "USD",
-        }).format(subtotal);
-        this.section.find("#subtotal span").text(currency);
+        this.update_cost(this.section.find("#subtotal span"), subtotal);
 
         // Get shipping
         const response = await G_API.post("/api/v1/cart/shipping", {});
-        currency = new Intl.NumberFormat("default", {
-            style: "currency",
-            currency: "USD",
-        }).format(response?.shipping_cost);
-        this.section.find("#shipping span").text(currency);
+        this.update_cost(this.section.find("#shipping span"), response?.shipping_cost);
 
         // Calculate total
         this.total = subtotal + response?.shipping_cost;
-        currency = new Intl.NumberFormat("default", {
-            style: "currency",
-            currency: "USD",
-        }).format(this.total);
-        this.section.find("#total span").text(currency);
+        this.update_cost(this.section.find("#total span"), this.total);
 
         // Login status message
         const login_status = $("#login_status");
