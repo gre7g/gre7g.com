@@ -65,6 +65,7 @@ class AuthLayer {
     async logout() {
         if (!this.use_dummy_auth) {
             await signOut();
+            G_PUBSUB.publish("ui.update", undefined);
         }
     }
 

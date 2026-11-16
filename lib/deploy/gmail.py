@@ -31,6 +31,6 @@ def send_email_home(subject: str, message: str) -> bool:
 
         return True
 
-    except Exception:
+    except:
         LOG.exception("Failed to send email")
         return False

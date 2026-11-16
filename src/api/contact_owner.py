@@ -26,7 +26,9 @@ class ContactOwner(LambdaBase):
         name = self.body["name"]
         email = self.body["email"]
         message = self.body["message"]
-        send_email_home("Contact from gre7g.com", f"""
+        send_email_home(
+            "Contact from gre7g.com",
+            f"""
 User: {user}
 Guest: {guest}
 Official email: {official_email}
@@ -34,4 +36,5 @@ Official email: {official_email}
 Name: {name}
 Input e-mail: {email}
 Message:
-{message}""")
+{message}""",
+        )

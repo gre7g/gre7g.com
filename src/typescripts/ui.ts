@@ -221,7 +221,44 @@ class OrderUI extends ListSection {
     }
 }
 
-class OrdersUI extends ListSection {} // TODO
+class MinimalOrderUI extends ListSection {
+    order: Order | null = null;
+
+    override async update() {
+        this.unordered_list.empty();
+        if (this.order) {
+            for (const product of this.order.products) {
+                const new_item = this.list_item.clone();
+                new_item.find(".product-name").text(product.name);
+                this.unordered_list.append(new_item);
+            }
+        }
+    }
+}
+
+class OrdersUI extends ListSection {
+    orders: Order[] = [];
+    order_ui: MinimalOrderUI;
+
+    constructor(section: JQuery<HTMLElement>, order: JQuery<HTMLElement>) {
+        const order_ui = new MinimalOrderUI(order);
+        super(section);
+        this.order_ui = order_ui;
+    }
+
+    override async update() {
+        this.unordered_list.empty();
+        for (const order of this.orders) {
+            const new_item = this.list_item.clone();
+            new_item.find("a").attr("href", `/order/${order.order_id}`);
+            const section = new_item.find(".products");
+            this.order_ui.unordered_list = section.find("ul");
+            this.order_ui.order = order;
+            await this.order_ui.update();
+            this.unordered_list.append(new_item);
+        }
+    }
+}
 
 class ThankYou extends OrderUI {
     override async update() {
@@ -249,7 +286,7 @@ export class UI {
         checkout: new CheckoutUI($("#checkout")),
         contact: new InertSection($("#contact")),
         order: new OrderUI($("#order"), $("#order .downloads")),
-        orders: new OrdersUI($("#orders")),
+        orders: new OrdersUI($("#orders"), $("#orders .products")),
         privacy: new InertSection($("#privacy")),
         product: new ProductUI($("#product-listing")),
         products: new ProductsUI($("#products")),
@@ -259,12 +296,6 @@ export class UI {
     };
 
     init() {
-        G_PUBSUB.subscribe("cart.empty", async () => {
-            await this.update_header();
-        });
-        G_PUBSUB.subscribe("user.logout", async () => {
-            await this.update_header();
-        });
         G_PUBSUB.subscribe("navigate.bury_url", async (params) => {
             await this.bury_url(params.section, params.path);
         });

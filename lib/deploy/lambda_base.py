@@ -308,7 +308,9 @@ class LambdaBase(ABC):
 
     def get_email_by_sub(self) -> str | None:
         try:
-            response = boto3.client("cognito-idp").admin_get_user(UserPoolId=os.getenv("USER_POOL"), Username=self.user_id)
+            response = boto3.client("cognito-idp").admin_get_user(
+                UserPoolId=os.getenv("USER_POOL"), Username=self.user_id
+            )
 
             for attr in response.get("UserAttributes", []):
                 if attr["Name"] == "email":

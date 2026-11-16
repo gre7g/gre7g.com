@@ -16,10 +16,12 @@ Basic Features
 - [X] Sign in if signed out, profile if signed in
 - [X] Show contact form
 - [X] Show privacy policy
-- [ ] Show a sitemap
 - [ ] Shopping cart needs:
-    - [ ] Quantity, price per, remove from cart, update amount
-- [ ] Show previous orders (logged in only)
+    - [ ] Quantity
+    - [ ] price per
+    - [ ] remove from cart
+    - [ ] update amount
+- [X] Show previous orders (logged in only)
 - [ ] Handle AJAX errors
 - [ ] CSS
 - [ ] Unit tests
@@ -34,6 +36,8 @@ Low Urgency
 - [ ] Add something to monitor progress on code coverage
 - [ ] Go through .ts files and add more comments, function headers, etc.
 - [ ] Breadcrumbs
+- [ ] Show a sitemap
+- [ ] Move message bar to one consistent location
 
 Old and Completed
 -----------------

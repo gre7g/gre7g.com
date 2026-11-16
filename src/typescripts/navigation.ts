@@ -1,4 +1,5 @@
 import { G_API, G_PRODUCTS, G_PUBSUB, G_UI } from "./main";
+import { Order } from "./orders";
 
 export class Navigator {
     async navigate(event: NavigateEvent) {
@@ -48,6 +49,9 @@ export class Navigator {
                 G_PUBSUB.publish("ui.show_section", { section: "products" });
                 break;
             case "/user/orders":
+                const orders = await G_API.get("/api/v1/order");
+                orders.orders.sort((a: Order, b: Order) => b.timestamp.localeCompare(a.timestamp));
+                G_UI.sections.orders.orders = orders.orders;
                 G_PUBSUB.publish("ui.show_section", { section: "orders" });
                 break;
             case "/user/profile":

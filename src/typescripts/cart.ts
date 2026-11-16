@@ -49,5 +49,6 @@ export class Cart {
 
     async empty_cart() {
         this.contents = [];
+        G_PUBSUB.publish("ui.update", undefined);
     }
 }
