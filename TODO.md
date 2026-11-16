@@ -13,15 +13,8 @@ Moderate Urgency
 
 Basic Features
 --------------
-- [X] Sign in if signed out, profile if signed in
-- [X] Show contact form
-- [X] Show privacy policy
-- [ ] Shopping cart needs:
-    - [ ] Quantity
-    - [ ] price per
-    - [ ] remove from cart
-    - [ ] update amount
 - [X] Show previous orders (logged in only)
+- [ ] Checkout must show quantity and extended amount
 - [ ] Handle AJAX errors
 - [ ] CSS
 - [ ] Unit tests
@@ -41,6 +34,14 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] Sign in if signed out, profile if signed in
+- [X] Show contact form
+- [X] Show privacy policy
+- [X] Shopping cart needs:
+    - [X] Quantity
+    - [X] price per
+    - [X] remove from cart
+    - [X] update amount
 - [X] e-mail the administrator if we are unable to decrement the inventory quantities in confirm_order.py
 - [X] Show shop
 - [X] Log out
