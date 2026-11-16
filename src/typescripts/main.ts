@@ -5,7 +5,7 @@ import { Cart } from "./cart";
 import { Contact } from "./contact";
 import { Navigator } from "./navigation";
 import { load_paypal } from "./paypal";
-import { Products } from "./products";
+import { Product, Products } from "./products";
 import { PubSub } from "./pubsub";
 import { UI } from "./ui";
 
@@ -27,7 +27,12 @@ interface SamOutputs {
 
 interface Events {
     "cart.empty": void;
+    "cart.add": { product: Product };
+    "cart.delete": { product_index: number };
+    "cart.update": void;
+    "cart.update_qty": { product_index: number; quantity: number };
     "navigate.bury_url": { section: string; path: string };
+    "navigate.go": { path: string; save?: boolean };
     "ui.show_section": { section: string };
     "ui.update": void;
     "user.logout": void;
@@ -51,10 +56,10 @@ export class Main {
     contact = new Contact($("#contact"));
     navigator = new Navigator();
 
-    async add_to_cart() {
+    add_to_cart() {
         if (G_UI.sections.product.product) {
-            await G_CART.add(G_UI.sections.product.product);
-            await this.navigator.go("/cart", true);
+            G_PUBSUB.publish("cart.add", { product: G_UI.sections.product.product });
+            G_PUBSUB.publish("navigate.go", { path: "/cart", save: true });
         }
     }
 
@@ -73,18 +78,19 @@ export class Main {
         this.contact.init();
         await G_PRODUCTS.load();
         await G_CART.load();
+        this.navigator.init();
         G_API.init();
         G_UI.init();
-        await this.navigator.go(window.location.pathname);
+        G_PUBSUB.publish("navigate.go", { path: window.location.pathname });
 
-        $(window).on("popstate", async () => {
-            await this.navigator.go(window.location.pathname);
+        $(window).on("popstate", () => {
+            G_PUBSUB.publish("navigate.go", { path: window.location.pathname });
         });
         navigation.addEventListener("navigate", (event) => {
             this.navigator.navigate(event);
         });
-        $("#add-to-cart").on("click", async () => {
-            await this.add_to_cart();
+        $("#add-to-cart").on("click", () => {
+            this.add_to_cart();
         });
         $("#checkout-button").on("click", async () => {
             G_PUBSUB.publish("navigate.bury_url", { section: "checkout", path: "/cart/checkout" });
@@ -94,7 +100,7 @@ export class Main {
         });
         $("#contact button").on("click", async () => {
             await this.contact.submit();
-        })
+        });
         G_PUBSUB.publish("ui.update", undefined);
         load_paypal();
     }

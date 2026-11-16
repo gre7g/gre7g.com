@@ -96,7 +96,7 @@ export class Api extends AuthLayer {
         }
         let params: Record<string, any> = { method, headers };
         if (data) {
-            params.data = JSON.stringify(data);
+            params.body = JSON.stringify(data);
         }
         const response = await fetch(path, params);
         const token = response.headers.get("x-csrf-token");

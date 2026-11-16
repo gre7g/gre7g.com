@@ -2,6 +2,12 @@ import { G_API, G_PRODUCTS, G_PUBSUB, G_UI } from "./main";
 import { Order } from "./orders";
 
 export class Navigator {
+    init() {
+        G_PUBSUB.subscribe("navigate.go", async (params) => {
+            await this.go(params.path, params.save);
+        });
+    }
+
     async navigate(event: NavigateEvent) {
         const navigator = this;
         if (event.canIntercept && !event.downloadRequest && !event.formData && event.userInitiated) {

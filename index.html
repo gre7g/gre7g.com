@@ -149,7 +149,12 @@
             <section id="cart" style="display: none">
                 <h1>Shopping Cart</h1>
                 <ul>
-                    <li><span class="product-name"></span></li>
+                    <li>
+                        <span class="product-name"></span>
+                        <input type="number" class="quantity" min="1" max="9" />
+                        <span class="ext-cost"></span>
+                        <button>Remove</button>
+                    </li>
                 </ul>
                 <button id="checkout-button">Checkout</button>
             </section>

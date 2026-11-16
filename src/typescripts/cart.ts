@@ -8,6 +8,15 @@ export class Cart {
         G_PUBSUB.subscribe("cart.empty", async () => {
             await this.empty_cart();
         });
+        G_PUBSUB.subscribe("cart.add", async (params) => {
+            await this.add(params.product);
+        });
+        G_PUBSUB.subscribe("cart.update_qty", async (params) => {
+            this.update_qty(params.product_index, params.quantity);
+        });
+        G_PUBSUB.subscribe("cart.delete", async (params) => {
+            this.delete(params.product_index);
+        });
     }
 
     async load() {
@@ -50,5 +59,14 @@ export class Cart {
     async empty_cart() {
         this.contents = [];
         G_PUBSUB.publish("ui.update", undefined);
+    }
+
+    update_qty(product_index: number, quantity: number) {
+        this.contents[product_index].quantity = quantity;
+    }
+
+    delete(product_index: number) {
+        this.contents.splice(product_index, 1);
+        G_PUBSUB.publish("cart.update", undefined);
     }
 }

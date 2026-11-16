@@ -9,6 +9,7 @@ class InertSection {
         this.section = section;
     }
 
+    init() {}
     update() {}
 }
 
@@ -41,13 +42,8 @@ class ProductsUI extends ListSection {
 
 class ShopUI extends ProductsUI {}
 
-class ProductUI {
-    section: JQuery<HTMLElement>;
+class ProductUI extends InertSection {
     product: Product | null = null;
-
-    constructor(section: JQuery<HTMLElement>) {
-        this.section = section;
-    }
 
     private price(): string {
         if (this.product?.child_ids.length == 0) {
@@ -79,7 +75,7 @@ class ProductUI {
         return formatter.format(links);
     }
 
-    async update() {
+    override async update() {
         $("#example").attr("href", this.product?.images[0]!);
         $("#price").text(this.price());
         const views = $("#views");
@@ -99,14 +95,48 @@ class ProductUI {
 }
 
 class CartUI extends ListSection {
+    override init() {
+        G_PUBSUB.subscribe("cart.update_qty", async (params) => {
+            this.update_qty(params.product_index, params.quantity);
+        });
+        G_PUBSUB.subscribe("cart.update", async () => {
+            await this.update();
+        });
+    }
+
+    update_ext_cost(select: JQuery<HTMLElement>, product: Product, quantity: number) {
+        const currency = new Intl.NumberFormat("default", {
+            style: "currency",
+            currency: "USD",
+        }).format(product.cost_per * quantity);
+        select.text(currency);
+    }
+
+    update_qty(product_index: number, quantity: number) {
+        const select = this.section.find(`li:nth-child(${product_index + 1}) .ext-cost`);
+        this.update_ext_cost(select, G_CART.contents[product_index], quantity);
+    }
+
     override async update() {
         this.unordered_list.empty();
-        const add_item = (product: Product) => {
+        for (const [index, product] of G_CART.contents.entries()) {
             const new_item = this.list_item.clone();
+            new_item.data("product_index", index);
             new_item.find(".product-name").text(product.name);
+            const quantity = new_item.find("input");
+            quantity.val(product.quantity);
+            quantity.on("input", function () {
+                const input = $(this);
+                const product_index = input.closest("li").data("product_index");
+                G_PUBSUB.publish("cart.update_qty", { product_index, quantity: parseInt(input.val() ?? "0", 10) });
+            });
+            this.update_ext_cost(new_item.find(".ext-cost"), product, product.quantity);
+            new_item.find("button").on("click", function () {
+                const product_index = $(this).closest("li").data("product_index");
+                G_PUBSUB.publish("cart.delete", { product_index });
+            });
             this.unordered_list.append(new_item);
-        };
-        Object.values(G_CART.contents).forEach(add_item);
+        }
     }
 }
 
@@ -304,6 +334,10 @@ export class UI {
         });
         G_PUBSUB.subscribe("ui.update", async () => {
             await this.update_header();
+        });
+
+        Object.values(this.sections).forEach((section) => {
+            section.init();
         });
     }
 
