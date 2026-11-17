@@ -27,10 +27,10 @@ from secrets import token_hex
 from threading import Thread
 from time import time
 from types_boto3_dynamodb.service_resource import Table as DynamoDBTable
-from typing import Any, Callable, NewType
+from typing import Any, Callable
 
 from audit_log import AuditLogEvent, audit_log
-from database import UserId, Cart, Product, Order
+from database import UserId, Cart, Order
 
 # Constants:
 LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.getLogger(__name__)
@@ -131,7 +131,7 @@ class LambdaBase(ABC):
                     return
         raise CSRFException()
 
-    def wrapper(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
+    def __call__(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Wrapper around the handler than takes care of parameters, privileges, and error handling"""
         http_dict = event["requestContext"]["http"]
         source_ip = http_dict["sourceIp"]
@@ -227,7 +227,7 @@ class LambdaBase(ABC):
             orders_table = cls.get_table("ORDERS_TABLE")
             env_secret = os.getenv("CSRF_SECRET_KEY")
             secret_key = env_secret.encode("ascii") if env_secret else b""
-            return cls(products_table, carts_table, orders_table, secret_key).wrapper
+            return cls(products_table, carts_table, orders_table, secret_key)
         except:
             LOG.exception("loading object failed")
             return None

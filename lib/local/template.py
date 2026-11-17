@@ -38,7 +38,7 @@ class Function:
         path = f"{self.code_uri.replace("/", ".")}.{self.handler}".split(".")
         module = path[:-1]
         function = path[-1]
-        return getattr(import_module(".".join(module)), function)(event, context)
+        return getattr(import_module(".".join(module)), function).lambda_handler()(event, context)
 
     @property
     def file_path(self) -> Path:

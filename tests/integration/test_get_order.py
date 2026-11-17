@@ -20,7 +20,7 @@ class TestGetOrder(BaseTestCase):
     def test_user(self) -> None:
         """Should fetch an order"""
         orders, order_dict = self.order_data()
-        with self.create_records([(self.orders_table, orders[0]), (self.orders_table, orders[1])]):
+        with self.create_records([(self.orders_table, orders[0])]):
             response = self.get(
                 "/api/v1/order/order1_id",
                 auth_user=self.regular_user,

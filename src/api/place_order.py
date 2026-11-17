@@ -1,7 +1,7 @@
 """
 Place order
 
-REQUIRES: CartsRead, ProductsRead, AuditsRW
+REQUIRES: CartsRead, ProductsRead, AuditsRW, Gmail
 """
 
 from aws_lambda_powertools import Logger
@@ -22,6 +22,7 @@ from uuid import uuid1
 
 from audit_log import AuditLogEvent
 from database import Cart, Product
+from gmail import send_email_home
 from lambda_base import LambdaBase, AuthenticationRequired, ProductMix, AuthException, PHYSICAL_SHIPPING, CURRENCY
 
 # Constants:
@@ -59,20 +60,20 @@ class PlaceOrder(LambdaBase):
             physical_goods = self.physical_item(product_listing.media)
             if physical_goods and (product_listing.quantity < product.quantity):
                 out_of_stock.append(product.product_id)
-            else:
-                item = Item(
-                    name=product_listing.name,
-                    unit_amount=Money(CURRENCY, "%0.2f" % product_listing.cost_per),
-                    quantity=str(product.quantity),
-                    description=product_listing.short_desc,
-                    sku=product_listing.product_id,
-                    category=ItemCategory.PHYSICAL_GOODS if physical_goods else ItemCategory.DIGITAL_GOODS,
-                )
-                item_list.append(item)
-                subtotal_cost += product_listing.cost_per * product.quantity
+
+            item = Item(
+                name=product_listing.name,
+                unit_amount=Money(CURRENCY, "%0.2f" % product_listing.cost_per),
+                quantity=str(product.quantity),
+                description=product_listing.short_desc,
+                sku=product_listing.product_id,
+                category=ItemCategory.PHYSICAL_GOODS if physical_goods else ItemCategory.DIGITAL_GOODS,
+            )
+            item_list.append(item)
+            subtotal_cost += product_listing.cost_per * product.quantity
 
         if out_of_stock:
-            return {"status": "cannot_fulfill", "out_of_stock": out_of_stock}
+            send_email_home("Cannot fulfill purchase warning", "Items: %s" % ", ".join(out_of_stock))
 
         shipping_cost = PHYSICAL_SHIPPING if mix in [ProductMix.ALL_PHYSICAL, ProductMix.MIX_OF_TYPES] else 0.00
         total_cost = subtotal_cost + shipping_cost

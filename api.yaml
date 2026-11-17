@@ -452,13 +452,15 @@ paths:
                         - rel
                   status:
                     type: string
-                  out_of_stock:
-                    type: array
-                    items:
-                      type: string
                 additionalProperties: false
                 required:
+                  - id
+                  - links
                   - status
+        "401":
+          $ref: "#/components/responses/401-unauthorized"
+        "500":
+          $ref: "#/components/responses/500-internal-server-error"
 
   /api/v1/order/{order_id}:
     get:

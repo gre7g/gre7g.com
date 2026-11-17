@@ -478,6 +478,8 @@ Resources:
           PAYPAL_SANDBOX: !Ref PaypalSandbox
           PAYPAL_CLIENT_ID: !Ref PaypalClientId
           PAYPAL_CLIENT_SECRET: !Ref PaypalClientSecret
+          GMAIL_APP_PASSWORD: !Ref GmailAppPassword
+          GMAIL_SERVER: !Ref GmailServer
       Layers:
         - !Ref Lib
       Events:

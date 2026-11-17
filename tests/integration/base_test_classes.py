@@ -15,6 +15,9 @@ AuditObj = dict[str, Any]
 class BaseTestCase(integration_base.BaseTestCase):
     """Base class for integration tests"""
 
+    OUT_OF_STOCK = Product(
+        "Skeleton Crew", "--", "aa", "books/skeleton-crew", ProductId("p1"), 0, 13.99, media="paperback"
+    )
     PRODUCT1 = Product("Skeleton Crew", "--", "aa", "books/skeleton-crew", ProductId("p1"), 1, 13.99, media="paperback")
     P_DICT1 = {
         "name": "Skeleton Crew",
@@ -95,6 +98,13 @@ class BaseTestCase(integration_base.BaseTestCase):
         return (
             Cart(UserId(self.regular_user.user_id), [self.PRODUCT1, self.PRODUCT2]),
             {"products": [self.P_DICT1, self.P_DICT2]},
+        )
+
+    def digital_cart_data(self):
+        """Return some more cart data"""
+        return (
+            Cart(UserId(self.regular_user.user_id), [self.PRODUCT3, self.PRODUCT4]),
+            {"products": [self.P_DICT3, self.P_DICT4]},
         )
 
     def guest_cart_data(self):
