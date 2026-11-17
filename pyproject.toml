@@ -1,10 +1,12 @@
 [tool.black]
 line-length = 120
 
-[tool.pytest.ini_options]
-addopts = ["--tb=short"]
-log_cli = true
-log_cli_level = "DEBUG"
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "*/tests/*",
+    "*/lib/local/*",
+]
 
 [tool.mypy]
 exclude = ["boto3_hack", "integration_base"]
@@ -15,3 +17,8 @@ explicit_package_bases = true
 [[tool.mypy.overrides]]
 module = "paypalserversdk.*"
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+addopts = ["--tb=short"]
+log_cli = true
+log_cli_level = "DEBUG"

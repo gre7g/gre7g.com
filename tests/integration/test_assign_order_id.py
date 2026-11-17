@@ -3,7 +3,7 @@
 from http import HTTPStatus
 import logging
 
-from lib.local.integration_base import BaseTestCase
+from .base_test_classes import BaseTestCase
 
 # Constants:
 LOG = logging.getLogger(__name__)

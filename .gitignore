@@ -1,9 +1,12 @@
 .aws-sam/
+.coverage
 .idea/
 .vitest/
 __pycache__/
 audit_log/
 dist/
+coverage.json
+htmlcov/
 node_modules/
 scratch/
 package-lock.json

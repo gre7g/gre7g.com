@@ -104,6 +104,13 @@ class BaseTestCase(integration_base.BaseTestCase):
             {"products": [self.P_DICT3, self.P_DICT4]},
         )
 
+    def guest_cart_no_downloads(self):
+        """Return some cart additional data"""
+        return (
+            Cart(UserId("guest1_id"), [self.PRODUCT4]),
+            {"products": [self.P_DICT4]},
+        )
+
     def order_data(self):
         """Return some order data"""
         order1 = Order(

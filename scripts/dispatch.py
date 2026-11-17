@@ -48,6 +48,8 @@ DELETE_OLDER = timedelta(days=30)
 WEB_PORT = 8080
 SEARCH_PRETTIER_EXT = re.compile(r"\.(ts|html|json)$", re.M)
 SEARCH_PRETTIER_NOT = re.compile(r" notes/")
+COVERAGE_JSON_PATH = ROOT_PATH / "coverage.json"
+KEEP_LAST_RUNS = 20
 
 # Globals
 G_PY_TESTER = ["pytest"]
@@ -88,6 +90,7 @@ def compile_ts(minify: bool = True, use_dummy_auth: bool = False) -> None:
 #         ... (all the sam outputs)
 #     },
 #     "tests-passed": bool,
+#     "python-coverage": float,
 #     "timestamp": str in ISO format,
 #     "up": bool,  (not present in production)
 # }
@@ -122,6 +125,7 @@ class Dispatch:
     aws_path: str | None = which("aws")
     npm_path: str | None = which("npm")
     npx_path: str | None = which("npx")
+    coverage: str | None = which("coverage")
 
     name_set: str = ""  # Current dev name e.g. "gre7g"
     stack_name: str = ""  # Current stack name e.g. "gre7g-com-gre7g" or "gre7g-com-PROD"
@@ -374,7 +378,7 @@ class Dispatch:
             assert False
 
     def typescript_tests(self) -> None:
-        """Run the typescript tests"""
+        """Run the TypeScript tests"""
         self.check_call([self.npm_path, "run", "test"])
 
     def integration_tests(self, stack_name: str) -> bool:
@@ -394,7 +398,9 @@ class Dispatch:
 
     def main(self) -> int:
         """Dispatch a build, deploy, and run the tests"""
-        passed = 0
+        start_time = monotonic()
+        coverage = None
+        passed = True
         audit_log = Mock()
         self.load_state()
         try:
@@ -412,10 +418,14 @@ class Dispatch:
             elif self.args.local:
                 self.name_set = "LOCAL"
                 self.typescript_tests()
-                self.check_call(
-                    [sys.executable, "-m"] + G_TESTER + [str(TEST_PATH)],
-                    env=os.environ | {"STACK-NAME": "LOCAL"},
-                )
+                args = [self.coverage, "run", "-m"] + G_TESTER + [str(TEST_PATH)]
+                self.check_call(args, env=os.environ | {"STACK-NAME": "LOCAL"})
+                self.call([self.coverage, "html"])
+                self.call([self.coverage, "json"])
+                with COVERAGE_JSON_PATH.open("rt") as file_obj:
+                    report = json.load(file_obj)
+                    coverage = report["totals"]["percent_covered"]
+                self.save_state.setdefault("statistics", {})["python-coverage"] = coverage
 
             elif self.args.dev and (self.args.command == "down"):
                 self.set_stack_name()
@@ -484,7 +494,7 @@ class Dispatch:
         except Exception as error:
             audit_log.error("failed: %s", error)
             LOG.exception(str(error))
-            passed = 1
+            passed = False
         else:
             audit_log.info("complete")
         finally:
@@ -498,11 +508,31 @@ class Dispatch:
             for stack_name in old_stack_names:
                 del recent_stacks[stack_name]
 
+            # Keep a log of recent runs
+            elapsed = monotonic() - start_time
+            recent = self.save_state.setdefault("statistics", {"recent": []})["recent"]
+            entry = {
+                "timestamp": datetime.now(UTC).isoformat(),
+                "elapsed": elapsed,
+                "passed": passed,
+                "parameters": " ".join(sys.argv[1:]),
+            }
+            if isinstance(coverage, float):
+                prev_coverage = self.save_state["statistics"].get("coverage")
+                self.save_state["statistics"]["coverage"] = coverage
+                LOG.info("Python code coverage: %0.2f%%", coverage)
+                if prev_coverage is not None:
+                    LOG.info("coverage improvement: %+0.2f%%", coverage - prev_coverage)
+                entry["coverage"] = coverage
+            self.save_state["statistics"]["recent"] = (recent + [entry])[-KEEP_LAST_RUNS:]
+
             # Write the saved state back out
             with open(YAML_PATH, "wt") as file_obj:
                 yaml.dump(self.save_state, file_obj)
 
-        return passed
+            LOG.info("elapsed: %0.3f seconds", elapsed)
+
+        return 0 if passed else 1
 
 
 def main():
@@ -575,11 +605,7 @@ def main():
         dispatch = Dispatch(args, level_name)
         if log_level < logging.WARNING:
             dispatch.stdout = sys.stdout  # noqa
-        start_time = monotonic()
-        exit_code = dispatch.main()
-        elapsed = monotonic() - start_time
-        LOG.info("elapsed: %0.3f seconds", elapsed)
-        sys.exit(exit_code)
+        sys.exit(dispatch.main())
 
 
 if __name__ == "__main__":

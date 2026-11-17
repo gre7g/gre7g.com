@@ -4,7 +4,7 @@ import { G_API, G_PUBSUB } from "./main";
 export class Cart {
     contents: Product[] = [];
 
-    init(check_out:JQuery<HTMLElement>) {
+    init(check_out: JQuery<HTMLElement>) {
         G_PUBSUB.subscribe("cart.empty", async () => {
             await this.empty_cart();
         });
