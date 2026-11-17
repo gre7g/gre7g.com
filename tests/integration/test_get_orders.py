@@ -1,4 +1,4 @@
-"""Test viewing the shopping cart"""
+"""Test fetching order history"""
 
 from http import HTTPStatus
 import logging
@@ -10,6 +10,8 @@ LOG = logging.getLogger(__name__)
 
 
 class TestGetOrders(BaseTestCase):
+    """Test fetching order history"""
+
     def test_no_id(self):
         """Should fail if there's no user ID"""
         response = self.get("/api/v1/order")
