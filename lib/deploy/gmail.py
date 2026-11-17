@@ -11,8 +11,8 @@ GMAIL_ADDRESS = "gre7g.luterman@gmail.com"
 SMTP_PORT = 587
 
 
-def send_email_home(subject: str, message: str) -> bool:
-    """Send an email to the site owner (returns success)"""
+def send_email_home(subject: str, message: str) -> bool:  # pragma: no cover
+    """Send an e-mail to the site owner (returns success)"""
     try:
 
         msg = EmailMessage()

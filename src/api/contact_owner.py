@@ -24,7 +24,7 @@ class ContactOwner(LambdaBase):
         """Contact site owner"""
         user = repr(self.user_id)
         guest = repr(self.guest_id)
-        official_email = repr(self.get_email_by_sub())
+        official_email = repr(self.get_email_by_sub() if self.user_id else None)
         name = self.body["name"]
         email = self.body["email"]
         message = self.body["message"]
@@ -42,3 +42,6 @@ Message:
         )
 
         return {}
+
+
+lambda_handler = ContactOwner.lambda_handler()

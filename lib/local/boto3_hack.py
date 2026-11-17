@@ -158,7 +158,7 @@ class HackBoto(Template):
 
     def __call__(self, resource: str):
         """Dynamodb and s3 are the only supported resources"""
-        assert resource in ["dynamodb", "s3"]
+        assert resource in ["dynamodb", "s3", "cognito-idp"]
         return self
 
     def Table(self, name: ResourceName) -> Table:
@@ -257,3 +257,7 @@ class HackBoto(Template):
         thread = Thread(target=httpd.serve_forever, daemon=True)
         thread.start()
         sleep(DELAY_SERVER_START)
+
+    def admin_get_user(self, UserPoolId, Username):
+        """Get a mock user"""
+        return {"UserAttributes": [{"Name": "email", "Value": "address@example.com"}]}
