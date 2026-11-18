@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from http import HTTPStatus
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import logging
+from mimetypes import guess_type
 from pathlib import Path
 from subprocess import check_call
 from threading import Thread
@@ -62,7 +63,9 @@ class HttpRequestHandler(SimpleHTTPRequestHandler):
             path = ASSETS_PATH / self.path[8:]
             if path.exists():
                 self.send_response(HTTPStatus.OK, "Success")
-                self.send_header("Content-Type", "text/javascript")
+                content_type, _ = guess_type(path)
+                assert content_type
+                self.send_header("Content-Type", content_type)
                 self.end_headers()
                 with path.open("rb") as file_obj:
                     self.wfile.write(file_obj.read())
