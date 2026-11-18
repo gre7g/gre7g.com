@@ -139,17 +139,18 @@ footer ul {
 #nav-bar > li > a,
 #nav-bar > li > span,
 #socials > li > a,
+#socials > li > button,
 #nav-bar > li.login > a,
 #cart_button > a {
     display: inline-flex;
-    min-height: 2.7rem;
+    min-height: 2.75rem;
     align-items: center;
     justify-content: center;
     padding: 0.45rem 0.8rem;
     border: 1px solid rgb(56 45 37 / 15%);
     border-radius: 999px;
     color: var(--ink);
-    background: rgb(255 253 248 / 77%);
+    background: rgb(255 253 248 / 45%);
     font-weight: 700;
     line-height: 1.2;
     text-decoration: none;
@@ -166,6 +167,7 @@ footer ul {
 #nav-bar > li > a:hover,
 #nav-bar > li > span:hover,
 #socials > li > a:hover,
+#socials > li > button:hover,
 #nav-bar > li.login > a:hover,
 #cart_button > a:hover {
     transform: translateY(-1px);
@@ -201,7 +203,7 @@ footer ul {
 }
 
 #socials > li > a {
-    min-height: 2rem;
+    min-height: 2.75rem;
     padding: 0.25rem 0.65rem;
     border-color: transparent;
     background: rgb(255 253 248 / 45%);
@@ -221,6 +223,14 @@ footer ul {
     padding: 0.45rem;
 }
 
+#socials > .login > button,
+#socials > #profile > button {
+    width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0.45rem;
+    cursor: pointer;
+}
+
 #socials > #patreon > a::before,
 #socials > #goodreads > a::before,
 #socials > #etsy > a::before,
@@ -228,6 +238,8 @@ footer ul {
 #socials > #audible > a::before,
 #socials > #bsky > a::before,
 #socials > #discord > a::before,
+#socials > .login > button::before,
+#socials > #profile > button::before,
 #cart_button > a::before {
     display: block;
     width: 1.75rem;
@@ -235,7 +247,7 @@ footer ul {
     flex: 0 0 auto;
     background-image: url("/static/images/sprites.png");
     background-repeat: no-repeat;
-    background-size: 800% 100%;
+    background-size: 900% 100%;
     content: "";
 }
 
@@ -244,34 +256,40 @@ footer ul {
 }
 
 #socials > #goodreads > a::before {
-    background-position: 14.285714%;
+    background-position: 12.5%;
 }
 
 #socials > #etsy > a::before {
-    background-position: 28.571429%;
+    background-position: 25%;
 }
 
 #socials > #amazon > a::before {
-    background-position: 42.857143%;
+    background-position: 37.5%;
 }
 
 #socials > #audible > a::before {
-    background-position: 57.142857%;
+    background-position: 50%;
 }
 
 #socials > #bsky > a::before {
-    background-position: 71.428571%;
+    background-position: 62.5%;
 }
 
 #socials > #discord > a::before {
-    background-position: 85.714286%;
+    background-position: 75%;
 }
 
 #cart_button > a {
     gap: 0.35rem;
+    min-height: 2.75rem;
 }
 
 #cart_button > a::before {
+    background-position: 87.5%;
+}
+
+#socials > .login > button::before,
+#socials > #profile > button::before {
     background-position: 100%;
 }
 
