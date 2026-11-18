@@ -71,7 +71,7 @@ from lib.local.web_server import WebBrowser
 
 
 def compile_ts(minify: bool = True, use_dummy_auth: bool = False) -> None:
-    """Compile the Typescript code into Javascript"""
+    """Compile the TypeScript code into JavaScript"""
     npx = which("npx")
     assert npx
     args = [npx, "vite", "build"]
