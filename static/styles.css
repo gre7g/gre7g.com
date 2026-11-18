@@ -177,14 +177,19 @@ footer ul {
 
 #nav-bar #home_link {
     margin-right: auto;
+    transform: translateY(-7rem);
 }
 
 #nav-bar #home_link > a {
     border-color: var(--ink);
     color: var(--cream);
     background: var(--ink);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 1.15rem;
+}
+
+#nav-bar #home_link > a img {
+    display: block;
+    width: clamp(10rem, 22vw, 19rem);
+    height: auto;
 }
 
 #nav-bar #home_link > a:hover {
