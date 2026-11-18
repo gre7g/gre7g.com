@@ -60,7 +60,7 @@ class Upgradeable:
 
     def to_dict(self) -> dict[str, Any]:
         """Convert the object to a dict"""
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def put(self, db_table: DynamoDBTable) -> None:
         """Put object into table"""

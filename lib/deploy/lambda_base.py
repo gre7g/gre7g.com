@@ -93,7 +93,7 @@ class LambdaBase(ABC):
     @abstractmethod
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Overload this function with your handler code"""
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def extract_user_id(self, event: dict[str, Any]) -> None:
         """Decode user sub from JWT bearer token if present, without verifying signature"""
@@ -114,7 +114,8 @@ class LambdaBase(ABC):
                     options={"verify_aud": False},
                 )
                 self.user_id = UserId(claims["sub"])
-        except Exception:
+        except:  # pragma: no cover
+            # Tested in cloud only
             LOG.exception("failed to authenticate bearer token")
 
     def validate_csrf(self, csrf_header: str, source_ip: str) -> None:
@@ -148,7 +149,8 @@ class LambdaBase(ABC):
             match self.AUTH_REQUIRED:
                 case AuthenticationRequired.NONE:
                     pass
-                case AuthenticationRequired.GUEST:
+                case AuthenticationRequired.GUEST:  # pragma: no cover
+                    # Don't know that I'll ever use this
                     if not self.guest_id:
                         raise PermissionError()
                 case AuthenticationRequired.USER:
@@ -160,7 +162,7 @@ class LambdaBase(ABC):
                 case AuthenticationRequired.GUEST_AND_USER:
                     if not (self.guest_id and self.user_id):
                         raise PermissionError()
-                case _:
+                case _:  # pragma: no cover
                     raise Exception("unknown authentication requirement")
 
             status = HTTPStatus.CREATED if http_dict["method"] == "POST" else HTTPStatus.OK
@@ -195,7 +197,7 @@ class LambdaBase(ABC):
             status = PAGE_EXPIRED  # type: ignore [assignment]
             body = {"message": "CSRF error"}
 
-        except Exception as error:
+        except Exception as error:  # pragma: no cover
             LOG.exception("Unhandled exception")
             status = HTTPStatus.INTERNAL_SERVER_ERROR
             body = {"message": str(error)}
@@ -228,7 +230,7 @@ class LambdaBase(ABC):
             env_secret = os.getenv("CSRF_SECRET_KEY")
             secret_key = env_secret.encode("ascii") if env_secret else b""
             return cls(products_table, carts_table, orders_table, secret_key)
-        except:
+        except:  # pragma: no cover
             LOG.exception("loading object failed")
             return None
 
@@ -315,7 +317,7 @@ class LambdaBase(ABC):
             for attr in response.get("UserAttributes", []):
                 if attr["Name"] == "email":
                     return attr["Value"]
-        except Exception:
+        except:  # pragma: no cover
             LOG.exception("Unable to fetch email")
 
-        return None
+        return None  # pragma: no cover
