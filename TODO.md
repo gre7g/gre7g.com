@@ -14,22 +14,23 @@ Moderate Urgency
 Basic Features
 --------------
 - [ ] CSS
-- [ ] Unit tests
+- [ ] TypeScript unit tests
 
 Low Urgency
 -----------
 - [ ] In the dispatch script, I have a check that won't treat "No changes to deploy." as an error. However, if I have to
       re-execute a deploy command because we weren't logged in, then I still treat the "No changes to deploy." status as
       an error.
-- [ ] Add code coverage for Python
 - [ ] Add code coverage for Typescript
-- [ ] Add something to monitor progress on code coverage
 - [ ] Go through .ts files and add more comments, function headers, etc.
 - [ ] Breadcrumbs
 - [ ] Show a sitemap
 
 Old and Completed
 -----------------
+- [X] Python unit tests
+- [X] Add code coverage for Python
+- [X] Add something to monitor progress on code coverage
 - [X] Show previous orders (logged in only)
 - [X] Checkout must show quantity and extended amount
 - [X] Handle AJAX errors
