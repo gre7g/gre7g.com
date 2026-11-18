@@ -138,7 +138,7 @@ class BaseTestCase(integration_base.BaseTestCase):
         )
         order2 = Order(
             UserId(self.regular_user.user_id),
-            [self.PRODUCT3],
+            [self.PRODUCT3, self.PRODUCT4],
             18.49,
             5.00,
             21.49,
@@ -159,7 +159,7 @@ class BaseTestCase(integration_base.BaseTestCase):
                     "notes": [],
                 },
                 {
-                    "products": [self.P_DICT3],
+                    "products": [self.P_DICT3, self.P_DICT4],
                     "subtotal_cost": 18.49,
                     "discount": -2.00,
                     "shipping_cost": 5.00,
