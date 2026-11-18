@@ -353,7 +353,8 @@ main > form {
 #ai,
 #about,
 #privacy,
-#sitemap {
+#sitemap,
+#contact {
     box-sizing: content-box;
     max-width: 75ch;
     margin-inline: auto;
@@ -615,6 +616,7 @@ input,
 textarea {
     max-width: 100%;
     padding: 0.65rem 0.75rem;
+    margin-right: 0.5rem;
     border: 1px solid #bcae99;
     border-radius: 0.55rem;
     color: var(--ink);
@@ -653,6 +655,43 @@ textarea {
 #contact > div span {
     color: var(--ink-soft);
     font-size: 0.9rem;
+}
+
+#contact .email-field {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 0.5rem;
+    min-width: 0;
+    flex: 1 1 34rem;
+}
+
+#contact .email-field::after {
+    grid-column: 2;
+    grid-row: 1;
+    content: "*";
+    visibility: hidden;
+}
+
+#contact .contact-field:not(.email-field) {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 34rem;
+    align-items: baseline;
+}
+
+#contact .contact-field:not(.email-field) > input,
+#contact .contact-field:not(.email-field) > textarea {
+    min-width: 0;
+    width: auto;
+    flex: 1 1 auto;
+}
+
+#contact .email-field input {
+    width: 100%;
+}
+
+#contact .email-field span {
+    text-align: right;
 }
 
 footer {

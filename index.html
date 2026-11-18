@@ -132,16 +132,22 @@
                 <h1>Contact Me</h1>
                 <div>
                     <label for="name">Your name:</label>
-                    <input id="name" type="text" placeholder="John Smith" />*
+                    <div class="contact-field">
+                        <input id="name" type="text" placeholder="John Smith" />*
+                    </div>
                 </div>
                 <div>
                     <label for="email">Your email:</label>
-                    <input id="email" type="email" />
-                    <span>Although not required, I can&rsquo;t respond without it!</span>
+                    <div class="contact-field email-field">
+                        <input id="email" type="email" aria-describedby="email-note" />
+                        <span id="email-note">Although not required, I can&rsquo;t respond without it!</span>
+                    </div>
                 </div>
                 <div>
                     <label for="message">Your comments:</label>
-                    <textarea id="message" placeholder="Keep up the great work!"></textarea>*
+                    <div class="contact-field">
+                        <textarea id="message" placeholder="Keep up the great work!"></textarea>*
+                    </div>
                 </div>
                 <div><button>Submit</button></div>
             </form>
