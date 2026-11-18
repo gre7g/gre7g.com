@@ -34,6 +34,7 @@ body {
     flex-direction: column;
     background: radial-gradient(ellipse at 12% 0%, rgb(245 181 27 / 13%), transparent 30rem), #f7f1e5;
     line-height: 1.65;
+    text-align: justify;
 }
 
 a {
@@ -349,6 +350,14 @@ main > form {
     border-radius: 1.25rem;
     background: var(--paper);
     box-shadow: var(--shadow);
+}
+
+#ai,
+#privacy,
+#sitemap {
+    box-sizing: content-box;
+    max-width: 75ch;
+    margin-inline: auto;
 }
 
 h1,
