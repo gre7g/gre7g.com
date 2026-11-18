@@ -343,6 +343,34 @@ export class UI {
             await this.update_header();
         });
 
+        $("#socials > .login > button").on("click", () => {
+            G_PUBSUB.publish("user.login", undefined);
+        });
+
+        const profile_button = $("#profile > button");
+        const profile_menu = $("#profile > .drop-down");
+        const close_profile_menu = () => {
+            profile_menu.hide();
+            profile_button.attr("aria-expanded", "false");
+        };
+        profile_button.on("click", () => {
+            const expanded = profile_button.attr("aria-expanded") == "true";
+            profile_button.attr("aria-expanded", String(!expanded));
+            profile_menu.toggle(!expanded);
+        });
+        profile_menu.find("a").on("click", close_profile_menu);
+        $(document).on("click", (event) => {
+            if ($(event.target).closest("#profile").length == 0) {
+                close_profile_menu();
+            }
+        });
+        $(document).on("keydown", (event) => {
+            if (event.key == "Escape" && profile_button.attr("aria-expanded") == "true") {
+                close_profile_menu();
+                profile_button.trigger("focus");
+            }
+        });
+
         Object.values(this.sections).forEach((section) => {
             section.init();
         });
@@ -381,6 +409,10 @@ export class UI {
         // Profile menu (if logged in) or login button (if not)
         const logged_in = await G_API.logged_in();
         $("#profile").toggle(logged_in);
-        $("#nav-bar .login").toggle(!logged_in);
+        $("#socials > .login").toggle(!logged_in);
+        if (!logged_in) {
+            $("#profile > button").attr("aria-expanded", "false");
+            $("#profile > .drop-down").hide();
+        }
     }
 }

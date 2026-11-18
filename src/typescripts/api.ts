@@ -17,6 +17,9 @@ class AuthLayer {
     dummy_auth: string = "";
 
     init() {
+        G_PUBSUB.subscribe("user.login", async () => {
+            await this.login();
+        });
         G_PUBSUB.subscribe("user.logout", async () => {
             await this.logout();
         });

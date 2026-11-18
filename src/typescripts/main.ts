@@ -38,6 +38,7 @@ interface Events {
     "ui.show_info": { message: string };
     "ui.show_section": { section: string };
     "ui.update": void;
+    "user.login": void;
     "user.logout": void;
 }
 
