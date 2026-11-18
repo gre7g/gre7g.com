@@ -15,8 +15,11 @@ AuditObj = dict[str, Any]
 class BaseTestCase(integration_base.BaseTestCase):
     """Base class for integration tests"""
 
-    OUT_OF_STOCK = Product(
+    OUT_OF_STOCK1 = Product(
         "Skeleton Crew", "--", "aa", "books/skeleton-crew", ProductId("p1"), 0, 13.99, media="paperback"
+    )
+    OUT_OF_STOCK4 = Product(
+        "Long Way Home", "--", "dd", "books/long-way-home", ProductId("p2"), 0, 18.49, media="paperback"
     )
     PRODUCT1 = Product("Skeleton Crew", "--", "aa", "books/skeleton-crew", ProductId("p1"), 1, 13.99, media="paperback")
     P_DICT1 = {

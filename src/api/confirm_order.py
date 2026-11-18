@@ -61,6 +61,18 @@ class ConfirmOrder(LambdaBase):
         total = 0.00
         order_id = OrderId(str(uuid1()))
         for purchase_unit in purchase_units:
+            total_money = purchase_unit["amount"]
+            order_id = purchase_unit["reference_id"]
+            assert total_money["currency_code"] == CURRENCY
+            breakdown = total_money["breakdown"]
+            subtotal_money = breakdown["item_total"]
+            assert subtotal_money["currency_code"] == CURRENCY
+            shipping_money = breakdown["shipping"]
+            assert shipping_money["currency_code"] == CURRENCY
+            subtotal += float(subtotal_money["value"])
+            shipping += float(shipping_money["value"])
+            total += float(total_money["value"])
+
             for item in purchase_unit["items"]:
                 # We will take the product objects from the products table, but keep a couple things from the PayPal
                 # record, namely quantity and cost_per. Although it's unlikely that the price would change between
@@ -85,7 +97,7 @@ class ConfirmOrder(LambdaBase):
                             "Insufficient stock",
                             extra={
                                 "product_id": product_id,
-                                "name": item["name"],
+                                "product_name": item["name"],
                                 "stock_quantity": product_listing.quantity,
                                 "purchase_quantity": quantity,
                             },
@@ -97,18 +109,6 @@ class ConfirmOrder(LambdaBase):
                 product_listing.quantity = quantity
                 product_listing.cost_per = float(unit_amount["value"])
                 products.append(product_listing)
-
-            total_money = purchase_unit["amount"]
-            order_id = purchase_unit["reference_id"]
-            assert total_money["currency_code"] == CURRENCY
-            breakdown = total_money["breakdown"]
-            subtotal_money = breakdown["item_total"]
-            assert subtotal_money["currency_code"] == CURRENCY
-            shipping_money = breakdown["shipping"]
-            assert shipping_money["currency_code"] == CURRENCY
-            subtotal += float(subtotal_money["value"])
-            shipping += float(shipping_money["value"])
-            total += float(total_money["value"])
 
         # Create the order object
         notes = ["%s: order placed" % datetime.now().strftime("%m/%d/%Y %H:%M")]

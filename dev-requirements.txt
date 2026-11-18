@@ -4,6 +4,7 @@ boto3==1.43.123
 boto3-stubs==1.43.123
 coverage==7.17.3
 cryptography==50.0.2
+freezegun==1.5.5
 paypal-server-sdk==2.4.0
 PyJWT==2.15.1
 types-boto3-dynamodb==1.43.116

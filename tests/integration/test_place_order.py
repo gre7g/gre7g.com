@@ -155,7 +155,7 @@ class TestPlaceOrder(BaseTestCase):
         lambda_base.PaypalServersdkClient = MockSdkClient("MockSdkClient")
         cart, cart_dict = self.cart_data()
         with self.create_records(
-            [(self.carts_table, cart), (self.products_table, self.OUT_OF_STOCK), (self.products_table, self.PRODUCT2)]
+            [(self.carts_table, cart), (self.products_table, self.OUT_OF_STOCK1), (self.products_table, self.PRODUCT2)]
         ):
             response = self.post(
                 "/api/v1/order",
