@@ -37,6 +37,7 @@ Message:
 Howdy""",
         )
 
+    @NO_CLOUD
     @patch("src.api.contact_owner.send_email_home")
     def test_logged_in(self, send_email_home) -> None:
         """Should send an e-mail to the site owner"""
