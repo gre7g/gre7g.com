@@ -77,7 +77,6 @@ header {
     display: block;
     width: min(100%, 18rem);
     justify-self: center;
-    filter: drop-shadow(1rem 1rem 0.4rem rgb(56 45 37 / 38%));
 }
 
 #status {
@@ -179,13 +178,11 @@ footer ul {
 
 #nav-bar #home_link {
     margin-right: auto;
-    transform: translateY(-7rem);
 }
 
 #nav-bar #home_link > a {
-    border-color: var(--ink);
-    color: var(--cream);
-    background: var(--ink);
+    border-color: transparent;
+    background: transparent;
 }
 
 #nav-bar #home_link > a img {
@@ -195,7 +192,8 @@ footer ul {
 }
 
 #nav-bar #home_link > a:hover {
-    background: var(--blue-dark);
+    background: transparent;
+    box-shadow: none;
 }
 
 #socials {
@@ -353,11 +351,31 @@ main > form {
 }
 
 #ai,
+#about,
 #privacy,
 #sitemap {
     box-sizing: content-box;
     max-width: 75ch;
     margin-inline: auto;
+}
+
+#ai,
+#about {
+    overflow: auto;
+}
+
+#ai > img,
+#about > img {
+    float: left;
+    width: min(45%, 218px);
+    height: auto;
+    margin: 0 1.25rem 1rem 0;
+}
+
+#about > img {
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
 }
 
 h1,
