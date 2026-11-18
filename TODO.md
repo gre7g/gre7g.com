@@ -13,8 +13,14 @@ Moderate Urgency
 
 Basic Features
 --------------
-- [ ] CSS
+- [X] CSS
 - [ ] TypeScript unit tests
+- [ ] Local links like appearances need to be intercepted and handled via TS navigation. There's probably quite a few of
+      these, so be thorough.
+- [ ] Books link does nothing
+- [ ] Profile link is no longer working
+- [ ] Empty shopping cart should show a message and disable the checkout button
+- [ ] Appearances should be the same width as the other sections
 
 Low Urgency
 -----------
@@ -25,6 +31,7 @@ Low Urgency
 - [ ] Go through .ts files and add more comments, function headers, etc.
 - [ ] Breadcrumbs
 - [ ] Show a sitemap
+- [ ] MCFC needs an image
 
 Old and Completed
 -----------------

@@ -32,7 +32,7 @@ export class Navigator {
             case "/ai":
                 G_PUBSUB.publish("ui.show_section", { section: "ai" });
                 break;
-            case "/appearances":
+            case "/gre7g/appearances":
                 G_PUBSUB.publish("ui.show_section", { section: "appearances" });
                 break;
             case "/cart":
