@@ -588,6 +588,11 @@ main > article img {
     cursor: pointer;
 }
 
+.amount.negative {
+    color: #8e352d;
+    font-weight: 600;
+}
+
 #order {
     text-align: left;
 }

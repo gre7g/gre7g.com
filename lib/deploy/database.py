@@ -227,6 +227,7 @@ class Order(Upgradeable):
     subtotal_cost: float
     shipping_cost: float
     total_cost: float
+    transaction_id: str
     discount: float = 0.00
     order_id: OrderId = field(default_factory=lambda: OrderId(str(uuid1())))
     timestamp: Timestamp = field(default_factory=lambda: Timestamp(datetime.now(UTC).isoformat()))
@@ -242,6 +243,7 @@ class Order(Upgradeable):
         subtotal_cost = value_dict["subtotal_cost"]
         shipping_cost = value_dict["shipping_cost"]
         total_cost = value_dict["total_cost"]
+        transaction_id = value_dict["transaction_id"]
         discount = value_dict["discount"]
         order_id = value_dict["order_id"]
         timestamp = value_dict["timestamp"]
@@ -251,6 +253,7 @@ class Order(Upgradeable):
         assert isinstance(subtotal_cost, float | Decimal)
         assert isinstance(shipping_cost, float | Decimal)
         assert isinstance(total_cost, float | Decimal)
+        assert isinstance(transaction_id, str)
         assert isinstance(discount, float | Decimal)
         assert isinstance(order_id, str)
         assert isinstance(timestamp, str)
@@ -262,6 +265,7 @@ class Order(Upgradeable):
             float(subtotal_cost),
             float(shipping_cost),
             float(total_cost),
+            transaction_id,
             float(discount),
             OrderId(order_id),
             Timestamp(timestamp),
@@ -276,6 +280,7 @@ class Order(Upgradeable):
             "subtotal_cost": float(self.subtotal_cost),
             "shipping_cost": float(self.shipping_cost),
             "total_cost": float(self.total_cost),
+            "transaction_id": self.transaction_id,
             "discount": float(self.discount),
             "order_id": self.order_id,
             "timestamp": self.timestamp,
@@ -290,6 +295,7 @@ class Order(Upgradeable):
             "subtotal_cost": currency(self.subtotal_cost),
             "shipping_cost": currency(self.shipping_cost),
             "total_cost": currency(self.total_cost),
+            "transaction_id": self.transaction_id,
             "discount": currency(self.discount),
             "order_id": self.order_id,
             "timestamp": self.timestamp,

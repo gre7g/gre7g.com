@@ -33,6 +33,8 @@ components:
           type: number
         total_cost:
           type: number
+        transaction_id:
+          type: string
         discount:
           type: number
         order_id:
@@ -49,6 +51,7 @@ components:
         - subtotal_cost
         - shipping_cost
         - total_cost
+        - transaction_id
         - discount
         - order_id
         - timestamp
@@ -158,14 +161,6 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/error-message"
-
-  parameters:
-    order_id:
-      name: order_id
-      in: path
-      required: true
-      schema:
-        type: string
 
 paths:
   /api/v1/cart:
@@ -466,7 +461,11 @@ paths:
     get:
       summary: Fetch an order
       parameters:
-        - $ref: "#/components/parameters/order_id"
+        - name: order_id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Successful fetch
@@ -485,11 +484,16 @@ paths:
         "500":
           $ref: "#/components/responses/500-internal-server-error"
 
-    put:  # Note: The order_id parameter is a PayPal order_id, not ours
+  /api/v1/order/{transaction_id}:
+    put:
       summary: Confirm an order
       description: Verify that an order processed successfully
       parameters:
-        - $ref: "#/components/parameters/order_id"
+        - name: transaction_id
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:

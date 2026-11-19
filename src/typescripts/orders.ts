@@ -8,6 +8,7 @@ export interface Order {
     subtotal_cost: number;
     shipping_cost: number;
     total_cost: number;
+    transaction_id: string;
     discount: number;
     order_id: string;
     timestamp: string;

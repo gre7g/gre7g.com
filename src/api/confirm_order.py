@@ -42,7 +42,9 @@ class ConfirmOrder(LambdaBase):
                 capture.pop("links", None)
                 capture.pop("seller_protection", None)
 
-    def process_purchase_units(self, user_id: UserId, purchase_units: list[dict[str, Any]]) -> Order:
+    def process_purchase_units(
+        self, user_id: UserId, transaction_id: str, purchase_units: list[dict[str, Any]]
+    ) -> Order:
         """Process purchase units from PayPal"""
         assert self.products_table
         assert self.orders_table
@@ -118,6 +120,7 @@ class ConfirmOrder(LambdaBase):
             float(subtotal),
             float(shipping),
             float(total),
+            transaction_id,
             order_id=order_id,
             notes=notes,
         )
@@ -127,14 +130,14 @@ class ConfirmOrder(LambdaBase):
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
         """Confirm order"""
         user_id = self.user_id or self.guest_id
-        order_id = self.path_parameters["order_id"]
+        transaction_id = self.path_parameters["transaction_id"]  # PayPal's transaction ID, not our ID!
 
         assert user_id
-        assert order_id
+        assert transaction_id
         assert self.carts_table
 
         # Fetch order from PayPal
-        response = self.get_paypal_controller().capture_order({"id": order_id, "prefer": "return=representation"})
+        response = self.get_paypal_controller().capture_order({"id": transaction_id, "prefer": "return=representation"})
         result: dict[str, Any] = APIHelper.to_dictionary(response.body)
         assert result["status"] == "COMPLETED"
         self.flush_chaff_from_paypal_response(result)
@@ -142,7 +145,7 @@ class ConfirmOrder(LambdaBase):
         # Log what we've received
         self.audit_log(AuditLogEvent.CONFIRM_ORDER, order=result)
 
-        order = self.process_purchase_units(user_id, result.get("purchase_units", []))
+        order = self.process_purchase_units(user_id, transaction_id, result.get("purchase_units", []))
         self.sign_downloads(order)
 
         # Clear the shopping cart

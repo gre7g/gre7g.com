@@ -275,6 +275,8 @@ class OrderUI extends ListSection {
             }
             update_cost(this.section.find(".total .amount"), this.order.total_cost);
             update_cost(this.section.find(".paid .amount"), -this.order.total_cost);
+            const link = `https://www.paypal.com/unifiedtransactions/details/payment/${this.order.transaction_id}`;
+            this.section.find("a.paypal").attr("href", link);
         }
     }
 }
