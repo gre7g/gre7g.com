@@ -119,10 +119,11 @@ export class Api extends AuthLayer {
             // The CSRF token is invalid or expired. We've updated it, so let's retry.
             response = await this.single_request(method, path, data);
         }
+        const result = await response.json();
         if (response.ok) {
-            return await response.json();
+            return result;
         } else {
-            throw new Error(response.statusText);
+            throw new Error(result.message);
         }
     }
 

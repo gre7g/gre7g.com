@@ -9,16 +9,20 @@ High Urgency
 - [ ] Is everything logged on purchase completion (like fees)?
 - [ ] "Skeleton Crew" paperback entry is missing text
 - [ ] Orders page is very broken and should show a message if you're not logged in
+- [X] Contact must disable the button until the fields are entered
 
 Moderate Urgency
 ----------------
+- [ ] When pulling up the / page, there should be more before the products, so write some!
+- [X] Sending an email on the local simulation scrolled an error on the console but returned a 201
+- [ ] User profile page
+- [ ] Theme the login to match
 
 Basic Features
 --------------
 - [ ] TypeScript unit tests
 - [ ] Check dynamically added HTML for links. They need to be intercepted and handled via TS navigation.
 - [ ] Books link needs to drop-down menu
-- [X] Profile link is no longer working
 - [ ] Test narrow and on phone
 - [ ] Links for other places an item is available
 
@@ -34,6 +38,7 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] Profile link is no longer working
 - [X] Local links like appearances need to be intercepted and handled via TS navigation. There's probably quite a few of
   these, so be thorough.
 - [X] Empty shopping cart should show a message and disable the checkout button

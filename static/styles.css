@@ -628,7 +628,7 @@ button:hover {
     background: var(--blue-dark);
 }
 
-#checkout-button:disabled {
+button:disabled {
     border-color: #bcae99;
     color: #645a50;
     background: #e2d9cc;

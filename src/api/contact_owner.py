@@ -28,7 +28,7 @@ class ContactOwner(LambdaBase):
         name = self.body["name"]
         email = self.body["email"]
         message = self.body["message"]
-        send_email_home(
+        success = send_email_home(
             "Contact from gre7g.com",
             f"""
 User: {user}
@@ -40,6 +40,8 @@ Input e-mail: {email}
 Message:
 {message}""",
         )
+        if not success:
+            raise Exception("Unable to contact site owner")
 
         return {}
 

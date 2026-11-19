@@ -2,32 +2,49 @@ import { $ } from "jquery";
 
 import { G_API, G_PUBSUB } from "./main";
 
+// Constants:
+const DEFAULT_EMAIL = "john.smith@gmail.com";
+
 export class Contact {
     section: JQuery<HTMLElement>;
+    name: JQuery<HTMLElement>;
+    email: JQuery<HTMLElement>;
+    message: JQuery<HTMLElement>;
+    button: JQuery<HTMLElement>;
 
     constructor(section: JQuery<HTMLElement>) {
         this.section = section;
+        this.name = section.find(".name");
+        this.email = section.find(".email");
+        this.message = section.find(".message");
+        this.button = section.find("button");
     }
 
     init() {
         G_PUBSUB.subscribe("ui.update", async () => {
             await this.update();
         });
-        this.section.find("button").on("click", async () => {
+        this.button.on("click", async () => {
             await this.submit();
+        });
+        this.name.on("change", async () => {
+            await this.update();
+        });
+        this.message.on("input", async () => {
+            await this.update();
         });
     }
 
     async update() {
-        const placeholder = (await G_API.logged_in()) ? "address on file" : "john.smith@gmail.com";
-        $("#email").attr("placeholder", placeholder);
-        this.section.find(".message").text();
+        const placeholder = (await G_API.logged_in()) ? "address on file" : DEFAULT_EMAIL;
+        this.email.attr("placeholder", placeholder);
+        this.button.prop("disabled", !(this.name.val() && this.message.val()));
     }
 
     async submit() {
-        const name = $("#name").val();
-        const email = $("#email").val();
-        const message = $("#message").val();
+        const name = this.name.val();
+        const email = this.email.val();
+        const message = this.message.val();
         if (name && message) {
             try {
                 await G_API.post("/api/v1/contact", { name, email, message });

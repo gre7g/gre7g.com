@@ -166,22 +166,24 @@
                 <h1>Contact Me</h1>
                 <div>
                     <label for="name">Your name:</label>
-                    <div class="contact-field"><input id="name" type="text" placeholder="John Smith" />*</div>
+                    <div class="contact-field">
+                        <input id="name" class="name" type="text" placeholder="John Smith" />*
+                    </div>
                 </div>
                 <div>
                     <label for="email">Your email:</label>
                     <div class="contact-field email-field">
-                        <input id="email" type="email" aria-describedby="email-note" />
+                        <input id="email" class="email" type="email" aria-describedby="email-note" />
                         <span id="email-note">Although not required, I can&rsquo;t respond without it!</span>
                     </div>
                 </div>
                 <div>
                     <label for="message">Your comments:</label>
                     <div class="contact-field">
-                        <textarea id="message" placeholder="Keep up the great work!"></textarea>*
+                        <textarea id="message" class="message" placeholder="Keep up the great work!"></textarea>*
                     </div>
                 </div>
-                <div><button>Submit</button></div>
+                <div><button disabled>Submit</button></div>
             </form>
 
             <article id="about" style="display: none">
