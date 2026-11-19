@@ -159,7 +159,7 @@ export class CheckoutUI extends CartUI {
 
     override init() {
         this.section.find("button.login").on("click", async () => {
-            await G_API.login();
+            G_PUBSUB.publish("user.login", undefined);
         });
     }
 

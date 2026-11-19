@@ -8,6 +8,7 @@ High Urgency
 ------------
 - [ ] Is everything logged on purchase completion (like fees)?
 - [ ] "Skeleton Crew" paperback entry is missing text
+- [ ] Orders page is very broken and should show a message if you're not logged in
 
 Moderate Urgency
 ----------------
@@ -15,12 +16,11 @@ Moderate Urgency
 Basic Features
 --------------
 - [ ] TypeScript unit tests
-- [X] Local links like appearances need to be intercepted and handled via TS navigation. There's probably quite a few of
-      these, so be thorough.
 - [ ] Check dynamically added HTML for links. They need to be intercepted and handled via TS navigation.
 - [ ] Books link needs to drop-down menu
-- [ ] Profile link is no longer working
+- [X] Profile link is no longer working
 - [ ] Test narrow and on phone
+- [ ] Links for other places an item is available
 
 Low Urgency
 -----------
@@ -34,6 +34,8 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] Local links like appearances need to be intercepted and handled via TS navigation. There's probably quite a few of
+  these, so be thorough.
 - [X] Empty shopping cart should show a message and disable the checkout button
 - [X] Appearances should be the same width as the other sections
 - [X] MCFC needs an image

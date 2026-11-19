@@ -26,7 +26,9 @@ class AuthLayer {
     }
 
     async login() {
-        if (!this.use_dummy_auth) {
+        if (this.use_dummy_auth) {
+            G_PUBSUB.publish("ui.show_info", { message: "No login method with dummy authentication" });
+        } else {
             await signInWithRedirect();
         }
     }
@@ -66,7 +68,9 @@ class AuthLayer {
     }
 
     async logout() {
-        if (!this.use_dummy_auth) {
+        if (this.use_dummy_auth) {
+            G_PUBSUB.publish("ui.show_info", { message: "No logout method with dummy authentication" });
+        } else {
             await signOut();
             G_PUBSUB.publish("ui.update", undefined);
         }
