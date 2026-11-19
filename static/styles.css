@@ -577,6 +577,15 @@ main > article img {
     background: var(--cream);
 }
 
+#orders .orders-note a {
+    color: var(--blue-dark);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-thickness: 0.1em;
+    text-underline-offset: 0.18em;
+    cursor: pointer;
+}
+
 #cart .product-name,
 #checkout .product-name {
     flex: 1 1 12rem;
