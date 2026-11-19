@@ -68,9 +68,9 @@ export class Navigator {
                     await G_PRODUCTS.show_path(path);
                 } else {
                     const parts = path.split("/");
-                    if (parts.length == 3 && parts[1] == "order") {
-                        // URL: /order/{order_id}
-                        const order = await G_API.get(`/api/v1/order/${parts[2]}`);
+                    if (parts.length == 4 && parts[1] == "user" && parts[2] == "order") {
+                        // URL: /user/order/{order_id}
+                        const order = await G_API.get(`/api/v1/order/${parts[3]}`);
                         G_UI.sections.order.order = order.order;
                         G_PUBSUB.publish("ui.show_section", { section: "order" });
                     } else {

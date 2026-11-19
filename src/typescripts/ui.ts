@@ -326,7 +326,7 @@ class OrdersUI extends ListSection {
             for (const order of this.orders) {
                 const new_item = this.list_item.clone();
                 const order_link = new_item.find("a");
-                order_link.attr("href", `/order/${order.order_id}`);
+                order_link.attr("href", `/user/order/${order.order_id}`);
                 const date: Date = new Date(order.timestamp);
                 order_link.text(date.toLocaleDateString());
                 this.order_ui.unordered_list = new_item.find("ul");
