@@ -86,6 +86,13 @@ export class Main {
         $(window).on("popstate", () => {
             G_PUBSUB.publish("navigate.go", { path: window.location.pathname });
         });
+        $(".internal").on("click", (event) => {
+            event.preventDefault();
+            const href = $(event.target).closest("a").attr("href");
+            if (href) {
+                G_PUBSUB.publish("navigate.go", { path: href, save: true });
+            }
+        });
         load_paypal();
     }
 }

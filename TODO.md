@@ -15,11 +15,11 @@ Moderate Urgency
 Basic Features
 --------------
 - [ ] TypeScript unit tests
-- [ ] Local links like appearances need to be intercepted and handled via TS navigation. There's probably quite a few of
+- [X] Local links like appearances need to be intercepted and handled via TS navigation. There's probably quite a few of
       these, so be thorough.
-- [ ] Books link does nothing
+- [ ] Check dynamically added HTML for links. They need to be intercepted and handled via TS navigation.
+- [ ] Books link needs to drop-down menu
 - [ ] Profile link is no longer working
-- [X] Empty shopping cart should show a message and disable the checkout button
 - [ ] Test narrow and on phone
 
 Low Urgency
@@ -34,6 +34,7 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] Empty shopping cart should show a message and disable the checkout button
 - [X] Appearances should be the same width as the other sections
 - [X] MCFC needs an image
 - [X] Test the status bar

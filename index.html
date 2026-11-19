@@ -17,40 +17,58 @@
             </div>
             <nav>
                 <ul id="nav-bar">
-                    <li id="home_link"><a href="/"><img src="static/images/gre7g_luterman.png" alt="Gre7g Luterman" /></a></li>
+                    <li id="home_link">
+                        <a href="/" class="internal"
+                            ><img src="static/images/gre7g_luterman.png" alt="Gre7g Luterman"
+                        /></a>
+                    </li>
                     <li>
                         <span>Books</span>
                         <ul class="drop-down" style="display: none">
-                            <li><a href="/books/skeleton-crew">Skeleton Crew</a></li>
-                            <li><a href="/books/small-world">Small World</a></li>
-                            <li><a href="/books/fair-trade">Fair Trade</a></li>
-                            <li><a href="/books/nobody-left-behind">Nobody Left Behind</a></li>
+                            <li><a href="/books/skeleton-crew" class="internal">Skeleton Crew</a></li>
+                            <li><a href="/books/small-world" class="internal">Small World</a></li>
+                            <li><a href="/books/fair-trade" class="internal">Fair Trade</a></li>
+                            <li><a href="/books/nobody-left-behind" class="internal">Nobody Left Behind</a></li>
                             <li class="divider"></li>
-                            <li><a href="/books/reapers-lottery">Reaper&rsquo;s Lottery</a></li>
-                            <li><a href="/books/executioners-gambit">Executioner&rsquo;s Gambit</a></li>
+                            <li><a href="/books/reapers-lottery" class="internal">Reaper&rsquo;s Lottery</a></li>
+                            <li>
+                                <a href="/books/executioners-gambit" class="internal">Executioner&rsquo;s Gambit</a>
+                            </li>
                             <li class="divider"></li>
-                            <li><a href="/books/long-way-home">Long Way Home</a></li>
+                            <li><a href="/books/long-way-home" class="internal">Long Way Home</a></li>
                             <li class="divider"></li>
-                            <li><a href="/books/tales-of-hayven-celestia-1">Tales of Hayven Celestia 1</a></li>
-                            <li><a href="/books/tales-of-hayven-celestia-2">Tales of Hayven Celestia 2</a></li>
+                            <li>
+                                <a href="/books/tales-of-hayven-celestia-1" class="internal"
+                                    >Tales of Hayven Celestia 1</a
+                                >
+                            </li>
+                            <li>
+                                <a href="/books/tales-of-hayven-celestia-2" class="internal"
+                                    >Tales of Hayven Celestia 2</a
+                                >
+                            </li>
                         </ul>
                     </li>
                     <li>
-                        <a href="/products"><span>Shop</span></a>
+                        <a href="/products" class="internal"><span>Shop</span></a>
                     </li>
                     <li>
-                        <a href="/gre7g/appearances"><span>Appearances</span></a>
+                        <a href="/gre7g/appearances" class="internal"><span>Appearances</span></a>
                     </li>
                     <li>
-                        <a href="/gre7g/contact"><span>Contact</span></a>
+                        <a href="/gre7g/contact" class="internal"><span>Contact</span></a>
                     </li>
                     <li>
-                        <a href="/gre7g/about"><span>About</span></a>
+                        <a href="/gre7g/about" class="internal"><span>About</span></a>
                     </li>
                 </ul>
                 <ul id="socials">
                     <li id="patreon">
-                        <a href="https://www.patreon.com/c/goataroo" target="_blank" rel="noopener noreferrer" title="Patreon"
+                        <a
+                            href="https://www.patreon.com/c/goataroo"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Patreon"
                             ><span class="social-label">Patreon</span></a
                         >
                     </li>
@@ -87,25 +105,41 @@
                         >
                     </li>
                     <li id="bsky">
-                        <a href="https://bsky.app/profile/gre7g.com" target="_blank" rel="noopener noreferrer" title="BlueSky"
+                        <a
+                            href="https://bsky.app/profile/gre7g.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="BlueSky"
                             ><span class="social-label">BlueSky</span></a
                         >
                     </li>
                     <li id="discord">
-                        <a href="https://discord.gg/bCN2493dTK" target="_blank" rel="noopener noreferrer" title="Discord"
+                        <a
+                            href="https://discord.gg/bCN2493dTK"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Discord"
                             ><span class="social-label">discord</span></a
                         >
                     </li>
                     <li class="login"><button type="button" aria-label="Log in" title="User Profile"></button></li>
                     <li id="profile">
-                        <button type="button" aria-label="User menu" aria-expanded="false" aria-controls="profile-menu" title="User Profile"></button>
+                        <button
+                            type="button"
+                            aria-label="User menu"
+                            aria-expanded="false"
+                            aria-controls="profile-menu"
+                            title="User Profile"
+                        ></button>
                         <ul id="profile-menu" class="drop-down" style="display: none">
-                            <li><a href="/user/profile">user profile</a></li>
-                            <li><a href="/user/orders">orders</a></li>
-                            <li><a href="/user/logout">logout</a></li>
+                            <li><a href="/user/profile" class="internal">user profile</a></li>
+                            <li><a href="/user/orders" class="internal">orders</a></li>
+                            <li><a href="/user/logout" class="internal">logout</a></li>
                         </ul>
                     </li>
-                    <li id="cart_button"><a href="/cart" aria-label="Shopping cart" title="Shopping Cart"></a></li>
+                    <li id="cart_button">
+                        <a href="/cart" class="internal" aria-label="Shopping cart" title="Shopping Cart"></a>
+                    </li>
                 </ul>
             </nav>
         </header>
@@ -132,9 +166,7 @@
                 <h1>Contact Me</h1>
                 <div>
                     <label for="name">Your name:</label>
-                    <div class="contact-field">
-                        <input id="name" type="text" placeholder="John Smith" />*
-                    </div>
+                    <div class="contact-field"><input id="name" type="text" placeholder="John Smith" />*</div>
                 </div>
                 <div>
                     <label for="email">Your email:</label>
@@ -342,8 +374,8 @@
                 </p>
                 <p>
                     If you have a specific question, want to receive a copy of your data, or delete it from my server,
-                    please drop the request on my <a href="/gre7g/contact">contact form</a> and be sure to include a
-                    valid e-mail address so I can reply.
+                    please drop the request on my <a href="/gre7g/contact" class="internal">contact form</a> and be sure
+                    to include a valid e-mail address so I can reply.
                 </p>
                 <p>Thanks!</p>
             </section>
@@ -358,9 +390,9 @@
             <nav>
                 <ul id="minor_nav">
                     <li class="copyright">&copy;2026 Gre7g Luterman</li>
-                    <li><a href="/ai">AI policy</a></li>
-                    <li><a href="/privacy">Privacy Policy</a></li>
-                    <li><a href="/sitemap">Sitemap</a></li>
+                    <li><a href="/ai" class="internal">AI policy</a></li>
+                    <li><a href="/privacy" class="internal">Privacy Policy</a></li>
+                    <li><a href="/sitemap" class="internal">Sitemap</a></li>
                 </ul>
             </nav>
         </footer>
