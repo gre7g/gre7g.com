@@ -404,6 +404,9 @@ class Password extends InertSection {
         this.repeat_password.on("input", () => {
             this.update();
         });
+        this.section.find("button").on("click", async () => {
+            await G_API.update_password(this.old_password.val()!, this.new_password.val()!);
+        });
     }
 
     reset() {

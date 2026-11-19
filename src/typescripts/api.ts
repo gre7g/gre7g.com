@@ -1,5 +1,5 @@
 import { Amplify } from "aws-amplify";
-import { fetchAuthSession, signInWithRedirect, signOut, AuthSession } from "aws-amplify/auth";
+import { fetchAuthSession, signInWithRedirect, signOut, AuthSession, updatePassword } from "aws-amplify/auth";
 
 import { G_PUBSUB, G_SAM_OUTPUTS } from "./main";
 
@@ -79,6 +79,15 @@ class AuthLayer {
     async logged_in(): Promise<boolean> {
         const auth = await this.get_session();
         return Boolean(auth.userSub);
+    }
+
+    async update_password(old_password: string, new_password: string) {
+        if (this.use_dummy_auth) {
+            G_PUBSUB.publish("ui.show_info", { message: "No password update method with dummy authentication" });
+        } else {
+            await updatePassword({ oldPassword: old_password, newPassword: new_password });
+            G_PUBSUB.publish("ui.update", undefined);
+        }
     }
 }
 

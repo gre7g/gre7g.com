@@ -814,6 +814,18 @@ textarea {
     margin-bottom: 1.2rem;
 }
 
+#edit-password > p.message {
+    display: block;
+}
+
+#edit-password > p:has(> meter) {
+    margin-bottom: 0.5rem;
+}
+
+#edit-password > p:has(> meter) + p {
+    margin-top: 0.5rem;
+}
+
 #edit-password > p > label {
     font-weight: 700;
 }
