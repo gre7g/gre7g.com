@@ -22,7 +22,7 @@ export class Cart {
             this.update_qty(params.product_index, params.quantity);
         });
         G_PUBSUB.subscribe("cart.delete", async (params) => {
-            this.delete(params.product_index);
+            await this.delete(params.product_index);
         });
         G_PUBSUB.subscribe("ui.update", async (params) => {
             this.update();
@@ -83,13 +83,16 @@ export class Cart {
         this.contents[product_index].quantity = quantity;
     }
 
-    delete(product_index: number) {
+    async delete(product_index: number) {
         this.contents.splice(product_index, 1);
+
+        // Save the cart
+        await G_API.put("/api/v1/cart", { products: this.contents });
         G_PUBSUB.publish("cart.update", undefined);
     }
 
     update() {
-        const empty = (this.contents.length == 0);
+        const empty = this.contents.length == 0;
         this.empty.toggle(empty);
         this.button.prop("disabled", empty);
     }

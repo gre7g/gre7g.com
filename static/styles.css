@@ -373,6 +373,7 @@ main > form {
 #sitemap,
 #contact,
 #appearances,
+#edit-password,
 #order,
 #cart,
 #orders,
@@ -584,6 +585,38 @@ main > article img {
     background: var(--cream);
 }
 
+#cart {
+    --cart-row-gap: 1rem;
+    --cart-row-padding: 1rem;
+    --cart-remove-width: 5rem;
+}
+
+#cart > ul > li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 5.5rem auto var(--cart-remove-width);
+    column-gap: var(--cart-row-gap);
+    padding: var(--cart-row-padding);
+}
+
+#cart .product-name {
+    min-width: 0;
+}
+
+#cart .quantity {
+    width: 5.5rem;
+    margin-right: 0;
+}
+
+#cart .ext-cost {
+    text-align: right;
+    white-space: nowrap;
+}
+
+#cart > ul > li > button {
+    width: var(--cart-remove-width);
+    padding-inline: 0.25rem;
+}
+
 #orders .orders-note a,
 #order a.paypal {
     color: var(--blue-dark);
@@ -641,6 +674,10 @@ main > article img {
 #order > .summary {
     width: min(50%, 30rem);
     margin-left: auto;
+}
+
+#cart > .summary {
+    padding-right: calc(var(--cart-row-padding) + var(--cart-row-gap) + var(--cart-remove-width) + 1px);
 }
 
 #cart > .summary > p,
@@ -767,6 +804,31 @@ textarea {
 #contact > div span {
     color: var(--ink-soft);
     font-size: 0.9rem;
+}
+
+#edit-password > p {
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.5rem 0.85rem;
+    margin-bottom: 1.2rem;
+}
+
+#edit-password > p > label {
+    font-weight: 700;
+}
+
+#edit-password > p > input {
+    box-sizing: border-box;
+    min-width: 0;
+    width: 100%;
+    margin-right: 0;
+}
+
+#edit-password > p > meter {
+    grid-column: 2;
+    width: 100%;
+    height: 2rem;
 }
 
 #contact .email-field {
@@ -906,6 +968,24 @@ footer nav {
         border-radius: 0.9rem;
     }
 
+    #cart {
+        --cart-row-gap: 0.35rem;
+        --cart-remove-width: 4rem;
+    }
+
+    #cart > ul > li {
+        grid-template-columns: minmax(0, 1fr) 4.25rem auto var(--cart-remove-width);
+    }
+
+    #cart .quantity {
+        width: 4.25rem;
+    }
+
+    #cart > ul > li > button {
+        padding-inline: 0.15rem;
+        font-size: 0.75rem;
+    }
+
     main > article img {
         float: none;
         display: block;
@@ -926,6 +1006,14 @@ footer nav {
 
     #contact > div label {
         flex-basis: auto;
+    }
+
+    #edit-password > p {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    #edit-password > p > meter {
+        grid-column: 1;
     }
 
     #cart > .summary,

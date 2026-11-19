@@ -1,3 +1,4 @@
+import { check_password } from "./password";
 import { G_API, G_CART, G_PRODUCTS, G_PUBSUB, G_UI } from "./main";
 import { Order, has_physical } from "./orders";
 import { Product } from "./products";
@@ -133,7 +134,7 @@ class CartUI extends ListSection {
 
     override async update() {
         this.unordered_list.empty();
-        let subtotal = 0.00;
+        let subtotal = 0.0;
         for (const [index, product] of G_CART.contents.entries()) {
             const new_item = this.list_item.clone();
             new_item.data("product_index", index);
@@ -369,6 +370,57 @@ class ThankYou extends OrderUI {
     }
 }
 
+class Password extends InertSection {
+    old_password: JQuery<HTMLElement>;
+    new_password: JQuery<HTMLElement>;
+    meter: JQuery<HTMLElement>;
+    repeat_password: JQuery<HTMLElement>;
+
+    constructor(
+        section: JQuery<HTMLElement>,
+        old_password: JQuery<HTMLElement>,
+        new_password: JQuery<HTMLElement>,
+        meter: JQuery<HTMLElement>,
+        repeat_password: JQuery<HTMLElement>,
+    ) {
+        super(section);
+
+        this.old_password = old_password;
+        this.new_password = new_password;
+        this.meter = meter;
+        this.repeat_password = repeat_password;
+    }
+
+    override init() {
+        G_PUBSUB.subscribe("navigate.go", () => {
+            this.reset();
+        });
+        G_PUBSUB.subscribe("navigate.bury_url", () => {
+            this.reset();
+        });
+        this.new_password.on("input", () => {
+            this.update();
+        });
+        this.repeat_password.on("input", () => {
+            this.update();
+        });
+    }
+
+    reset() {
+        this.old_password.val("");
+        this.new_password.val("");
+        this.repeat_password.val("");
+    }
+
+    override update() {
+        super.update();
+        const status = check_password(this.new_password.val()!, this.repeat_password.val()!);
+        this.meter.attr("value", status.strength);
+        this.section.find("button").prop("disabled", status.sufficient);
+        this.section.find(".message").text(status.message);
+    }
+}
+
 export class UI {
     current_section = "products";
     sections = {
@@ -380,6 +432,13 @@ export class UI {
         contact: new InertSection($("#contact")),
         order: new OrderUI($("#order"), $("#order .downloads")),
         orders: new OrdersUI($("#orders"), $("#orders .products")),
+        password: new Password(
+            $("#edit-password"),
+            $("#old-password"),
+            $("#new-password"),
+            $("#strength"),
+            $("#repeat"),
+        ),
         privacy: new InertSection($("#privacy")),
         product: new ProductUI($("#product-listing")),
         products: new ProductsUI($("#products")),

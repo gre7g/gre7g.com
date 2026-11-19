@@ -343,6 +343,18 @@
 
             <section id="look-inside" style="display: none"></section>
 
+            <section id="edit-password" style="display: none">
+                <h1>Edit Password</h1>
+                <p><label for="old-password">Old password:</label> <input id="old-password" type="password"></p>
+                <p>
+                    <label for="new-password">New password:</label> <input id="new-password" type="password">
+                    <meter id="strength" min="0" max="20" low="8" high="16" optimum="20" value="0" aria-label="Password strength"></meter>
+                </p>
+                <p><label for="repeat">Repeat:</label> <input id="repeat" type="password"></p>
+                <p class="message"></p>
+                <button>Save</button>
+            </section>
+
             <section id="ai" style="display: none">
                 <h1>AI Policy</h1>
                 <img src="/static/images/no-ai.png" />

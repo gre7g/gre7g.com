@@ -61,7 +61,7 @@ export class Navigator {
                 await G_UI.sections.orders.fetch();
                 break;
             case "/user/profile":
-                console.log("Show user profile"); // TODO
+                G_PUBSUB.publish("ui.show_section", { section: "password" });
                 break;
             default:
                 if (G_PRODUCTS.has_path(path)) {
