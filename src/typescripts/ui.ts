@@ -254,14 +254,14 @@ class OrderUI extends ListSection {
                     quantity.hide();
                 }
                 update_cost(new_item.find(".amount"), product.cost_per * product.quantity);
-                // const section = new_item.find(".downloads");
-                // if (Object.keys(product.downloads).length) {
-                //     this.downloads.unordered_list = section.find("ul");
-                //     this.downloads.downloads = product.downloads;
-                //     await this.downloads.update();
-                // } else {
-                //     section.hide();
-                // }
+                const section = new_item.find(".downloads");
+                if (Object.keys(product.downloads).length) {
+                    this.downloads.unordered_list = section.find("ul");
+                    this.downloads.downloads = product.downloads;
+                    await this.downloads.update();
+                } else {
+                    section.hide();
+                }
                 this.unordered_list.append(new_item);
             }
             update_cost(this.section.find(".subtotal .amount"), this.order.subtotal_cost);
