@@ -241,7 +241,7 @@ class OrderUI extends ListSection {
         if (this.order) {
             this.unordered_list.empty();
             const date: Date = new Date(this.order.timestamp);
-            this.section.find(".timestamp").text(date.toLocaleDateString());
+            this.section.find(".timestamp").text(date.toLocaleDateString() + ":");
             for (const product of this.order.products) {
                 const new_item = this.list_item.clone();
                 const item_link = new_item.find("a");
@@ -253,7 +253,7 @@ class OrderUI extends ListSection {
                 } else {
                     quantity.hide();
                 }
-                update_cost(new_item.find(".ext-cost"), product.cost_per * product.quantity);
+                update_cost(new_item.find(".amount"), product.cost_per * product.quantity);
                 // const section = new_item.find(".downloads");
                 // if (Object.keys(product.downloads).length) {
                 //     this.downloads.unordered_list = section.find("ul");
@@ -264,6 +264,17 @@ class OrderUI extends ListSection {
                 // }
                 this.unordered_list.append(new_item);
             }
+            update_cost(this.section.find(".subtotal .amount"), this.order.subtotal_cost);
+            update_cost(this.section.find(".shipping .amount"), this.order.shipping_cost);
+            const discount = this.section.find(".discount");
+            if (this.order.discount) {
+                update_cost(discount.find(".amount"), this.order.discount);
+                discount.show();
+            } else {
+                discount.hide();
+            }
+            update_cost(this.section.find(".total .amount"), this.order.total_cost);
+            update_cost(this.section.find(".paid .amount"), -this.order.total_cost);
         }
     }
 }

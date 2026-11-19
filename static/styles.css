@@ -372,7 +372,8 @@ main > form {
 #privacy,
 #sitemap,
 #contact,
-#appearances {
+#appearances,
+#order {
     box-sizing: content-box;
     max-width: 75ch;
     margin-inline: auto;
@@ -577,13 +578,65 @@ main > article img {
     background: var(--cream);
 }
 
-#orders .orders-note a {
+#orders .orders-note a,
+#order a.paypal {
     color: var(--blue-dark);
     font-weight: 700;
     text-decoration: underline;
     text-decoration-thickness: 0.1em;
     text-underline-offset: 0.18em;
     cursor: pointer;
+}
+
+#order {
+    text-align: left;
+}
+
+#order > ul > li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 0.3rem 1rem;
+}
+
+#order > ul > li > a {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+#order > ul > li > .quantity {
+    grid-column: 2;
+    text-align: right;
+}
+
+#order > ul > li > .amount {
+    grid-column: 3;
+    text-align: right;
+    white-space: nowrap;
+}
+
+#order > .summary {
+    width: min(50%, 30rem);
+    margin-left: auto;
+}
+
+#order > .summary > p {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0.2rem 0;
+    text-align: left;
+}
+
+#order > .summary .amount {
+    flex: 0 0 auto;
+    margin-left: auto;
+    text-align: right;
+    white-space: nowrap;
+}
+
+#order > .summary .paid {
+    flex-wrap: wrap;
 }
 
 #cart .product-name,
@@ -847,6 +900,10 @@ footer nav {
 
     #contact > div label {
         flex-basis: auto;
+    }
+
+    #order > .summary {
+        width: min(100%, 30rem);
     }
 
     #minor_nav .copyright {
