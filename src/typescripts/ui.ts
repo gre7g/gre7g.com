@@ -133,10 +133,13 @@ class CartUI extends ListSection {
 
     override async update() {
         this.unordered_list.empty();
+        let subtotal = 0.00;
         for (const [index, product] of G_CART.contents.entries()) {
             const new_item = this.list_item.clone();
             new_item.data("product_index", index);
-            new_item.find(".product-name").text(product.name);
+            const name = new_item.find(".product-name");
+            name.text(product.name);
+            name.attr("href", product.listing_path);
             const quantity = new_item.find("input");
             quantity.val(product.quantity);
             quantity.on("input", function () {
@@ -144,13 +147,16 @@ class CartUI extends ListSection {
                 const product_index = input.closest("li").data("product_index");
                 G_PUBSUB.publish("cart.update_qty", { product_index, quantity: parseInt(input.val() ?? "0", 10) });
             });
-            update_cost(new_item.find(".ext-cost"), product.cost_per * product.quantity);
+            const item_cost = product.cost_per * product.quantity;
+            subtotal += item_cost;
+            update_cost(new_item.find(".ext-cost"), item_cost);
             new_item.find("button").on("click", function () {
                 const product_index = $(this).closest("li").data("product_index");
                 G_PUBSUB.publish("cart.delete", { product_index });
             });
             this.unordered_list.append(new_item);
         }
+        update_cost(this.section.find(".subtotal .amount"), subtotal);
     }
 }
 

@@ -31,7 +31,7 @@ export class Cart {
             this.update();
         });
         this.button.on("click", async () => {
-            G_PUBSUB.publish("navigate.bury_url", { section: "checkout", path: "/cart/checkout" });
+            G_PUBSUB.publish("navigate.bury_url", { section: "checkout", path: "/user/cart/checkout" });
         });
     }
 
@@ -67,7 +67,7 @@ export class Cart {
             copy.quantity = 1;
             this.contents.push(copy);
         }
-        G_PUBSUB.publish("navigate.go", { path: "/cart", save: true });
+        G_PUBSUB.publish("navigate.go", { path: "/user/cart", save: true });
 
         // Save the cart
         await G_API.put("/api/v1/cart", { products: this.contents });

@@ -49,6 +49,9 @@ export class Contact {
             try {
                 await G_API.post("/api/v1/contact", { name, email, message });
                 G_PUBSUB.publish("ui.show_info", { message: "Thank you for leaving me a comment!" });
+                this.name.val("");
+                this.email.val("");
+                this.message.val("");
             } catch (error) {
                 if (error instanceof Error) {
                     G_PUBSUB.publish("ui.show_error", { message: error.message });

@@ -32,7 +32,7 @@ PRODUCTS = [
             </p>
             <p>SciFi / Action</p>
             """,
-        "/books/skeleton-crew",
+        "/shop/books/skeleton-crew",
         ProductId("kc1"),
         images=["/static/images/products/skeleton-crew-1.png"],
         media="paperback, ebook, audiobook",
@@ -42,7 +42,7 @@ PRODUCTS = [
         "Skeleton Crew − paperback",
         "Kanti Cycle 1: Skeleton Crew (paperback, action/adventure sci-fi novel)",
         "<p>220 pages, Illustrated</p>",
-        "/books/skeleton-crew/paperback",
+        "/shop/books/skeleton-crew/paperback",
         ProductId("kc1-paperback"),
         SKELETON_CREW,
         13.99,
@@ -62,7 +62,7 @@ PRODUCTS = [
                 <li>.pdf format</li>
             </ul>
             """,
-        "/books/skeleton-crew/ebook",
+        "/shop/books/skeleton-crew/ebook",
         ProductId("kc1-ebook"),
         -1,
         4.99,
@@ -83,7 +83,7 @@ PRODUCTS = [
             <p>Voiced by the amazing Piers Ryman</p>
             <p>Digital download is a .zip of DRM-free .mp3 files</p>
             """,
-        "/books/skeleton-crew/audiobook",
+        "/shop/books/skeleton-crew/audiobook",
         ProductId("kc1-audiobook"),
         -1,
         16.11,
@@ -108,7 +108,7 @@ PRODUCTS = [
             </p>
             <p>SciFi / Action</p>
             """,
-        "/books/small-world",
+        "/shop/books/small-world",
         ProductId("kc2"),
         images=["/static/images/products/small-world-1.png"],
         media="paperback, ebook, audiobook",
@@ -118,7 +118,7 @@ PRODUCTS = [
         "Small World − paperback",
         "Kanti Cycle 2: Small World (paperback, action/adventure sci-fi novel)",
         "<p>300 pages, Illustrated</p>",
-        "/books/small-world/paperback",
+        "/shop/books/small-world/paperback",
         ProductId("kc2-paperback"),
         3,
         15.99,
@@ -138,7 +138,7 @@ PRODUCTS = [
                 <li>.pdf format</li>
             </ul>
             """,
-        "/books/small-world/ebook",
+        "/shop/books/small-world/ebook",
         ProductId("kc2-ebook"),
         -1,
         5.99,
@@ -159,7 +159,7 @@ PRODUCTS = [
             <p>Voiced by the amazing Piers Ryman</p>
             <p>Digital download is a .zip of DRM-free .mp3 files</p>
             """,
-        "/books/small-world/audiobook",
+        "/shop/books/small-world/audiobook",
         ProductId("kc2-audiobook"),
         -1,
         17.40,
@@ -187,7 +187,7 @@ PRODUCTS = [
             </p>
             <p>SciFi / Action</p>
             """,
-        "/books/fair-trade",
+        "/shop/books/fair-trade",
         ProductId("kc3"),
         images=["/static/images/products/fair-trade-1.png"],
         media="paperback, ebook, audiobook",
@@ -197,7 +197,7 @@ PRODUCTS = [
         "Fair Trade − paperback",
         "Kanti Cycle 3: Fair Trade (paperback, action/adventure sci-fi novel)",
         "<p>334 pages, Illustrated</p>",
-        "/books/fair-trade/paperback",
+        "/shop/books/fair-trade/paperback",
         ProductId("kc3-paperback"),
         FAIR_TRADE,
         17.99,
@@ -217,7 +217,7 @@ PRODUCTS = [
                 <li>.pdf format</li>
             </ul>
             """,
-        "/books/fair-trade/ebook",
+        "/shop/books/fair-trade/ebook",
         ProductId("kc3-ebook"),
         -1,
         6.99,
@@ -238,7 +238,7 @@ PRODUCTS = [
             <p>Voiced by the amazing Piers Ryman</p>
             <p>Digital download is a .zip of DRM-free .mp3 files</p>
             """,
-        "/books/fair-trade/audiobook",
+        "/shop/books/fair-trade/audiobook",
         ProductId("kc3-audiobook"),
         -1,
         21.83,
@@ -268,7 +268,7 @@ PRODUCTS = [
             </p>
             <p>SciFi / Intrigue</p>
             """,
-        "/books/nobody-left-behind",
+        "/shop/books/nobody-left-behind",
         ProductId("kc3.5"),
         images=["/static/images/products/nobody-left-behind-1.png"],
         media="paperback, ebook, audiobook",
@@ -278,7 +278,7 @@ PRODUCTS = [
         "Nobody Left Behind − paperback",
         "Kanti Cycle 3.5: Nobody Left Behind (paperback, action/adventure sci-fi novel)",
         "<p>228 pages, Illustrated</p>",
-        "/books/nobody-left-behind/paperback",
+        "/shop/books/nobody-left-behind/paperback",
         ProductId("kc3.5-paperback"),
         NOBODY_LEFT_BEHIND,
         19.99,
@@ -298,7 +298,7 @@ PRODUCTS = [
                 <li>.pdf format</li>
             </ul>
             """,
-        "/books/nobody-left-behind/ebook",
+        "/shop/books/nobody-left-behind/ebook",
         ProductId("kc3.5-ebook"),
         -1,
         9.99,
@@ -319,7 +319,7 @@ PRODUCTS = [
             <p>Voiced by the amazing Piers Ryman</p>
             <p>Digital download is a .zip of DRM-free .mp3 files</p>
             """,
-        "/books/nobody-left-behind/audiobook",
+        "/shop/books/nobody-left-behind/audiobook",
         ProductId("kc3.5-audiobook"),
         -1,
         99.99,
@@ -349,7 +349,7 @@ PRODUCTS = [
             </p>
             <p>SciFi / Mystery</p>
             """,
-        "/books/reapers-lottery",
+        "/shop/books/reapers-lottery",
         ProductId("tm1"),
         images=["/static/images/products/reapers-lottery-1.png"],
         media="paperback, ebook, audiobook",
@@ -359,7 +359,7 @@ PRODUCTS = [
         "Reaper's Lottery − paperback",
         "The Tori Mysteries 1: Reaper's Lottery (paperback, mystery sci-fi novel)",
         "<p>432 pages, Illustrated</p>",
-        "/books/reapers-lottery/paperback",
+        "/shop/books/reapers-lottery/paperback",
         ProductId("tm1-paperback"),
         REAPERS_LOTTERY,
         16.99,
@@ -379,7 +379,7 @@ PRODUCTS = [
                 <li>.pdf format</li>
             </ul>
             """,
-        "/books/reapers-lottery/ebook",
+        "/shop/books/reapers-lottery/ebook",
         ProductId("tm1-ebook"),
         -1,
         7.99,
@@ -400,7 +400,7 @@ PRODUCTS = [
             <p>Voiced by the amazing Piers Ryman</p>
             <p>Digital download is a .zip of DRM-free .mp3 files</p>
             """,
-        "/books/reapers-lottery/audiobook",
+        "/shop/books/reapers-lottery/audiobook",
         ProductId("tm1-audiobook"),
         -1,
         20.62,
@@ -429,7 +429,7 @@ PRODUCTS = [
             </p>
             <p>SciFi / Mystery</p>
             """,
-        "/books/executioners-gambit",
+        "/shop/books/executioners-gambit",
         ProductId("tm2"),
         images=["/static/images/products/executioners-gambit-1.png"],
         media="paperback, ebook, audiobook",
@@ -439,7 +439,7 @@ PRODUCTS = [
         "Executioner's Gambit − paperback",
         "The Tori Mysteries 2: Executioner's Gambit (paperback, mystery sci-fi novel)",
         "<p>493 pages, Illustrated</p>",
-        "/books/executioners-gambit/paperback",
+        "/shop/books/executioners-gambit/paperback",
         ProductId("tm2-paperback"),
         EXECUTIONERS_GAMBIT,
         22.99,
@@ -459,7 +459,7 @@ PRODUCTS = [
                 <li>.pdf format</li>
             </ul>
             """,
-        "/books/executioners-gambit/ebook",
+        "/shop/books/executioners-gambit/ebook",
         ProductId("tm2-ebook"),
         -1,
         9.99,
@@ -480,7 +480,7 @@ PRODUCTS = [
             <p>Voiced by the amazing Piers Ryman</p>
             <p>Digital download is a .zip of DRM-free .mp3 files</p>
             """,
-        "/books/executioners-gambit/audiobook",
+        "/shop/books/executioners-gambit/audiobook",
         ProductId("tm2-audiobook"),
         -1,
         23.39,
@@ -507,7 +507,7 @@ PRODUCTS = [
                 ● M/F ● M/M ● Group Sex ●
             </p>
             """,
-        "/books/long-way-home",
+        "/shop/books/long-way-home",
         ProductId("lwh"),
         images=["/static/images/products/long-way-home-1.png"],
         media="paperback, ebook, audiobook",
@@ -517,7 +517,7 @@ PRODUCTS = [
         "Long Way Home − paperback",
         "Long Way Home (paperback, erotica/adventure sci-fi novel)",
         "<p>292 pages, Explicit Illustrations</p>",
-        "/books/long-way-home/paperback",
+        "/shop/books/long-way-home/paperback",
         ProductId("lwh-paperback"),
         83,
         18.49,
@@ -537,7 +537,7 @@ PRODUCTS = [
                 <li>.pdf format</li>
             </ul>
             """,
-        "/books/long-way-home/ebook",
+        "/shop/books/long-way-home/ebook",
         ProductId("lwh-ebook"),
         -1,
         8.99,
@@ -554,7 +554,7 @@ PRODUCTS = [
             <p>Voiced by the amazing Piers Ryman</p>
             <p>Digital download is a .zip of DRM-free .mp3 files</p>
             """,
-        "/books/long-way-home/audiobook",
+        "/shop/books/long-way-home/audiobook",
         ProductId("lwh-audiobook"),
         -1,
         18.83,
@@ -590,7 +590,7 @@ PRODUCTS = [
                 SciFi / Short Stories
             </p>
             """,
-        "/books/tales-of-hayven-celestia-1",
+        "/shop/books/tales-of-hayven-celestia-1",
         ProductId("tohc1"),
         images=["/static/images/products/tales-of-hayven-celestia-1-1.png"],
         media="paperback, ebook, audiobook",
@@ -600,7 +600,7 @@ PRODUCTS = [
         "Tales of Hayven Celestia 1 − paperback",
         "Tales of Hayven Celestia 1 (paperback, short-stories sci-fi anthology)",
         "<p>419 pages, Illustrated</p>",
-        "/books/tales-of-hayven-celestia-1/paperback",
+        "/shop/books/tales-of-hayven-celestia-1/paperback",
         ProductId("tohc1-paperback"),
         TALES_OF_HAYVEN_CELESTIA_1,
         18.95,
@@ -620,7 +620,7 @@ PRODUCTS = [
                 <li>.pdf format</li>
             </ul>
             """,
-        "/books/tales-of-hayven-celestia-1/ebook",
+        "/shop/books/tales-of-hayven-celestia-1/ebook",
         ProductId("tohc1-ebook"),
         -1,
         8.99,
@@ -641,7 +641,7 @@ PRODUCTS = [
             <p>Voiced by the amazing Piers Ryman</p>
             <p>Digital download is a .zip of DRM-free .mp3 files</p>
             """,
-        "/books/tales-of-hayven-celestia-1/audiobook",
+        "/shop/books/tales-of-hayven-celestia-1/audiobook",
         ProductId("tohc1-audiobook"),
         -1,
         27.77,
@@ -663,7 +663,7 @@ PRODUCTS = [
                 SciFi / Short Stories
             </p>
             """,
-        "/books/tales-of-hayven-celestia-2",
+        "/shop/books/tales-of-hayven-celestia-2",
         ProductId("tohc2"),
         images=["/static/images/products/tales-of-hayven-celestia-2-1.png"],
         media="paperback, ebook",
@@ -673,7 +673,7 @@ PRODUCTS = [
         "Tales of Hayven Celestia 2 − paperback",
         "Tales of Hayven Celestia 2 (paperback, short-stories sci-fi anthology)",
         "<p>353 pages, Illustrated</p>",
-        "/books/tales-of-hayven-celestia-2/paperback",
+        "/shop/books/tales-of-hayven-celestia-2/paperback",
         ProductId("tohc2-paperback"),
         TALES_OF_HAYVEN_CELESTIA_2,
         22.99,
@@ -692,7 +692,7 @@ PRODUCTS = [
                 <li>.pdf format</li>
             </ul>
             """,
-        "/books/tales-of-hayven-celestia-2/ebook",
+        "/shop/books/tales-of-hayven-celestia-2/ebook",
         ProductId("tohc2-ebook"),
         -1,
         9.99,
@@ -715,7 +715,7 @@ PRODUCTS = [
                 grids glitters in the light as you move!
             </p>
             """,
-        "/apparel/hayven-celestia-pin",
+        "/shop/apparel/hayven-celestia-pin",
         ProductId("hc-pin"),
         HAYVEN_CELESTIA_PIN,
         13.00,

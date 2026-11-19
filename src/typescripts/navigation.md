@@ -8,7 +8,7 @@ Paths:
 
 - / or any unrecognized string
 
-- /books/<product_id>
+- /shop/books/<product_id>
 
   Product listing for the item.
 

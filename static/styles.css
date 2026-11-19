@@ -373,7 +373,13 @@ main > form {
 #sitemap,
 #contact,
 #appearances,
-#order {
+#order,
+#cart,
+#orders,
+#checkout,
+#thank-you,
+#product-listing,
+#look-inside {
     box-sizing: content-box;
     max-width: 75ch;
     margin-inline: auto;
@@ -631,11 +637,13 @@ main > article img {
     white-space: nowrap;
 }
 
+#cart > .summary,
 #order > .summary {
     width: min(50%, 30rem);
     margin-left: auto;
 }
 
+#cart > .summary > p,
 #order > .summary > p {
     display: flex;
     justify-content: space-between;
@@ -645,6 +653,7 @@ main > article img {
     text-align: left;
 }
 
+#cart > .summary .amount,
 #order > .summary .amount {
     flex: 0 0 auto;
     margin-left: auto;
@@ -919,6 +928,7 @@ footer nav {
         flex-basis: auto;
     }
 
+    #cart > .summary,
     #order > .summary {
         width: min(100%, 30rem);
     }

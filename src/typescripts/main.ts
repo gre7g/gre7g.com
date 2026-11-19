@@ -96,6 +96,9 @@ export class Main {
         $("a.login").on("click", () => {
             G_PUBSUB.publish("user.login", undefined);
         });
+        $(".logout").on("click", () => {
+            G_PUBSUB.publish("user.logout", undefined);
+        });
         load_paypal();
     }
 }

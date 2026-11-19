@@ -8,9 +8,6 @@ High Urgency
 ------------
 - [ ] Is everything logged on purchase completion (like fees)?
 - [ ] "Skeleton Crew" paperback entry is missing text
-- [ ] Single order page is broken
-- [X] Orders page login button is broken
-- [X] Orders page is very broken and should show a message if you're not logged in
 
 Moderate Urgency
 ----------------
@@ -38,6 +35,10 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] Shopping cart items must link to listings
+- [X] Single order page is broken
+- [X] Orders page login button is broken
+- [X] Orders page is very broken and should show a message if you're not logged in
 - [X] Contact must disable the button until the fields are entered
 - [X] Sending an email on the local simulation scrolled an error on the console but returned a 201
 - [X] Profile link is no longer working

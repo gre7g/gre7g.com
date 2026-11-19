@@ -25,32 +25,32 @@
                     <li>
                         <span>Books</span>
                         <ul class="drop-down" style="display: none">
-                            <li><a href="/books/skeleton-crew" class="internal">Skeleton Crew</a></li>
-                            <li><a href="/books/small-world" class="internal">Small World</a></li>
-                            <li><a href="/books/fair-trade" class="internal">Fair Trade</a></li>
-                            <li><a href="/books/nobody-left-behind" class="internal">Nobody Left Behind</a></li>
+                            <li><a href="/shop/books/skeleton-crew" class="internal">Skeleton Crew</a></li>
+                            <li><a href="/shop/books/small-world" class="internal">Small World</a></li>
+                            <li><a href="/shop/books/fair-trade" class="internal">Fair Trade</a></li>
+                            <li><a href="/shop/books/nobody-left-behind" class="internal">Nobody Left Behind</a></li>
                             <li class="divider"></li>
-                            <li><a href="/books/reapers-lottery" class="internal">Reaper&rsquo;s Lottery</a></li>
+                            <li><a href="/shop/books/reapers-lottery" class="internal">Reaper&rsquo;s Lottery</a></li>
                             <li>
-                                <a href="/books/executioners-gambit" class="internal">Executioner&rsquo;s Gambit</a>
+                                <a href="/shop/books/executioners-gambit" class="internal">Executioner&rsquo;s Gambit</a>
                             </li>
                             <li class="divider"></li>
-                            <li><a href="/books/long-way-home" class="internal">Long Way Home</a></li>
+                            <li><a href="/shop/books/long-way-home" class="internal">Long Way Home</a></li>
                             <li class="divider"></li>
                             <li>
-                                <a href="/books/tales-of-hayven-celestia-1" class="internal"
+                                <a href="/shop/books/tales-of-hayven-celestia-1" class="internal"
                                     >Tales of Hayven Celestia 1</a
                                 >
                             </li>
                             <li>
-                                <a href="/books/tales-of-hayven-celestia-2" class="internal"
+                                <a href="/shop/books/tales-of-hayven-celestia-2" class="internal"
                                     >Tales of Hayven Celestia 2</a
                                 >
                             </li>
                         </ul>
                     </li>
                     <li>
-                        <a href="/products" class="internal"><span>Shop</span></a>
+                        <a href="/shop/products" class="internal"><span>Shop</span></a>
                     </li>
                     <li>
                         <a href="/gre7g/appearances" class="internal"><span>Appearances</span></a>
@@ -134,11 +134,11 @@
                         <ul id="profile-menu" class="drop-down" style="display: none">
                             <li><a href="/user/profile" class="internal">user profile</a></li>
                             <li><a href="/user/orders" class="internal">orders</a></li>
-                            <li><a href="/user/logout" class="internal">logout</a></li>
+                            <li><a class="logout">logout</a></li>
                         </ul>
                     </li>
                     <li id="cart_button">
-                        <a href="/cart" class="internal" aria-label="Shopping cart" title="Shopping Cart"></a>
+                        <a href="/user/cart" class="internal" aria-label="Shopping cart" title="Shopping Cart"></a>
                     </li>
                 </ul>
             </nav>
@@ -201,7 +201,7 @@
                         >Rick Griffin&rsquo;s</a
                     >
                     short story
-                    <a href="https://www.smashwords.com/books/view/146211/" target="_blank" rel="noopener noreferrer"
+                    <a href="https://www.smashwords.com/shop/books/view/146211/" target="_blank" rel="noopener noreferrer"
                         ><i>Ten Thousand Miles Up</i></a
                     >. He loved the notion of tiny aliens enslaved to gigantic aliens and tasked with mundane jobs.
                     Hayven Celestia (as Rick had dubbed it) was a rich landscape begging to be explored!
@@ -222,12 +222,15 @@
                 <h1>Shopping Cart</h1>
                 <ul>
                     <li>
-                        <span class="product-name"></span>
+                        <a class="product-name"></a>
                         <input type="number" class="quantity" min="1" max="9" />
                         <span class="ext-cost"></span>
                         <button>Remove</button>
                     </li>
                 </ul>
+                <div class="summary">
+                    <p class="subtotal">Subtotal: <span class="amount"></span></p>
+                </div>
                 <p id="empty-cart">Your cart is empty</p>
                 <button id="checkout-button">Checkout</button>
             </section>
@@ -423,9 +426,9 @@
             <nav>
                 <ul id="minor_nav">
                     <li class="copyright">&copy;2026 Gre7g Luterman</li>
-                    <li><a href="/ai" class="internal">AI policy</a></li>
-                    <li><a href="/privacy" class="internal">Privacy Policy</a></li>
-                    <li><a href="/sitemap" class="internal">Sitemap</a></li>
+                    <li><a href="/articles/ai" class="internal">AI policy</a></li>
+                    <li><a href="/articles/privacy" class="internal">Privacy Policy</a></li>
+                    <li><a href="/articles/sitemap" class="internal">Sitemap</a></li>
                 </ul>
             </nav>
         </footer>

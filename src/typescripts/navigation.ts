@@ -29,33 +29,33 @@ export class Navigator {
             history.pushState(null, "", path);
         }
         switch (path) {
-            case "/ai":
+            case "/articles/ai":
                 G_PUBSUB.publish("ui.show_section", { section: "ai" });
                 break;
-            case "/gre7g/appearances":
-                G_PUBSUB.publish("ui.show_section", { section: "appearances" });
+            case "/articles/privacy":
+                G_PUBSUB.publish("ui.show_section", { section: "privacy" });
                 break;
-            case "/cart":
-                G_PUBSUB.publish("ui.show_section", { section: "cart" });
+            case "/articles/sitemap":
+                G_PUBSUB.publish("ui.show_section", { section: "sitemap" });
                 break;
             case "/gre7g/about":
                 G_PUBSUB.publish("ui.show_section", { section: "about" });
                 break;
+            case "/gre7g/appearances":
+                G_PUBSUB.publish("ui.show_section", { section: "appearances" });
+                break;
             case "/gre7g/contact":
                 G_PUBSUB.publish("ui.show_section", { section: "contact" });
                 break;
-            case "/login":
+            case "/login": // Bounce from Cognito
                 history.replaceState(null, "", "/login");
                 G_PUBSUB.publish("ui.show_section", { section: "products" });
                 break;
-            case "/privacy":
-                G_PUBSUB.publish("ui.show_section", { section: "privacy" });
-                break;
-            case "/sitemap":
-                G_PUBSUB.publish("ui.show_section", { section: "sitemap" });
-                break;
-            case "/products":
+            case "/shop/products":
                 G_PUBSUB.publish("ui.show_section", { section: "products" });
+                break;
+            case "/user/cart":
+                G_PUBSUB.publish("ui.show_section", { section: "cart" });
                 break;
             case "/user/orders":
                 await G_UI.sections.orders.fetch();
