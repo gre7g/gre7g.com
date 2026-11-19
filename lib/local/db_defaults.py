@@ -37,7 +37,7 @@ def write_default_data_to_db(user_id: UserId, carts_table: DynamoDBTable, orders
     nlb1.quantity = 1
     nlb1.status = ProductStatus.REFUNDED
     nlb2 = find("kc3.5-ebook")
-    nlb2.quantity = 1
+    nlb2.quantity = 2
     nlb2.status = ProductStatus.DOWNLOADED
 
     orders = [

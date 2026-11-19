@@ -300,16 +300,23 @@
 
             <section id="order" style="display: none">
                 <h1>Order</h1>
+                <p>Purchased on <span class="timestamp"></span>:</p>
                 <ul>
                     <li>
-                        <a class="timestamp"></a>
-                        <section class="products">
-                            <ul>
-                                <li><a></a></li>
-                            </ul>
-                        </section>
+                        <a></a>
+                        <span class="quantity"></span>
+                        <span class="ext-cost"></span>
                     </li>
                 </ul>
+                <div class="summary">
+                    <p class="subtotal">Subtotal: <span class="amount"></span></p>
+                    <p class="shipping">Shipping: <span class="amount"></span></p>
+                    <p class="discount">Discount: <span class="amount negative"></span></p>
+                    <p class="total">Total: <span class="amount"></span></p>
+                    <p class="paid">Paid on <span class="timestamp"></span>: <span class="amount negative"></span></p>
+                    <p class="balance-due">Balance due: <span class="amount">$0.00</span></p>
+                </div>
+                <p>Tracking numbers are stored in the <a class="paypal">PayPal invoice</a></p>
             </section>
 
             <section id="orders" style="display: none">

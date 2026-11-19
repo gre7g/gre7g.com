@@ -8,13 +8,13 @@ High Urgency
 ------------
 - [ ] Is everything logged on purchase completion (like fees)?
 - [ ] "Skeleton Crew" paperback entry is missing text
-- [ ] Orders page is very broken and should show a message if you're not logged in
-- [X] Contact must disable the button until the fields are entered
+- [ ] Single order page is broken
+- [X] Orders page login button is broken
+- [X] Orders page is very broken and should show a message if you're not logged in
 
 Moderate Urgency
 ----------------
 - [ ] When pulling up the / page, there should be more before the products, so write some!
-- [X] Sending an email on the local simulation scrolled an error on the console but returned a 201
 - [ ] User profile page
 - [ ] Theme the login to match
 
@@ -38,6 +38,8 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] Contact must disable the button until the fields are entered
+- [X] Sending an email on the local simulation scrolled an error on the console but returned a 201
 - [X] Profile link is no longer working
 - [X] Local links like appearances need to be intercepted and handled via TS navigation. There's probably quite a few of
   these, so be thorough.

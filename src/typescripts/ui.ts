@@ -4,6 +4,14 @@ import { Product } from "./products";
 import { $ } from "jquery";
 import { DropDown } from "./drop_down";
 
+function update_cost(select: JQuery<HTMLElement>, cost: number) {
+    const currency = new Intl.NumberFormat("default", {
+        style: "currency",
+        currency: "USD",
+    }).format(cost);
+    select.text(currency);
+}
+
 class InertSection {
     section: JQuery<HTMLElement>;
 
@@ -13,14 +21,6 @@ class InertSection {
 
     init() {}
     update() {}
-
-    update_cost(select: JQuery<HTMLElement>, cost: number) {
-        const currency = new Intl.NumberFormat("default", {
-            style: "currency",
-            currency: "USD",
-        }).format(cost);
-        select.text(currency);
-    }
 }
 
 class ListSection extends InertSection {
@@ -128,7 +128,7 @@ class CartUI extends ListSection {
 
     update_qty(product_index: number, quantity: number) {
         const select = this.section.find(`li:nth-child(${product_index + 1}) .ext-cost`);
-        this.update_cost(select, G_CART.contents[product_index].cost_per * quantity);
+        update_cost(select, G_CART.contents[product_index].cost_per * quantity);
     }
 
     override async update() {
@@ -144,7 +144,7 @@ class CartUI extends ListSection {
                 const product_index = input.closest("li").data("product_index");
                 G_PUBSUB.publish("cart.update_qty", { product_index, quantity: parseInt(input.val() ?? "0", 10) });
             });
-            this.update_cost(new_item.find(".ext-cost"), product.cost_per * product.quantity);
+            update_cost(new_item.find(".ext-cost"), product.cost_per * product.quantity);
             new_item.find("button").on("click", function () {
                 const product_index = $(this).closest("li").data("product_index");
                 G_PUBSUB.publish("cart.delete", { product_index });
@@ -173,15 +173,15 @@ export class CheckoutUI extends CartUI {
             subtotal += product.quantity * product.cost_per;
         };
         G_CART.contents.forEach(add_item);
-        this.update_cost(this.section.find("#subtotal span"), subtotal);
+        update_cost(this.section.find("#subtotal span"), subtotal);
 
         // Get shipping
         const response = await G_API.post("/api/v1/cart/shipping", {});
-        this.update_cost(this.section.find("#shipping span"), response?.shipping_cost);
+        update_cost(this.section.find("#shipping span"), response?.shipping_cost);
 
         // Calculate total
         this.total = subtotal + response?.shipping_cost;
-        this.update_cost(this.section.find("#total span"), this.total);
+        update_cost(this.section.find("#total span"), this.total);
 
         // Login status message
         const login_status = $("#login_status");
@@ -240,21 +240,30 @@ class OrderUI extends ListSection {
     override async update() {
         if (this.order) {
             this.unordered_list.empty();
-            const populate_item = async (product: Product) => {
+            const date: Date = new Date(this.order.timestamp);
+            this.section.find(".timestamp").text(date.toLocaleDateString());
+            for (const product of this.order.products) {
                 const new_item = this.list_item.clone();
-                new_item.find("a").attr("href", product.listing_path);
-                new_item.find(".product-name").text(product.name);
-                const section = new_item.find(".downloads");
-                if (Object.keys(product.downloads).length) {
-                    this.downloads.unordered_list = section.find("ul");
-                    this.downloads.downloads = product.downloads;
-                    await this.downloads.update();
+                const item_link = new_item.find("a");
+                item_link.attr("href", product.listing_path);
+                item_link.text(product.name);
+                const quantity = new_item.find(".quantity");
+                if (product.quantity > 1) {
+                    quantity.text(`Qty: ${product.quantity}`);
                 } else {
-                    section.hide();
+                    quantity.hide();
                 }
+                update_cost(new_item.find(".ext-cost"), product.cost_per * product.quantity);
+                // const section = new_item.find(".downloads");
+                // if (Object.keys(product.downloads).length) {
+                //     this.downloads.unordered_list = section.find("ul");
+                //     this.downloads.downloads = product.downloads;
+                //     await this.downloads.update();
+                // } else {
+                //     section.hide();
+                // }
                 this.unordered_list.append(new_item);
-            };
-            Object.values(this.order.products).forEach(populate_item);
+            }
         }
     }
 }
@@ -318,6 +327,9 @@ class OrdersUI extends ListSection {
             const html = logged_in ? "Found no old orders" : '<a class="login">Log in</a> to view old orders';
             this.note.html(html);
             this.note.show();
+            this.note.find("a").on("click", () => {
+                G_PUBSUB.publish("user.login", undefined);
+            });
         }
     }
 }
