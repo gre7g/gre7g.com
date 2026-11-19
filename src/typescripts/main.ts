@@ -93,6 +93,9 @@ export class Main {
                 G_PUBSUB.publish("navigate.go", { path: href, save: true });
             }
         });
+        $("a.login").on("click", () => {
+            G_PUBSUB.publish("user.login", undefined);
+        });
         load_paypal();
     }
 }

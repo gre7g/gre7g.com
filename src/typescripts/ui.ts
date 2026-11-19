@@ -277,23 +277,47 @@ class MinimalOrderUI extends ListSection {
 class OrdersUI extends ListSection {
     orders: Order[] = [];
     order_ui: MinimalOrderUI;
+    note: JQuery<HTMLElement>;
 
     constructor(section: JQuery<HTMLElement>, order: JQuery<HTMLElement>) {
         const order_ui = new MinimalOrderUI(order);
         super(section);
         this.order_ui = order_ui;
+        this.note = section.find(".orders-note");
+    }
+
+    async fetch() {
+        let orders;
+        try {
+            orders = await G_API.get("/api/v1/order");
+            orders.orders.sort((a: Order, b: Order) => b.timestamp.localeCompare(a.timestamp));
+            this.orders = orders.orders;
+        } catch (error) {
+            this.orders = [];
+        }
+        G_PUBSUB.publish("ui.show_section", { section: "orders" });
     }
 
     override async update() {
         this.unordered_list.empty();
-        for (const order of this.orders) {
-            const new_item = this.list_item.clone();
-            new_item.find("a").attr("href", `/order/${order.order_id}`);
-            const section = new_item.find(".products");
-            this.order_ui.unordered_list = section.find("ul");
-            this.order_ui.order = order;
-            await this.order_ui.update();
-            this.unordered_list.append(new_item);
+        if (this.orders.length) {
+            for (const order of this.orders) {
+                const new_item = this.list_item.clone();
+                const order_link = new_item.find("a");
+                order_link.attr("href", `/order/${order.order_id}`);
+                const date: Date = new Date(order.timestamp);
+                order_link.text(date.toLocaleDateString());
+                this.order_ui.unordered_list = new_item.find("ul");
+                this.order_ui.order = order;
+                await this.order_ui.update();
+                this.unordered_list.append(new_item);
+            }
+            this.note.hide();
+        } else {
+            const logged_in = await G_API.logged_in();
+            const html = logged_in ? "Found no old orders" : '<a class="login">Log in</a> to view old orders';
+            this.note.html(html);
+            this.note.show();
         }
     }
 }
@@ -390,6 +414,6 @@ export class UI {
         $("#cart_button a").text(G_CART.contents.length == 0 ? "" : G_CART.contents.length);
 
         // Login button is visible if not logged in
-        $("#socials > .login").toggle(!await G_API.logged_in());
+        $("#socials > .login").toggle(!(await G_API.logged_in()));
     }
 }

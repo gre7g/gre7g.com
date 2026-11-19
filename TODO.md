@@ -33,7 +33,7 @@ Low Urgency
       an error.
 - [ ] Add code coverage for TypeScript
 - [ ] Go through .ts files and add more comments, function headers, etc.
-- [ ] Breadcrumbs
+- [ ] Breadcrumbs -- see breadcrumbs-feature branch for visual component, but let's work on adding the data as we go
 - [ ] Show a sitemap
 
 Old and Completed
