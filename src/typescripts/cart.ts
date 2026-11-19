@@ -3,8 +3,15 @@ import { G_API, G_PUBSUB } from "./main";
 
 export class Cart {
     contents: Product[] = [];
+    empty: JQuery<HTMLElement>;
+    button: JQuery<HTMLElement>;
 
-    init(check_out: JQuery<HTMLElement>) {
+    constructor(empty: JQuery<HTMLElement>, button: JQuery<HTMLElement>) {
+        this.empty = empty;
+        this.button = button;
+    }
+
+    init() {
         G_PUBSUB.subscribe("cart.empty", async () => {
             await this.empty_cart();
         });
@@ -17,7 +24,13 @@ export class Cart {
         G_PUBSUB.subscribe("cart.delete", async (params) => {
             this.delete(params.product_index);
         });
-        check_out.on("click", async () => {
+        G_PUBSUB.subscribe("ui.update", async (params) => {
+            this.update();
+        });
+        G_PUBSUB.subscribe("cart.update", async (params) => {
+            this.update();
+        });
+        this.button.on("click", async () => {
             G_PUBSUB.publish("navigate.bury_url", { section: "checkout", path: "/cart/checkout" });
         });
     }
@@ -34,6 +47,7 @@ export class Cart {
 
         const response = await G_API.get("/api/v1/cart");
         this.contents = response.products;
+        G_PUBSUB.publish("ui.update", undefined);
     }
 
     async add(product: Product) {
@@ -72,5 +86,11 @@ export class Cart {
     delete(product_index: number) {
         this.contents.splice(product_index, 1);
         G_PUBSUB.publish("cart.update", undefined);
+    }
+
+    update() {
+        const empty = (this.contents.length == 0);
+        this.empty.toggle(empty);
+        this.button.prop("disabled", empty);
     }
 }

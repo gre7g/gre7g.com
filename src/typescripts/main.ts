@@ -63,7 +63,7 @@ export class Main {
 
     async main(): Promise<void> {
         G_API = new Api();
-        G_CART = new Cart();
+        G_CART = new Cart($("#empty-cart"), $("#checkout-button"));
         G_PRODUCTS = new Products();
         G_PUBSUB = new PubSub<Events>();
         G_UI = new UI();
@@ -72,7 +72,7 @@ export class Main {
         G_SAM_OUTPUTS = await response.json();
         G_API.dummy_auth = new URLSearchParams(window.location.search).get("auth") ?? "";
         G_API.load();
-        G_CART.init($("#checkout-button"));
+        G_CART.init();
         this.contact.init();
         await G_PRODUCTS.load();
         await G_CART.load();

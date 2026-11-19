@@ -7,34 +7,37 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 High Urgency
 ------------
 - [ ] Is everything logged on purchase completion (like fees)?
+- [ ] "Skeleton Crew" paperback entry is missing text
 
 Moderate Urgency
 ----------------
 
 Basic Features
 --------------
-- [X] CSS
 - [ ] TypeScript unit tests
 - [ ] Local links like appearances need to be intercepted and handled via TS navigation. There's probably quite a few of
       these, so be thorough.
 - [ ] Books link does nothing
 - [ ] Profile link is no longer working
-- [ ] Empty shopping cart should show a message and disable the checkout button
-- [ ] Appearances should be the same width as the other sections
+- [X] Empty shopping cart should show a message and disable the checkout button
+- [ ] Test narrow and on phone
 
 Low Urgency
 -----------
 - [ ] In the dispatch script, I have a check that won't treat "No changes to deploy." as an error. However, if I have to
       re-execute a deploy command because we weren't logged in, then I still treat the "No changes to deploy." status as
       an error.
-- [ ] Add code coverage for Typescript
+- [ ] Add code coverage for TypeScript
 - [ ] Go through .ts files and add more comments, function headers, etc.
 - [ ] Breadcrumbs
 - [ ] Show a sitemap
-- [ ] MCFC needs an image
 
 Old and Completed
 -----------------
+- [X] Appearances should be the same width as the other sections
+- [X] MCFC needs an image
+- [X] Test the status bar
+- [X] CSS
 - [X] Python unit tests
 - [X] Add code coverage for Python
 - [X] Add something to monitor progress on code coverage

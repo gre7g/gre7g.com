@@ -346,6 +346,9 @@ export class UI {
         G_PUBSUB.subscribe("ui.update", async () => {
             await this.update_header();
         });
+        G_PUBSUB.subscribe("cart.update", async () => {
+            await this.update_header();
+        });
 
         $("#socials > .login > button").on("click", () => {
             G_PUBSUB.publish("user.login", undefined);

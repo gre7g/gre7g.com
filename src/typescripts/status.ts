@@ -17,9 +17,17 @@ export class Status {
         G_PUBSUB.subscribe("ui.show_error", (params) => {
             this.show_error(params.message);
         });
+        this.section.find("button").on("click", () => {
+            this.close_status(this.section.find("span").text());
+        });
     }
 
     show_info(message: string) {
+        // Don't replace an error with a message
+        if (this.section.is(":visible") && this.section.hasClass("error")) {
+            return;
+        }
+
         this.section.find("span").text(message);
         this.section.addClass("info").removeClass("error");
         setTimeout(() => {
