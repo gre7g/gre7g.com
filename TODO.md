@@ -12,7 +12,7 @@ High Urgency
 Moderate Urgency
 ----------------
 - [ ] When pulling up the / page, there should be more before the products, so write some!
-- [ ] User profile page
+- [X] User profile page
 - [ ] Theme the login to match
 
 Basic Features

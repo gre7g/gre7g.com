@@ -457,9 +457,11 @@ export class UI {
         sitemap: new InertSection($("#sitemap")),
         thank_you: new ThankYou($("#thank-you"), $("#thank-you .downloads")),
     };
-    profile_menu: DropDown = new DropDown($("#profile"));
+    books_menu: DropDown = new DropDown($("#books"));
+    profile_menu: DropDown = new DropDown($("#profile"), true);
 
     init() {
+        this.books_menu.init();
         this.profile_menu.init();
 
         G_PUBSUB.subscribe("navigate.bury_url", async (params) => {

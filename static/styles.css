@@ -155,6 +155,7 @@ footer ul {
 
 #nav-bar > li > a,
 #nav-bar > li > span,
+#nav-bar > li > button,
 #socials > li > a,
 #socials > li > button,
 #nav-bar > li.login > a,
@@ -183,6 +184,7 @@ footer ul {
 
 #nav-bar > li > a:hover,
 #nav-bar > li > span:hover,
+#nav-bar > li > button:hover,
 #socials > li > a:hover,
 #socials > li > button:hover,
 #nav-bar > li.login > a:hover,
@@ -329,6 +331,7 @@ footer ul {
     border-radius: 0.8rem;
     background: var(--paper);
     box-shadow: var(--shadow);
+    text-align: left;
 }
 
 .drop-down li a {

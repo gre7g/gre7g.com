@@ -22,9 +22,15 @@
                             ><img src="static/images/gre7g_luterman.png" alt="Gre7g Luterman"
                         /></a>
                     </li>
-                    <li>
-                        <span>Books</span>
-                        <ul class="drop-down" style="display: none">
+                    <li id="books">
+                        <button
+                            type="button"
+                            aria-label="Books"
+                            aria-expanded="false"
+                            aria-controls="books-menu"
+                            title="Books"
+                        >Books</button>
+                        <ul id="books-menu" class="drop-down" style="display: none">
                             <li><a href="/shop/books/skeleton-crew" class="internal">Skeleton Crew</a></li>
                             <li><a href="/shop/books/small-world" class="internal">Small World</a></li>
                             <li><a href="/shop/books/fair-trade" class="internal">Fair Trade</a></li>
@@ -32,7 +38,9 @@
                             <li class="divider"></li>
                             <li><a href="/shop/books/reapers-lottery" class="internal">Reaper&rsquo;s Lottery</a></li>
                             <li>
-                                <a href="/shop/books/executioners-gambit" class="internal">Executioner&rsquo;s Gambit</a>
+                                <a href="/shop/books/executioners-gambit" class="internal"
+                                    >Executioner&rsquo;s Gambit</a
+                                >
                             </li>
                             <li class="divider"></li>
                             <li><a href="/shop/books/long-way-home" class="internal">Long Way Home</a></li>
@@ -201,7 +209,10 @@
                         >Rick Griffin&rsquo;s</a
                     >
                     short story
-                    <a href="https://www.smashwords.com/shop/books/view/146211/" target="_blank" rel="noopener noreferrer"
+                    <a
+                        href="https://www.smashwords.com/shop/books/view/146211/"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         ><i>Ten Thousand Miles Up</i></a
                     >. He loved the notion of tiny aliens enslaved to gigantic aliens and tasked with mundane jobs.
                     Hayven Celestia (as Rick had dubbed it) was a rich landscape begging to be explored!
@@ -345,12 +356,21 @@
 
             <section id="edit-password" style="display: none">
                 <h1>Edit Password</h1>
-                <p><label for="old-password">Old password:</label> <input id="old-password" type="password"></p>
+                <p><label for="old-password">Old password:</label> <input id="old-password" type="password" /></p>
                 <p>
-                    <label for="new-password">New password:</label> <input id="new-password" type="password">
-                    <meter id="strength" min="0" max="20" low="8" high="16" optimum="20" value="0" aria-label="Password strength"></meter>
+                    <label for="new-password">New password:</label> <input id="new-password" type="password" />
+                    <meter
+                        id="strength"
+                        min="0"
+                        max="20"
+                        low="8"
+                        high="16"
+                        optimum="20"
+                        value="0"
+                        aria-label="Password strength"
+                    ></meter>
                 </p>
-                <p><label for="repeat">Repeat:</label> <input id="repeat" type="password"></p>
+                <p><label for="repeat">Repeat:</label> <input id="repeat" type="password" /></p>
                 <p class="message"></p>
                 <button disabled>Save</button>
             </section>

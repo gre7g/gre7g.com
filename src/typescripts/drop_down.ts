@@ -1,13 +1,16 @@
 import { $ } from "jquery";
 
-import{G_API} from "./main";
-import { G_PUBSUB } from "./main";
+import { G_API, G_PUBSUB } from "./main";
 
 export class DropDown {
-    section: JQuery<HTMLElement>;
+    static active_dropdown: DropDown | null = null;
 
-    constructor(section: JQuery<HTMLElement>) {
+    section: JQuery<HTMLElement>;
+    requires_auth: boolean;
+
+    constructor(section: JQuery<HTMLElement>, requires_auth = false) {
         this.section = section;
+        this.requires_auth = requires_auth;
     }
 
     init() {
@@ -28,7 +31,7 @@ export class DropDown {
             this.close();
         });
         $(document).on("click", (event) => {
-            if ($(event.target).closest("#profile").length == 0) {
+            if (!this.section[0].contains(event.target as Node)) {
                 this.close();
             }
         });
@@ -43,16 +46,30 @@ export class DropDown {
     toggle() {
         const button = this.section.find("button");
         const expanded = button.attr("aria-expanded") == "true";
-        button.attr("aria-expanded", String(!expanded));
-        this.section.find(".drop-down").toggle(!expanded);
+        if (expanded) {
+            this.close();
+            return;
+        }
+
+        DropDown.active_dropdown?.close();
+        button.attr("aria-expanded", "true");
+        this.section.find(".drop-down").show();
+        DropDown.active_dropdown = this;
     }
 
     close() {
         this.section.find(".drop-down").hide();
         this.section.find("button").attr("aria-expanded", "false");
+        if (DropDown.active_dropdown === this) {
+            DropDown.active_dropdown = null;
+        }
     }
 
     async update_header() {
+        if (!this.requires_auth) {
+            return;
+        }
+
         const logged_in = await G_API.logged_in();
         this.section.toggle(logged_in);
         if (!logged_in) {
