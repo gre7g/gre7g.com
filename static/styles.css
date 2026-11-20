@@ -458,6 +458,26 @@ main > article img {
     border-radius: 0.75rem;
 }
 
+#shop .spotlight {
+    display: flow-root;
+    margin-bottom: 1.5rem;
+}
+
+#shop .spotlight > img {
+    float: left;
+    width: min(50%, 9.875rem);
+    height: auto;
+    margin: 0 1.25rem 1rem 0;
+}
+
+#shop .spotlight > h1 {
+    margin-left: min(calc(50% + 1.25rem), 11.125rem);
+}
+
+#shop .spotlight p {
+    max-width: none;
+}
+
 #products > ul,
 #shop > ul {
     display: grid;
