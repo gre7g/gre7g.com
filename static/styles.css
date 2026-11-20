@@ -106,12 +106,18 @@ header {
     overflow-wrap: anywhere;
 }
 
-#status:not(.info):not(.error) {
+#status:not(.info):not(.warning):not(.error) {
     visibility: hidden;
 }
 
 #status.info {
     border: 0.3em solid var(--ink);
+}
+
+#status.warning {
+    color: #ffdf94;
+    background: var(--ink);
+    font-weight: 700;
 }
 
 #status.error {

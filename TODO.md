@@ -6,10 +6,8 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
-- [ ] On vacation
-- [ ] When pulling up the / page, there should be more before the products, so write some!
+- [X] When pulling up the / page, there should be more before the products, so write some!
 - [ ] "Skeleton Crew" paperback entry is missing text
-- [ ] Deactivated accounts
 - [ ] Is everything logged on purchase completion (like fees)?
 
 Moderate Urgency
@@ -25,6 +23,7 @@ Basic Features
 
 Low Urgency
 -----------
+- [ ] Deactivated accounts
 - [ ] In the dispatch script, I have a check that won't treat "No changes to deploy." as an error. However, if I have to
       re-execute a deploy command because we weren't logged in, then I still treat the "No changes to deploy." status as
       an error.
@@ -35,6 +34,7 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] On vacation
 - [X] User profile page
 - [X] Books link needs to drop-down menu
 - [X] Shopping cart items must link to listings
