@@ -14,6 +14,9 @@ export class Status {
         G_PUBSUB.subscribe("ui.show_info", (params) => {
             this.show_info(params.message);
         });
+        G_PUBSUB.subscribe("ui.show_warning", (params) => {
+            this.show_warning(params.message);
+        });
         G_PUBSUB.subscribe("ui.show_error", (params) => {
             this.show_error(params.message);
         });
@@ -29,15 +32,26 @@ export class Status {
         }
 
         this.section.find("span").text(message);
-        this.section.addClass("info").removeClass("error");
+        this.section.addClass("info");
+        this.section.removeClass("warning");
+        this.section.removeClass("error");
         setTimeout(() => {
             this.close_status(message);
         }, INFO_TIMEOUT);
     }
 
+    show_warning(message: string) {
+        this.section.find("span").text(message);
+        this.section.removeClass("info");
+        this.section.addClass("warning");
+        this.section.removeClass("error");
+    }
+
     show_error(message: string) {
         this.section.find("span").text(message);
-        this.section.addClass("error").removeClass("info");
+        this.section.removeClass("info");
+        this.section.removeClass("warning");
+        this.section.addClass("error");
     }
 
     close_status(message: string) {

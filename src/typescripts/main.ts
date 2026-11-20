@@ -39,6 +39,7 @@ interface Events {
     "ui.show_error": { message: string };
     "ui.show_info": { message: string };
     "ui.show_section": { section: string };
+    "ui.show_warning": { message: string };
     "ui.update": void;
     "user.login": void;
     "user.logout": void;
@@ -103,7 +104,7 @@ export class Main {
         });
         load_paypal();
         if (G_SAM_OUTPUTS.vacation) {
-            G_PUBSUB.publish("ui.show_error", {message: G_SAM_OUTPUTS.vacation});
+            G_PUBSUB.publish("ui.show_warning", {message: G_SAM_OUTPUTS.vacation});
         }
     }
 }
