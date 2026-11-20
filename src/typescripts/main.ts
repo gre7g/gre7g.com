@@ -34,6 +34,7 @@ interface Events {
     "cart.update_qty": { product_index: number; quantity: number };
     "navigate.bury_url": { section: string; path: string };
     "navigate.go": { path: string; save?: boolean };
+    "ui.close_dropdowns": void;
     "ui.show_error": { message: string };
     "ui.show_info": { message: string };
     "ui.show_section": { section: string };

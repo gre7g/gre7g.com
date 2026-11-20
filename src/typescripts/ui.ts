@@ -458,7 +458,7 @@ export class UI {
         thank_you: new ThankYou($("#thank-you"), $("#thank-you .downloads")),
     };
     books_menu: DropDown = new DropDown($("#books"));
-    profile_menu: DropDown = new DropDown($("#profile"), true);
+    profile_menu: DropDown = new DropDown($("#profile"));
 
     init() {
         this.books_menu.init();
@@ -516,7 +516,9 @@ export class UI {
         // Shopping cart contents
         $("#cart_button a").text(G_CART.contents.length == 0 ? "" : G_CART.contents.length);
 
-        // Login button is visible if not logged in
-        $("#socials > .login").toggle(!(await G_API.logged_in()));
+        // Login button or profile menu is visible depending on whether the user is logged in
+        const logged_in = await G_API.logged_in();
+        this.profile_menu.section.toggle(logged_in);
+        $("#socials > .login").toggle(!logged_in);
     }
 }
