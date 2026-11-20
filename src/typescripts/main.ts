@@ -104,7 +104,7 @@ export class Main {
         });
         load_paypal();
         if (G_SAM_OUTPUTS.vacation) {
-            G_PUBSUB.publish("ui.show_warning", {message: G_SAM_OUTPUTS.vacation});
+            G_PUBSUB.publish("ui.show_warning", { message: G_SAM_OUTPUTS.vacation });
         }
     }
 }

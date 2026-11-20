@@ -383,6 +383,8 @@ paths:
                           type: number
                         total_cost:
                           type: number
+                        transaction_id:
+                          type: string
                         discount:
                           type: number
                         order_id:

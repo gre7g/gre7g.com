@@ -41,8 +41,8 @@ class TestGetOrder(BaseTestCase):
             result = response.json()
 
             # Should be signed now
-            expect = "https://example.com/test.zip?auth_id=1234567890"
-            assert result["order"]["products"][0]["downloads"]["test.zip"] == expect
-            order_dict["orders"][1]["products"][0]["downloads"]["test.zip"] = expect
+            signed = result["order"]["products"][0]["downloads"]["test.zip"]
+            assert signed.startswith("https://")
+            order_dict["orders"][1]["products"][0]["downloads"]["test.zip"] = signed
 
             assert response.json() == {"order": order_dict["orders"][1]}

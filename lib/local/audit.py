@@ -50,7 +50,8 @@ class SourceHash:
                 files[self._sortable_filename(audit_path.path)] = audit_path.path
             else:
                 for path in audit_path.path.glob(audit_path.wildcard):
-                    files[self._sortable_filename(path)] = path
+                    if path.is_file():
+                        files[self._sortable_filename(path)] = path
         return files
 
     def get_hash(self) -> str:
