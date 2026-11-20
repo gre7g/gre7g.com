@@ -1,4 +1,4 @@
-import { check_password } from "./password";
+import { check_password, PasswordStatus } from "./password";
 import { G_API, G_CART, G_PRODUCTS, G_PUBSUB, G_UI } from "./main";
 import { Order, has_physical } from "./orders";
 import { Product } from "./products";
@@ -405,7 +405,9 @@ class Password extends InertSection {
             this.update();
         });
         this.section.find("button").on("click", async () => {
-            await G_API.update_password(this.old_password.val()!, this.new_password.val()!);
+            await G_API.update_password(String(this.old_password.val() ?? ""), String(this.new_password.val() ?? ""));
+            this.reset();
+            this.set_status({ strength: 0, sufficient: false, message: "Password updated" });
         });
     }
 
@@ -413,14 +415,20 @@ class Password extends InertSection {
         this.old_password.val("");
         this.new_password.val("");
         this.repeat_password.val("");
+        this.update();
+    }
+
+    set_status(status: PasswordStatus) {
+        this.meter.attr("value", status.strength);
+        this.section.find("button").prop("disabled", !status.sufficient);
+        this.section.find(".message").text(status.message);
     }
 
     override update() {
         super.update();
-        const status = check_password(this.new_password.val()!, this.repeat_password.val()!);
-        this.meter.attr("value", status.strength);
-        this.section.find("button").prop("disabled", status.sufficient);
-        this.section.find(".message").text(status.message);
+        const new_password = String(this.new_password.val() ?? "");
+        const repeat_password = String(this.repeat_password.val() ?? "");
+        this.set_status(check_password(new_password, repeat_password));
     }
 }
 

@@ -11,3 +11,4 @@ node_modules/
 scratch/
 package-lock.json
 *.kra-autosave.kra
+*.*~
