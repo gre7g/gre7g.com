@@ -6,20 +6,20 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
-- [ ] Is everything logged on purchase completion (like fees)?
+- [ ] On vacation
+- [ ] When pulling up the / page, there should be more before the products, so write some!
 - [ ] "Skeleton Crew" paperback entry is missing text
+- [ ] Deactivated accounts
+- [ ] Is everything logged on purchase completion (like fees)?
 
 Moderate Urgency
 ----------------
-- [ ] When pulling up the / page, there should be more before the products, so write some!
-- [X] User profile page
-- [ ] Theme the login to match
+- [ ] Theme the login to match -- see notes/managed-login-theming.md
 
 Basic Features
 --------------
 - [ ] TypeScript unit tests
 - [ ] Check dynamically added HTML for links. They need to be intercepted and handled via TS navigation.
-- [ ] Books link needs to drop-down menu
 - [ ] Test narrow and on phone
 - [ ] Links for other places an item is available
 
@@ -35,6 +35,8 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] User profile page
+- [X] Books link needs to drop-down menu
 - [X] Shopping cart items must link to listings
 - [X] Single order page is broken
 - [X] Orders page login button is broken

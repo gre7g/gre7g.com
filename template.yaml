@@ -106,7 +106,27 @@ Resources:
     Properties:
       UserPoolId: !Ref UserPool
       ClientId: !Ref UserPoolClient
-      UseCognitoProvidedValues: true
+      UseCognitoProvidedValues: false
+      Settings:
+        categories:
+          global:
+            colorSchemeMode: LIGHT
+        components:
+          pageBackground:
+            lightMode:
+              color: "f7f1e5ff"
+          form:
+            lightMode:
+              backgroundColor: "fffdf8ff"
+          pageText:
+            lightMode:
+              bodyColor: "382d25ff"
+              headingColor: "382d25ff"
+          primaryButton:
+            lightMode:
+              defaults:
+                backgroundColor: "382d25ff"
+                textColor: "fffaf0ff"
 
   Api:
     Type: AWS::Serverless::HttpApi
