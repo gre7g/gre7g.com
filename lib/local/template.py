@@ -71,7 +71,7 @@ class Template:
 
         # The YAML library doesn't deal well with !Ref, !Sub, !GetAtt, !If, and !Equals, but that's okay. We don't need
         # them, so just strip them out.
-        self.template_dict = yaml.load(SUB_REF.sub("", template_str), yaml.Loader)
+        self.template_dict = yaml.safe_load(SUB_REF.sub("", template_str))
 
         for key, value in self.template_dict["Resources"].items():
             if value["Type"] == "AWS::Serverless::Function":

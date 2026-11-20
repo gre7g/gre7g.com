@@ -21,6 +21,10 @@ Parameters:
     Type: String
     Default: "://gmail.com"
 
+  Vacation:
+    Type: String
+    Default: ""
+
   EnableDeletionProtection:
     Type: String
     Default: "false"

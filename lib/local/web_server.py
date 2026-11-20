@@ -2,8 +2,10 @@ import boto3
 from dataclasses import dataclass
 from http import HTTPStatus
 from http.server import HTTPServer, SimpleHTTPRequestHandler
+import json
 import logging
 from mimetypes import guess_type
+import os
 from pathlib import Path
 from subprocess import check_call
 from threading import Thread
@@ -26,6 +28,12 @@ class HttpRequestHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs) -> None:  # type: ignore [no-untyped-def]
         super().__init__(*args, directory=ROOT_PATH, **kwargs)  # noqa
 
+    @staticmethod
+    def get_config() -> str:
+        with LOCAL_CONFIG_PATH.open("rt") as file_obj:
+            config = json.load(file_obj) | {"vacation": os.getenv("VACATION")}
+        return json.dumps(config)
+
     def call_func(self, method: str) -> None:
         content = self.rfile.read(int(self.headers["Content-Length"] or 0))
         parsed = urlsplit(self.path)
@@ -47,8 +55,7 @@ class HttpRequestHandler(SimpleHTTPRequestHandler):
             self.send_response(HTTPStatus.OK, "Success")
             self.send_header("Content-Type", "application/json")
             self.end_headers()
-            with LOCAL_CONFIG_PATH.open("rb") as file_obj:
-                self.wfile.write(file_obj.read())
+            self.wfile.write(self.get_config().encode())
         elif self.path.startswith("/test/"):
             path = TEST_PATH / self.path[6:]
             if path.exists():

@@ -1,0 +1,8 @@
+# Leave vacation messages here and assign each a key. They can be activated with "dispatch.py -V=key" or disabled by
+# omitting the "-V" parameter.
+
+messages:
+  thanksgiving: |
+    I'm out of town visiting relatives for Thanksgiving. The shop remains open and purchases with digital downloads
+    remain available, but any physical items will not be shipped until I return on 11/27/2026. My apologies for the
+    delay.

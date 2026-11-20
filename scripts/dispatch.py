@@ -50,6 +50,7 @@ SEARCH_PRETTIER_EXT = re.compile(r"\.(ts|html|json)$", re.M)
 SEARCH_PRETTIER_NOT = re.compile(r" notes/")
 COVERAGE_JSON_PATH = ROOT_PATH / "coverage.json"
 KEEP_LAST_RUNS = 20
+VACATION_STRINGS = ROOT_PATH / "vacation.yaml"
 
 # Globals
 G_PY_TESTER = ["pytest"]
@@ -110,12 +111,26 @@ def setup_sample_data(dest_dict: dict) -> None:
     write_default_data_to_db(user_id, carts_table, orders_table)
 
 
+def get_vacation(key: str) -> str:
+    """Get the vacation string"""
+    if key:
+        with VACATION_STRINGS.open("rt") as file_obj:
+            vacation = yaml.safe_load(file_obj)
+        message = vacation["messages"][key]
+    else:
+        message = ""
+
+    os.environ["VACATION"] = message
+    return message
+
+
 @dataclass
 class Dispatch:
     """Class for building, deploying, and running test suites"""
 
     args: Namespace
     log_level_name: str
+    vacation: str = ""
 
     save_state: dict = field(default_factory=dict)  # see `audit_log/save_state.yaml`
 
@@ -249,6 +264,7 @@ class Dispatch:
             "EnableDeletionProtection": str(self.name_set == "PROD").lower(),
             "GmailAppPassword": os.getenv("GMAIL_APP_PASSWORD"),
             "GmailServer": "://gmail.com",
+            "Vacation": self.vacation,
         }
         self.login_call(
             [
@@ -379,7 +395,8 @@ class Dispatch:
 
     def typescript_tests(self) -> None:
         """Run the TypeScript tests"""
-        self.check_call([self.npm_path, "run", "test"])
+        if not self.args.skip_typescript:
+            self.check_call([self.npm_path, "run", "test"])
 
     def integration_tests(self, stack_name: str) -> bool:
         """Run the integration tests"""
@@ -542,6 +559,8 @@ def main():
     arg_parser.add_argument("-v", "--verbose", action="count", default=0)
     arg_parser.add_argument("-q", "--quiet", action="store_const", dest="verbose", const=-1)
     arg_parser.add_argument("-n", "--name", action="store", help="set development name")
+    arg_parser.add_argument("-V", "--vacation", help="set vacation mode (see vacation.yaml)")
+    arg_parser.add_argument("-t", "--skip-typescript", action="store_true", help="skip all typescript tests")
     arg_parser.add_argument("-r", "--reset", action="store_true", help="reset saved variables")
 
     destination_group = arg_parser.add_mutually_exclusive_group()
@@ -582,6 +601,7 @@ def main():
 
     # Run a webserver?
     if args.command in ["regular", "admin", "webserver"]:
+        get_vacation(args.vacation)
         compile_ts(minify=False, use_dummy_auth=True)
         HackBoto(
             path=TEMPLATE_YAML,
@@ -602,7 +622,7 @@ def main():
         WebBrowser(WEB_PORT).run_main_thread(user_id)
     else:
         # No, build/deploy/test
-        dispatch = Dispatch(args, level_name)
+        dispatch = Dispatch(args, level_name, get_vacation(args.vacation))
         if log_level < logging.WARNING:
             dispatch.stdout = sys.stdout  # noqa
         sys.exit(dispatch.main())

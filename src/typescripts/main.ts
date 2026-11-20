@@ -24,6 +24,7 @@ interface SamOutputs {
     web_distribution: string;
     web_file_storage: string;
     website_url: string;
+    vacation: string;
 }
 
 interface Events {
@@ -101,5 +102,8 @@ export class Main {
             G_PUBSUB.publish("user.logout", undefined);
         });
         load_paypal();
+        if (G_SAM_OUTPUTS.vacation) {
+            G_PUBSUB.publish("ui.show_error", {message: G_SAM_OUTPUTS.vacation});
+        }
     }
 }
