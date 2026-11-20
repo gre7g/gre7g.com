@@ -6,8 +6,7 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
-- [X] When pulling up the / page, there should be more before the products, so write some!
-- [ ] "Skeleton Crew" paperback entry is missing text
+- [ ] Carousel
 - [ ] Is everything logged on purchase completion (like fees)?
 
 Moderate Urgency
@@ -31,9 +30,12 @@ Low Urgency
 - [ ] Go through .ts files and add more comments, function headers, etc.
 - [ ] Breadcrumbs -- see breadcrumbs-feature branch for visual component, but let's work on adding the data as we go
 - [ ] Show a sitemap
+- [ ] Try out that script experiment in notes/suggested_console.py
 
 Old and Completed
 -----------------
+- [X] "Skeleton Crew" paperback entry is missing text
+- [X] When pulling up the / page, there should be more before the products, so write some!
 - [X] On vacation
 - [X] User profile page
 - [X] Books link needs to drop-down menu

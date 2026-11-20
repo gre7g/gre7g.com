@@ -108,7 +108,11 @@ class ProductUI extends InertSection {
         };
         this.product?.images?.forEach(add_view);
         this.section.find(".product-name").text(this.product?.name!);
-        this.section.find(".description").html(this.product?.description!);
+        let description: string = this.product?.description!;
+        if (this.product?.parent_id) {
+            description = G_PRODUCTS.find_by_id(this.product.parent_id)?.description + description;
+        }
+        this.section.find(".description").html(description!);
         const media = this.media_links();
         $("#add-to-cart").toggle(media == "");
         const media_element = this.section.find(".media");

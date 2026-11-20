@@ -34,4 +34,8 @@ export class Products {
         G_UI.sections.product.product = this.product_list[path];
         G_PUBSUB.publish("ui.show_section", { section: "product" });
     }
+
+    find_by_id(id: string): Product | null {
+        return Object.values(this.product_list).find((product) => product.product_id === id) || null;
+    }
 }
