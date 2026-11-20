@@ -132,6 +132,7 @@ class BaseTestCase(integration_base.BaseTestCase):
             13.99,
             5.00,
             18.99,
+            "abc",
             0.00,
             OrderId("order1_id"),
             Timestamp("recently"),
@@ -142,6 +143,7 @@ class BaseTestCase(integration_base.BaseTestCase):
             18.49,
             5.00,
             21.49,
+            "def",
             -2.00,
             OrderId("order2_id"),
             Timestamp("long ago"),
@@ -157,6 +159,7 @@ class BaseTestCase(integration_base.BaseTestCase):
                     "order_id": "order1_id",
                     "timestamp": "recently",
                     "notes": [],
+                    "transaction_id": "abc",
                 },
                 {
                     "products": [self.P_DICT3, self.P_DICT4],
@@ -167,6 +170,7 @@ class BaseTestCase(integration_base.BaseTestCase):
                     "order_id": "order2_id",
                     "timestamp": "long ago",
                     "notes": [],
+                    "transaction_id": "def",
                 },
             ]
         }

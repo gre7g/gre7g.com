@@ -551,7 +551,7 @@ Resources:
         ApiEvent:
           Type: HttpApi
           Properties:
-            Path: /api/v1/order/{order_id}
+            Path: /api/v1/order/{transaction_id}
             Method: put
             ApiId: !Ref Api
 

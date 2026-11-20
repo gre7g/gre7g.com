@@ -136,6 +136,7 @@ class TestConfirmOrder(BaseTestCase):
                         "subtotal_cost": 34.48,
                         "timestamp": "2026-11-13T12:47:52.959734+00:00",
                         "total_cost": 39.48,
+                        "transaction_id": "abc",
                     }
                 }
 
@@ -235,6 +236,7 @@ class TestConfirmOrder(BaseTestCase):
                     "subtotal_cost": Decimal("34.48"),
                     "timestamp": "2026-11-13T12:47:52.959734+00:00",
                     "total_cost": Decimal("39.48"),
+                    "transaction_id": "abc",
                     "user_id": "f65b7878-a973-11f1-874a-64d69adcd141",
                     "version": 1,
                 }
