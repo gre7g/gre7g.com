@@ -11,6 +11,7 @@ High Urgency
 
 Moderate Urgency
 ----------------
+- [ ] When cart is empty, hide the subtotal
 
 Basic Features
 --------------

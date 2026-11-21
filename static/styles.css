@@ -388,7 +388,6 @@ main > form {
 #orders,
 #checkout,
 #thank-you,
-#product-listing,
 #look-inside {
     box-sizing: content-box;
     max-width: 75ch;
@@ -541,33 +540,66 @@ main > article img {
 }
 
 #carousel {
+    display: grid;
+    grid-template-columns: 4.25rem auto;
+    gap: 0.65rem;
     float: left;
-    width: min(48%, 30rem);
-    margin: 0 2rem 1.5rem 0;
+    width: fit-content;
+    max-width: 60%;
+    margin: 0 1.5rem 1rem 0;
 }
 
 #example {
     display: block;
-    width: 100%;
-    max-height: 34rem;
+    grid-column: 2;
+    grid-row: 1;
+    /* Fixed height + auto width shrinks the box to the image itself, so there's
+       no dead space beside it. object-fit only kicks in if max-width clamps an
+       unusually wide image. */
+    width: auto;
+    max-width: 100%;
+    height: clamp(16rem, 40vw, 30rem);
     object-fit: contain;
     border-radius: 0.85rem;
     background: var(--cream);
 }
 
+/* Thumbnails sit in a column to the left of the example image. height: 0 +
+   min-height: 100% keeps the list from stretching the row, so it matches the
+   example's height and scrolls if there are more thumbnails than fit. */
 #views {
     display: flex;
-    flex-wrap: wrap;
+    grid-column: 1;
+    grid-row: 1;
+    flex-direction: column;
     gap: 0.5rem;
-    margin-top: 0.65rem;
+    height: 0;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+    scrollbar-width: thin;
+}
+
+#views a {
+    display: block;
 }
 
 #views img {
+    display: block;
+    box-sizing: border-box;
     width: 4rem;
     height: 4rem;
     object-fit: cover;
     border: 2px solid var(--line);
     border-radius: 0.5rem;
+}
+
+/* The global p max-width counts the area under the floated carousel, which
+   would leave only a word or so of room beside it. */
+#product-listing p {
+    max-width: none;
 }
 
 #product-listing > .product-name {
@@ -950,7 +982,7 @@ footer nav {
     }
 
     #carousel {
-        width: min(45%, 22rem);
+        max-width: 50%;
         margin-right: 1.25rem;
     }
 }
@@ -1036,7 +1068,7 @@ footer nav {
 
     #carousel {
         float: none;
-        width: 100%;
+        max-width: 100%;
         margin: 0 0 1.25rem;
     }
 

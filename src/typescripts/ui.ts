@@ -1,8 +1,10 @@
-import { check_password, PasswordStatus } from "./password";
+import { $ } from "jquery";
+
+import{Carousel} from "./carousel";
 import { G_API, G_CART, G_PRODUCTS, G_PUBSUB, G_UI } from "./main";
 import { Order, has_physical } from "./orders";
+import { check_password, PasswordStatus } from "./password";
 import { Product } from "./products";
-import { $ } from "jquery";
 import { DropDown } from "./drop_down";
 
 function update_cost(select: JQuery<HTMLElement>, cost: number) {
@@ -55,6 +57,12 @@ class ShopUI extends ProductsUI {}
 
 class ProductUI extends InertSection {
     product: Product | null = null;
+    carousel: Carousel;
+
+    constructor(section: JQuery<HTMLElement>, example: JQuery<HTMLElement>, views: JQuery<HTMLElement>) {
+        super(section);
+        this.carousel = new Carousel(example, views);
+    }
 
     override init() {
         this.section.find("button").on("click", () => {
@@ -99,14 +107,7 @@ class ProductUI extends InertSection {
     }
 
     override async update() {
-        $("#example").attr("href", this.product?.images[0]!);
         $("#price").text(this.price());
-        const views = $("#views");
-        const add_view = (path: string) => {
-            const view = $(`<img src="${path}" />`);
-            views.append(view);
-        };
-        this.product?.images?.forEach(add_view);
         this.section.find(".product-name").text(this.product?.name!);
         let description: string = this.product?.description!;
         if (this.product?.parent_id) {
@@ -455,7 +456,7 @@ export class UI {
             $("#repeat"),
         ),
         privacy: new InertSection($("#privacy")),
-        product: new ProductUI($("#product-listing")),
+        product: new ProductUI($("#product-listing"), $("#example"), $("#views")),
         products: new ProductsUI($("#products")),
         shop: new ShopUI($("#shop")),
         sitemap: new InertSection($("#sitemap")),
