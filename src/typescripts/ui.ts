@@ -65,6 +65,7 @@ class ProductUI extends InertSection {
     }
 
     override init() {
+        this.carousel.init();
         this.section.find("button").on("click", () => {
             this.add_to_cart();
         });
