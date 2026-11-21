@@ -37,17 +37,19 @@ DIST_PATH = ROOT_PATH / "dist"
 INDEX_PATH = DIST_PATH / "index.html"
 ASSETS_PATH = DIST_PATH / "assets"
 TEST_PATH = ROOT_PATH / "tests"
+MANAGED_LOGIN = ROOT_PATH / "managed-login.json"
 INTEGRATION_PATH = TEST_PATH / "integration"
 STATIC_TEST_PATH = TEST_PATH / "static"
 LIB_PATH = ROOT_PATH / "lib" / "deploy"
 STATIC_PATH = ROOT_PATH / "static"
+PRODUCT_IMAGES_PATH = ROOT_PATH / "static" / "images" / "products"
 TEMPLATE_YAML = ROOT_PATH / "template.yaml"
 CONFIG_FILENAME = "config.json"
 UNIT_TESTER = ["unittest", "discover"]
 DELETE_OLDER = timedelta(days=30)
 WEB_PORT = 8080
 SEARCH_PRETTIER_EXT = re.compile(r"\.(ts|html|json)$", re.M)
-SEARCH_PRETTIER_NOT = re.compile(r" notes/")
+SEARCH_PRETTIER_NOT = re.compile(r" (notes/|managed-login.json)")
 COVERAGE_JSON_PATH = ROOT_PATH / "coverage.json"
 KEEP_LAST_RUNS = 20
 VACATION_STRINGS = ROOT_PATH / "vacation.yaml"
@@ -62,6 +64,7 @@ sys.path.extend(paths)
 os.environ["PYTHONPATH"] = os.pathsep.join(paths)
 
 from database import UserId
+from lambda_base import GLACIER_LAKE_BUCKET
 from lib.local.audit import configure_audit_log, SourceHash, AUDIT_LOG
 from lib.local.boto3_hack import HackBoto
 from lib.local.db_defaults import write_default_data_to_db
@@ -227,6 +230,7 @@ class Dispatch:
 
     def delete(self, dest_dict: dict) -> None:
         """Delete the dev stack"""
+        assert self.aws_path, "unable to find AWS"
         assert self.sam_path, "unable to find AWS sam"
         web_file_storage = dest_dict.get("outputs", {}).get("web_file_storage")
         self.login_call([self.aws_path, "s3", "rm", f"s3://{web_file_storage}", "--recursive"])
@@ -250,6 +254,40 @@ class Dispatch:
                     "*.js",
                 ]
             )
+
+    def fetch_managed_login(self, dest_dict: dict) -> None:
+        assert self.aws_path
+        outputs = dest_dict.setdefault("outputs", {})
+        response = json.loads(
+            check_output(
+                [
+                    self.aws_path,
+                    "cognito-idp",
+                    "describe-managed-login-branding-by-client",
+                    "--user-pool-id",
+                    outputs["user_pool"],
+                    "--client-id",
+                    outputs["user_pool_client"],
+                    "--output",
+                    "json",
+                    "--no-cli-pager",
+                ]
+            )
+        )
+
+        # AWS adds some stuff we can't use, so remove
+        result = response["ManagedLoginBranding"]
+        for bad_key in ["ManagedLoginBrandingId", "UserPoolId", "CreationDate", "LastModifiedDate"]:
+            del result[bad_key]
+
+        # Write JSON back out
+        with MANAGED_LOGIN.open("wt") as file_obj:
+            json.dump(result, file_obj)
+
+    def upload_managed_login(self, dest_dict: dict) -> None:
+        self.check_call(
+            [self.aws_path, "s3", "cp", str(MANAGED_LOGIN), f"s3://{GLACIER_LAKE_BUCKET}/{MANAGED_LOGIN.name}"]
+        )
 
     def deploy(self, dest_dict: dict, production: bool) -> None:
         """Deploy the stack, update the `dest_dict`"""
@@ -280,6 +318,7 @@ class Dispatch:
         self.record_deployment(dest_dict)
         self.patch_cognito(dest_dict)
         self.sync_static_files(dest_dict)
+        self.upload_managed_login(dest_dict)
         self.copy_config(dest_dict)
         self.invalidate_cache(dest_dict.get("outputs", {}).get("web_distribution"))
 
@@ -355,6 +394,16 @@ class Dispatch:
         web_file_storage = dest_dict.get("outputs", {}).get("web_file_storage")
         self.check_call([self.aws_path, "s3", "cp", str(INDEX_PATH), f"s3://{web_file_storage}/index.html"])
         self.check_call([self.aws_path, "s3", "sync", str(STATIC_PATH), f"s3://{web_file_storage}"])
+        self.check_call(
+            [
+                self.aws_path,
+                "s3",
+                "cp",
+                str(PRODUCT_IMAGES_PATH),
+                f"s3://{web_file_storage}/images/products",
+                "--recursive",
+            ]
+        )
         self.check_call([self.aws_path, "s3", "sync", str(ASSETS_PATH), f"s3://{web_file_storage}/assets/"])
 
     def copy_config(self, dest_dict: dict) -> None:
@@ -455,7 +504,7 @@ class Dispatch:
             elif self.args.dev and (self.args.command == "up"):
                 self.static_tests()
                 self.typescript_tests()
-                compile_ts(minify=False, use_dummy_auth=True)
+                compile_ts(minify=False, use_dummy_auth=False)
                 audit_log = AUDIT_LOG
                 self.set_hash()
                 audit_log.info("dispatch %r on hash %s", self.args, self.hash_str)
@@ -465,6 +514,8 @@ class Dispatch:
                 stack = (
                     self.save_state.setdefault("dev-stack", {}).setdefault("recent", {}).setdefault(self.name_set, {})
                 )
+                if self.args.managed_login:
+                    self.fetch_managed_login(stack)
                 if not ((self.hash_str == stack.get("hash")) and stack.get("up")):
                     self.delete_old_js(stack)
                     self.deploy(stack, False)
@@ -562,6 +613,7 @@ def main():
     arg_parser.add_argument("-V", "--vacation", help="set vacation mode (see vacation.yaml)")
     arg_parser.add_argument("-t", "--skip-typescript", action="store_true", help="skip all typescript tests")
     arg_parser.add_argument("-r", "--reset", action="store_true", help="reset saved variables")
+    arg_parser.add_argument("-m", "--managed-login", action="store_true", help="pull managed login from UI designer")
 
     destination_group = arg_parser.add_mutually_exclusive_group()
     destination_group.add_argument("-b", "--brief", action="store_true", help="run quick with basic checks only")

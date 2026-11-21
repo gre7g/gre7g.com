@@ -62,6 +62,18 @@ aws cognito-idp describe-managed-login-branding-by-client `
   --region 'YOUR_REGION' `
   --return-merged-resources `
   --output json
+
+# Use:
+aws cognito-idp describe-managed-login-branding-by-client --user-pool-id us-east-1_ZDmztDYuA --client-id 27uq3bfq3aob42attppvn8rf2b --output json --no-cli-pager > managed-login.json
+then i deleted:
+        "ManagedLoginBrandingId": "35705001-c234-4853-b888-034e4e91278c",
+        "UserPoolId": "us-east-1_ZDmztDYuA",
+        "CreationDate": "2026-11-03T18:11:11.637000-06:00",
+        "LastModifiedDate": "2026-11-20T14:50:39.721000-06:00"
+removed the layer:
+    "ManagedLoginBranding": {
+    }
+and uploaded to s3
 ```
 
 Copy the returned `ManagedLoginBranding.Settings` object into the resource’s `Settings`; images belong in the separate `Assets` property. Images such as `gre7g.png` must be supplied as encoded asset data, not merely a local path. For a larger theme, [`AWS::Include`](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/transform-aws-include.html) can keep the settings in a separate file.

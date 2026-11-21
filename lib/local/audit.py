@@ -20,9 +20,11 @@ ROOT_PATH = Path(__file__).parents[2]
 LOG_PATH = ROOT_PATH / "audit_log" / "audit.log"
 AUDIT_PATHS = [
     AuditPath(ROOT_PATH / "index.html", None, False),
+    AuditPath(ROOT_PATH / "managed-login.json", None, False),
     AuditPath(ROOT_PATH / "src/api"),
     AuditPath(ROOT_PATH / "src/typescripts", "*.ts"),
-    AuditPath(ROOT_PATH / "lib/deploy"),
+    AuditPath(ROOT_PATH / "scripts"),
+    AuditPath(ROOT_PATH / "lib"),
     AuditPath(ROOT_PATH / "static", "*"),
     AuditPath(ROOT_PATH / "api.yaml", None, False),
     AuditPath(ROOT_PATH / "template.yaml", None, False),

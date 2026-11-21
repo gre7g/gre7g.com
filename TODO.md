@@ -11,7 +11,6 @@ High Urgency
 
 Moderate Urgency
 ----------------
-- [ ] Theme the login to match -- see notes/managed-login-theming.md
 
 Basic Features
 --------------
@@ -34,6 +33,12 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] Theme the login to match -- see notes/managed-login-theming.md
+- [X] Profile menu is lower case
+- [X] Upload product images
+- [X] Add a configuration switch that pulls down managed login
+- [X] Add a push of managed login to s3
+- [X] hash must include managed login JSON
 - [X] "Skeleton Crew" paperback entry is missing text
 - [X] When pulling up the / page, there should be more before the products, so write some!
 - [X] On vacation
