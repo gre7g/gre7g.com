@@ -25,6 +25,9 @@ Parameters:
     Type: String
     Default: ""
 
+  ManagedLoginSettings:
+    Type: String
+
   EnableDeletionProtection:
     Type: String
     Default: "false"
@@ -114,7 +117,7 @@ Resources:
       Fn::Transform:
         Name: AWS::Include
         Parameters:
-          Location: "s3://gre7g-com-downloads/managed-login.json"
+          Location: !Ref ManagedLoginSettings
 
   Api:
     Type: AWS::Serverless::HttpApi

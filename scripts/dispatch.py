@@ -30,6 +30,7 @@ LOG_LEVELS = {
     2: [logging.DEBUG, "DEBUG"],
 }
 STACK_NAME_TEMPLATE = "gre7g-com-%s"
+MANAGED_LOGIN_TEMPLATE = "%s-managed-login.json"
 ROOT_PATH = Path(__file__).parents[1]
 YAML_PATH = ROOT_PATH / "audit_log" / "save_state.yaml"
 VERSION = 1
@@ -285,15 +286,15 @@ class Dispatch:
             json.dump(result, file_obj)
 
     def upload_managed_login(self, dest_dict: dict) -> None:
-        self.check_call(
-            [self.aws_path, "s3", "cp", str(MANAGED_LOGIN), f"s3://{GLACIER_LAKE_BUCKET}/{MANAGED_LOGIN.name}"]
-        )
+        filename = MANAGED_LOGIN_TEMPLATE % self.stack_name
+        self.check_call([self.aws_path, "s3", "cp", str(MANAGED_LOGIN), f"s3://{GLACIER_LAKE_BUCKET}/{filename}"])
 
     def deploy(self, dest_dict: dict, production: bool) -> None:
         """Deploy the stack, update the `dest_dict`"""
         assert self.sam_path, "unable to find AWS sam"
         client_id = os.getenv("LIVE_PAYPAL_CLIENT_ID" if production else "SANDBOX_PAYPAL_CLIENT_ID")
         client_secret = os.getenv("LIVE_PAYPAL_CLIENT_SECRET" if production else "SANDBOX_PAYPAL_CLIENT_SECRET")
+        managed_login = MANAGED_LOGIN_TEMPLATE % self.stack_name
         parameters = {
             "CsrfSecretKey": token_hex(),
             "PaypalSandbox": str(not production),
@@ -303,6 +304,7 @@ class Dispatch:
             "GmailAppPassword": os.getenv("GMAIL_APP_PASSWORD"),
             "GmailServer": "://gmail.com",
             "Vacation": self.vacation,
+            "ManagedLoginSettings": f"s3://{GLACIER_LAKE_BUCKET}/{managed_login}",
         }
         self.login_call(
             [
