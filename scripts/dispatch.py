@@ -43,7 +43,6 @@ INTEGRATION_PATH = TEST_PATH / "integration"
 STATIC_TEST_PATH = TEST_PATH / "static"
 LIB_PATH = ROOT_PATH / "lib" / "deploy"
 STATIC_PATH = ROOT_PATH / "static"
-PRODUCT_IMAGES_PATH = ROOT_PATH / "static" / "images" / "products"
 TEMPLATE_YAML = ROOT_PATH / "template.yaml"
 CONFIG_FILENAME = "config.json"
 UNIT_TESTER = ["unittest", "discover"]
@@ -202,6 +201,7 @@ class Dispatch:
         # Have the source files changed?
         if self.hash_str != self.save_state.setdefault("build", {}).get("hash"):
             # Yes, rebuild
+            # self.upload_managed_login(dest_dict) TODO chicken-and-the-egg!
             assert self.sam_path, "unable to find AWS sam"
             return_code = self.call([self.sam_path, "build"], cwd=ROOT_PATH, stdout=self.stdout, stderr=sys.stderr)
             build = self.save_state.setdefault("build", {})
@@ -237,8 +237,8 @@ class Dispatch:
         self.login_call([self.aws_path, "s3", "rm", f"s3://{web_file_storage}", "--recursive"])
         self.check_call([self.sam_path, "delete", "--stack-name", self.stack_name])
 
-    def delete_old_js(self, dest_dict: dict) -> None:
-        """Delete old JS files from the S3 bucket"""
+    def delete_old_assets(self, dest_dict: dict) -> None:
+        """Delete old asset files from the S3 bucket"""
         web_file_storage = dest_dict.get("outputs", {}).get("web_file_storage")
         if web_file_storage:
             assert self.aws_path, "unable to find AWS"
@@ -249,10 +249,6 @@ class Dispatch:
                     "rm",
                     f"s3://{web_file_storage}/assets/",
                     "--recursive",
-                    "--exclude",
-                    "*",
-                    "--include",
-                    "*.js",
                 ]
             )
 
@@ -320,7 +316,6 @@ class Dispatch:
         self.record_deployment(dest_dict)
         self.patch_cognito(dest_dict)
         self.sync_static_files(dest_dict)
-        self.upload_managed_login(dest_dict)
         self.copy_config(dest_dict)
         self.invalidate_cache(dest_dict.get("outputs", {}).get("web_distribution"))
 
@@ -395,17 +390,7 @@ class Dispatch:
         """Copy all images, stylesheets, scripts, and HTML to the S3 bucket"""
         web_file_storage = dest_dict.get("outputs", {}).get("web_file_storage")
         self.check_call([self.aws_path, "s3", "cp", str(INDEX_PATH), f"s3://{web_file_storage}/index.html"])
-        self.check_call([self.aws_path, "s3", "sync", str(STATIC_PATH), f"s3://{web_file_storage}"])
-        self.check_call(
-            [
-                self.aws_path,
-                "s3",
-                "cp",
-                str(PRODUCT_IMAGES_PATH),
-                f"s3://{web_file_storage}/images/products",
-                "--recursive",
-            ]
-        )
+        self.check_call([self.aws_path, "s3", "sync", str(STATIC_PATH), f"s3://{web_file_storage}/static/"])
         self.check_call([self.aws_path, "s3", "sync", str(ASSETS_PATH), f"s3://{web_file_storage}/assets/"])
 
     def copy_config(self, dest_dict: dict) -> None:
@@ -519,7 +504,7 @@ class Dispatch:
                 if self.args.managed_login:
                     self.fetch_managed_login(stack)
                 if not ((self.hash_str == stack.get("hash")) and stack.get("up")):
-                    self.delete_old_js(stack)
+                    self.delete_old_assets(stack)
                     self.deploy(stack, False)
                     audit_log.info("deploy success")
                     stack["up"] = True
@@ -551,7 +536,7 @@ class Dispatch:
                 audit_log.info("build success: %r", success)
                 production = self.save_state["production"]
                 if self.hash_str != self.save_state.setdefault("production", {}).get("hash"):
-                    self.delete_old_js(production)
+                    self.delete_old_assets(production)
                     self.deploy(production, True)
                     audit_log.info("deploy success")
                 passed = self.integration_tests("PROD")
