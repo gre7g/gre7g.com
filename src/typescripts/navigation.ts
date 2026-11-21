@@ -1,7 +1,15 @@
 import { G_API, G_PRODUCTS, G_PUBSUB, G_UI } from "./main";
-import { Order } from "./orders";
 
+/**
+ * Client-side router: turns a URL path into the UI section to show.
+ *
+ * Subscribes to "navigate.go" and intercepts user-initiated browser navigations (via the Navigation API) so
+ * that links within the site don't reload the page.
+ */
 export class Navigator {
+    /**
+     * Subscribe to "navigate.go" and start intercepting browser navigations.
+     */
     init() {
         G_PUBSUB.subscribe("navigate.go", async (params) => {
             await this.go(params.path, params.save);
@@ -11,7 +19,15 @@ export class Navigator {
         });
     }
 
+    /**
+     * Handle a browser navigation by routing it in-page instead of loading a new page.
+     *
+     * Downloads, form submissions, and navigations the page didn't start from a user action are left alone.
+     *
+     * @param event   Navigation API event
+     */
     async navigate(event: NavigateEvent) {
+        // `this` isn't the Navigator inside handler(), so keep a reference
         const navigator = this;
         if (event.canIntercept && !event.downloadRequest && !event.formData && event.userInitiated) {
             const target_url = new URL(event.destination.url);
@@ -24,6 +40,15 @@ export class Navigator {
         }
     }
 
+    /**
+     * Show the section for a URL path.
+     *
+     * Fixed paths are matched first, then product listing paths, then /user/order/{order_id}. Anything else shows
+     * the shop page.
+     *
+     * @param path    URL path to route
+     * @param save    If true, push the path onto the browser history
+     */
     async go(path: string, save?: boolean): Promise<void> {
         if (save) {
             history.pushState(null, "", path);

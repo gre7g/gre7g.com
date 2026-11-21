@@ -3,6 +3,7 @@ import { playwright } from "@vitest/browser-playwright";
 
 export default defineConfig({
     test: {
+        include: ["tests/typescripts/**/*.test.ts"],
         browser: {
             enabled: true,
             provider: playwright(),

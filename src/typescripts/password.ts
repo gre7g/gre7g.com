@@ -1,15 +1,33 @@
 // Constants:
 const MIN_LENGTH = 8;
+// Requires a lowercase letter, an uppercase letter, a digit, and a special character, and 8-256 characters with no
+// whitespace
 const PASSWORD_CHECK = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[\^$*.\[\]{}()?\-"!@#%&/\\,><':;|_~`=])\S{8,256}$/;
 
+/**
+ * Result of checking a new password.
+ */
 export interface PasswordStatus {
+    // Value for the strength meter (the password length, capped at 20)
     strength: number;
+    // True if the password is acceptable and the two entries match
     sufficient: boolean;
+    // Explanation shown to the user, or "" if there's nothing to say
     message: string;
 }
 
+/**
+ * Check a new password and its repeated entry.
+ *
+ * The checks are made in order (length, then character classes, then match) and the first failure is reported.
+ *
+ * @param new_password        Password the user typed
+ * @param repeat_password     Password typed into the "repeat" field
+ * @returns                   Strength, whether it's acceptable, and a message
+ */
 export function check_password(new_password: string, repeat_password: string): PasswordStatus {
     const strength = Math.min(new_password.length, 20);
+    // Nothing typed yet, so don't nag
     if (!new_password && !repeat_password) {
         return { strength: 0, sufficient: false, message: "" };
     }

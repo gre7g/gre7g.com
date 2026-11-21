@@ -1,9 +1,17 @@
 import { Product } from "./products";
 import { G_API, G_PUBSUB } from "./main";
 
+/**
+ * The shopping cart contents and the parts of the cart page that depend on whether it's empty.
+ *
+ * The cart is saved through the API, which identifies it by the guest ID. Subscribes to "cart.empty",
+ * "cart.add", "cart.update_qty", "cart.delete", "cart.update", and "ui.update".
+ */
 export class Cart {
     contents: Product[] = [];
+    // "Your cart is empty" message
     empty: JQuery<HTMLElement>;
+    // Checkout button
     button: JQuery<HTMLElement>;
 
     constructor(empty: JQuery<HTMLElement>, button: JQuery<HTMLElement>) {
@@ -11,6 +19,9 @@ export class Cart {
         this.button = button;
     }
 
+    /**
+     * Subscribe to the cart events and hook up the checkout button.
+     */
     init() {
         G_PUBSUB.subscribe("cart.empty", async () => {
             await this.empty_cart();
@@ -30,11 +41,17 @@ export class Cart {
         G_PUBSUB.subscribe("cart.update", async (params) => {
             this.update();
         });
+        // Checkout gets a buried URL so it can't be bookmarked (see UI.bury_url())
         this.button.on("click", async () => {
             G_PUBSUB.publish("navigate.bury_url", { section: "checkout", path: "/user/cart/checkout" });
         });
     }
 
+    /**
+     * Get or create a guest ID, then fetch the cart from the API.
+     *
+     * The guest ID is kept in localStorage so the cart survives page reloads.
+     */
     async load() {
         const guest_id = localStorage.getItem("guest_id");
         if (guest_id) {
@@ -50,6 +67,11 @@ export class Cart {
         G_PUBSUB.publish("ui.update", undefined);
     }
 
+    /**
+     * Add one of a product to the cart, show the cart, and save it.
+     *
+     * @param product     Product to add
+     */
     async add(product: Product) {
         // Search through the cart contents to see if we already have one
         const item_is_product = (item: Product) => {
@@ -62,7 +84,7 @@ export class Cart {
             }
         };
         if (!this.contents.some(item_is_product)) {
-            // Didn't find item, so add it
+            // Didn't find item. Add a copy so the catalog entry isn't changed.
             const copy = { ...product };
             copy.quantity = 1;
             this.contents.push(copy);
@@ -74,15 +96,31 @@ export class Cart {
         G_PUBSUB.publish("ui.update", undefined);
     }
 
+    /**
+     * Empty the cart.
+     */
     async empty_cart() {
         this.contents = [];
+        await G_API.put("/api/v1/cart", { products: this.contents });
         G_PUBSUB.publish("ui.update", undefined);
     }
 
-    update_qty(product_index: number, quantity: number) {
+    /**
+     * Change the quantity of a cart entry.
+     *
+     * @param product_index   Index into contents
+     * @param quantity        New quantity
+     */
+    async update_qty(product_index: number, quantity: number) {
         this.contents[product_index].quantity = quantity;
+        await G_API.put("/api/v1/cart", { products: this.contents });
     }
 
+    /**
+     * Remove an entry from the cart.
+     *
+     * @param product_index   Index into contents
+     */
     async delete(product_index: number) {
         this.contents.splice(product_index, 1);
 
@@ -91,6 +129,9 @@ export class Cart {
         G_PUBSUB.publish("cart.update", undefined);
     }
 
+    /**
+     * Show the "empty" message and disable checkout when there's nothing in the cart.
+     */
     update() {
         const empty = this.contents.length == 0;
         this.empty.toggle(empty);

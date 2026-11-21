@@ -7,6 +7,12 @@ import { check_password, PasswordStatus } from "./password";
 import { Product } from "./products";
 import { DropDown } from "./drop_down";
 
+/**
+ * Format a number as US dollars and put it in an element.
+ *
+ * @param select  Element to update
+ * @param cost    Amount in dollars
+ */
 function update_cost(select: JQuery<HTMLElement>, cost: number) {
     const currency = new Intl.NumberFormat("default", {
         style: "currency",
@@ -15,6 +21,11 @@ function update_cost(select: JQuery<HTMLElement>, cost: number) {
     select.text(currency);
 }
 
+/**
+ * Base class for a page section. On its own it's used for static sections that need no code.
+ *
+ * Subclasses override init() for one-time setup and update() to render the section each time it's shown.
+ */
 class InertSection {
     section: JQuery<HTMLElement>;
 
@@ -26,6 +37,11 @@ class InertSection {
     update() {}
 }
 
+/**
+ * A section built around a list.
+ *
+ * The first <li> in the HTML is a template: it's removed from the page and cloned for each item when rendering.
+ */
 class ListSection extends InertSection {
     unordered_list: JQuery<HTMLElement>;
     list_item: JQuery<HTMLElement>;
@@ -33,10 +49,15 @@ class ListSection extends InertSection {
     constructor(section: JQuery<HTMLElement>) {
         super(section);
         this.unordered_list = section.find("ul");
+        // Detaches every <li> in the section, nested ones included, so a nested list's template has to be detached
+        // first (see OrderUI and OrdersUI)
         this.list_item = section.find("li").detach();
     }
 }
 
+/**
+ * The product grid (#products). Lists every top-level product (formats of a book are left out).
+ */
 class ProductsUI extends ListSection {
     override async update() {
         this.unordered_list.empty();
@@ -53,9 +74,19 @@ class ProductsUI extends ListSection {
     }
 }
 
+/**
+ * The shop page (#shop). Same product grid as ProductsUI.
+ */
 class ShopUI extends ProductsUI {}
 
+/**
+ * The product listing page (#product-listing).
+ *
+ * Shows the product's images, name, price, and description. A product with formats (children) shows links to
+ * them in place of an Add to Cart button.
+ */
 class ProductUI extends InertSection {
+    // Product to show; set by Products.show_path() before the section is shown
     product: Product | null = null;
     carousel: Carousel;
 
@@ -64,6 +95,9 @@ class ProductUI extends InertSection {
         this.carousel = new Carousel(example, views);
     }
 
+    /**
+     * Set up the carousel and hook up the Add to Cart button.
+     */
     override init() {
         this.carousel.init();
         this.section.find("button").on("click", () => {
@@ -71,12 +105,20 @@ class ProductUI extends InertSection {
         });
     }
 
+    /**
+     * Add the product being shown to the cart.
+     */
     add_to_cart() {
         if (G_UI.sections.product.product) {
             G_PUBSUB.publish("cart.add", { product: G_UI.sections.product.product });
         }
     }
 
+    /**
+     * Format the price for display.
+     *
+     * @returns    The cost, or for a product with formats, "from" the cheapest format's cost
+     */
     private price(): string {
         if (this.product?.child_ids.length == 0) {
             return new Intl.NumberFormat("default", {
@@ -95,6 +137,11 @@ class ProductUI extends InertSection {
         }
     }
 
+    /**
+     * Build links to the product's formats.
+     *
+     * @returns    HTML such as '<a>ebook</a>, <a>paperback</a>, and <a>audiobook</a>', or "" if there are none
+     */
     private media_links(): string {
         let links: string[] = [];
         const add_link = (product: Product) => {
@@ -114,6 +161,7 @@ class ProductUI extends InertSection {
         $("#price").text(this.price());
         this.section.find(".product-name").text(this.product?.name!);
         let description: string = this.product?.description!;
+        // A format's description is appended to its book's description
         if (this.product?.parent_id) {
             description = G_PRODUCTS.find_by_id(this.product.parent_id)?.description + description;
         }
@@ -126,6 +174,11 @@ class ProductUI extends InertSection {
     }
 }
 
+/**
+ * The cart page (#cart). Lists the cart contents with quantity inputs, extended costs, and remove buttons.
+ *
+ * Subscribes to "cart.update_qty" and "cart.update".
+ */
 class CartUI extends ListSection {
     override init() {
         G_PUBSUB.subscribe("cart.update_qty", async (params) => {
@@ -136,6 +189,12 @@ class CartUI extends ListSection {
         });
     }
 
+    /**
+     * Show the new extended cost of a cart entry after its quantity changes.
+     *
+     * @param product_index   Index into the cart contents
+     * @param quantity        New quantity
+     */
     update_qty(product_index: number, quantity: number) {
         const select = this.section.find(`li:nth-child(${product_index + 1}) .ext-cost`);
         update_cost(select, G_CART.contents[product_index].cost_per * quantity);
@@ -146,6 +205,7 @@ class CartUI extends ListSection {
         let subtotal = 0.0;
         for (const [index, product] of G_CART.contents.entries()) {
             const new_item = this.list_item.clone();
+            // Each <li> remembers its index so its input and button handlers know which entry they're for
             new_item.data("product_index", index);
             const name = new_item.find(".product-name");
             name.text(product.name);
@@ -171,9 +231,19 @@ class CartUI extends ListSection {
     }
 }
 
+/**
+ * The checkout page (#checkout).
+ *
+ * Lists the cart like CartUI, then fetches shipping from the API and shows the subtotal, shipping, and total. It
+ * also asks the user to log in, or requires it (for digital downloads), depending on what the API says.
+ */
 export class CheckoutUI extends CartUI {
+    // Order total in dollars; PayPal shows it with the buttons
     total = 0.0;
 
+    /**
+     * Hook up the login button. (Doesn't subscribe to the cart events like CartUI does.)
+     */
     override init() {
         this.section.find("button.login").on("click", async () => {
             G_PUBSUB.publish("user.login", undefined);
@@ -227,7 +297,13 @@ share your address, and I won't spam you.`);
     }
 }
 
+/**
+ * The list of download links for one product in an order.
+ *
+ * OrderUI points unordered_list at the product's list before each update().
+ */
 class DownloadsUI extends ListSection {
+    // File name -> URL
     downloads: Record<string, string> = {};
 
     override async update() {
@@ -244,11 +320,16 @@ class DownloadsUI extends ListSection {
     }
 }
 
+/**
+ * The order details page (#order): line items with downloads, totals, and a link to the PayPal transaction.
+ */
 class OrderUI extends ListSection {
+    // Order to show; set before the section is shown
     order: Order | null = null;
     downloads: DownloadsUI;
 
     constructor(section: JQuery<HTMLElement>, downloads: JQuery<HTMLElement>) {
+        // Created before super() so it can grab the downloads template <li> before ListSection detaches it
         const downloads_ui = new DownloadsUI(downloads);
         super(section);
         this.downloads = downloads_ui;
@@ -298,6 +379,11 @@ class OrderUI extends ListSection {
     }
 }
 
+/**
+ * The product names in one order on the orders page.
+ *
+ * OrdersUI points unordered_list at the order's list before each update().
+ */
 class MinimalOrderUI extends ListSection {
     order: Order | null = null;
 
@@ -313,18 +399,27 @@ class MinimalOrderUI extends ListSection {
     }
 }
 
+/**
+ * The order history page (#orders). Lists past orders, newest first, with links to their details.
+ *
+ * If there are none, shows a note saying so, or asking the user to log in if they aren't.
+ */
 class OrdersUI extends ListSection {
     orders: Order[] = [];
     order_ui: MinimalOrderUI;
     note: JQuery<HTMLElement>;
 
     constructor(section: JQuery<HTMLElement>, order: JQuery<HTMLElement>) {
+        // Created before super() so it can grab the product template <li> before ListSection detaches it
         const order_ui = new MinimalOrderUI(order);
         super(section);
         this.order_ui = order_ui;
         this.note = section.find(".orders-note");
     }
 
+    /**
+     * Fetch the user's orders from the API and show the orders page. On error, show no orders.
+     */
     async fetch() {
         let orders;
         try {
@@ -364,6 +459,9 @@ class OrdersUI extends ListSection {
     }
 }
 
+/**
+ * The thank-you page (#thank-you). Like the order details page, plus a message about what happens next.
+ */
 class ThankYou extends OrderUI {
     override async update() {
         super.update();
@@ -380,6 +478,12 @@ class ThankYou extends OrderUI {
     }
 }
 
+/**
+ * The change password page (#edit-password).
+ *
+ * Checks the new password as it's typed, and enables Save only when it's acceptable and both entries match. The
+ * fields are cleared whenever the user navigates.
+ */
 class Password extends InertSection {
     old_password: JQuery<HTMLElement>;
     new_password: JQuery<HTMLElement>;
@@ -401,6 +505,9 @@ class Password extends InertSection {
         this.repeat_password = repeat_password;
     }
 
+    /**
+     * Clear the form on navigation, check the password as it's typed, and hook up Save.
+     */
     override init() {
         G_PUBSUB.subscribe("navigate.go", () => {
             this.reset();
@@ -421,6 +528,9 @@ class Password extends InertSection {
         });
     }
 
+    /**
+     * Clear all the fields and the status.
+     */
     reset() {
         this.old_password.val("");
         this.new_password.val("");
@@ -428,12 +538,20 @@ class Password extends InertSection {
         this.update();
     }
 
+    /**
+     * Show a password check result.
+     *
+     * @param status  Strength for the meter, whether Save is enabled, and the message to show
+     */
     set_status(status: PasswordStatus) {
         this.meter.attr("value", status.strength);
         this.section.find("button").prop("disabled", !status.sufficient);
         this.section.find(".message").text(status.message);
     }
 
+    /**
+     * Check the passwords that have been entered and show the result.
+     */
     override update() {
         super.update();
         const new_password = String(this.new_password.val() ?? "");
@@ -442,8 +560,16 @@ class Password extends InertSection {
     }
 }
 
+/**
+ * All the page sections and the header controls.
+ *
+ * Only one section is shown at a time; showing one calls its update() to render it. Subscribes to
+ * "navigate.bury_url", "ui.show_section", "ui.update", and "cart.update".
+ */
 export class UI {
+    // Key into sections of the section being shown
     current_section = "products";
+    // Keys here are the section names used by "ui.show_section"
     sections = {
         about: new InertSection($("#about")),
         ai: new InertSection($("#ai")),
@@ -470,6 +596,9 @@ export class UI {
     books_menu: DropDown = new DropDown($("#books"));
     profile_menu: DropDown = new DropDown($("#profile"));
 
+    /**
+     * Set up the menus and every section, and subscribe to the UI events.
+     */
     init() {
         this.books_menu.init();
         this.profile_menu.init();
@@ -511,6 +640,11 @@ export class UI {
         G_PUBSUB.publish("ui.show_section", { section });
     }
 
+    /**
+     * Show one section, hide the rest, and render the one being shown.
+     *
+     * @param section     Key into sections
+     */
     async show(section: string) {
         this.current_section = section;
         for (const [key, value] of Object.entries(this.sections)) {
@@ -522,6 +656,9 @@ export class UI {
         }
     }
 
+    /**
+     * Update the cart count and show either the login button or the profile menu.
+     */
     async update_header() {
         // Shopping cart contents
         $("#cart_button a").text(G_CART.contents.length == 0 ? "" : G_CART.contents.length);

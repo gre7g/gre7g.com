@@ -6,7 +6,6 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
-- [ ] Carousel
 - [ ] Is everything logged on purchase completion (like fees)?
 
 Moderate Urgency
@@ -14,7 +13,6 @@ Moderate Urgency
 
 Basic Features
 --------------
-- [ ] TypeScript unit tests
 - [ ] Check dynamically added HTML for links. They need to be intercepted and handled via TS navigation.
 - [ ] Test narrow and on phone
 - [ ] Links for other places an item is available
@@ -26,13 +24,15 @@ Low Urgency
       re-execute a deploy command because we weren't logged in, then I still treat the "No changes to deploy." status as
       an error.
 - [ ] Add code coverage for TypeScript
-- [ ] Go through .ts files and add more comments, function headers, etc.
 - [ ] Breadcrumbs -- see breadcrumbs-feature branch for visual component, but let's work on adding the data as we go
 - [ ] Show a sitemap
 - [ ] Try out that script experiment in notes/suggested_console.py
 
 Old and Completed
 -----------------
+- [X] TypeScript unit tests
+- [X] Go through .ts files and add more comments, function headers, etc.
+- [X] Carousel
 - [X] Products with children shouldn't show the add to cart button
 - [X] When cart is empty, hide the subtotal
 - [X] Theme the login to match -- see notes/managed-login-theming.md
