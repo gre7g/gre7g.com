@@ -11,7 +11,6 @@ High Urgency
 
 Moderate Urgency
 ----------------
-- [ ] When cart is empty, hide the subtotal
 
 Basic Features
 --------------
@@ -34,6 +33,8 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] Products with children shouldn't show the add to cart button
+- [X] When cart is empty, hide the subtotal
 - [X] Theme the login to match -- see notes/managed-login-theming.md
 - [X] Profile menu is lower case
 - [X] Upload product images

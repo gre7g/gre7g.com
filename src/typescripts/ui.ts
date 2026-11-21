@@ -108,6 +108,9 @@ class ProductUI extends InertSection {
     }
 
     override async update() {
+        this.carousel.images = this.product?.images ?? [];
+        this.carousel.update();
+        this.section.find("button").toggle(this.product?.child_ids.length == 0);
         $("#price").text(this.price());
         this.section.find(".product-name").text(this.product?.name!);
         let description: string = this.product?.description!;
@@ -163,6 +166,7 @@ class CartUI extends ListSection {
             });
             this.unordered_list.append(new_item);
         }
+        this.section.find(".summary").toggle(G_CART.contents.length);
         update_cost(this.section.find(".subtotal .amount"), subtotal);
     }
 }

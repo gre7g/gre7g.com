@@ -9,15 +9,20 @@ export class Carousel {
     }
 
     init() {
-        // TODO: This code really has to happen after thumbnail images are added, but we're testing now with static HTML
+    }
+
+    update() {
+        this.views.empty();
+        this.images.forEach((image) => {
+            this.views.append(`<li><a><img src="${image}" /></a></li>`);
+        });
         this.views.find("img").on("click", (event) => {
             event.preventDefault();
             const image_src = $(event.target).attr("src");
-            console.log("Image src: ", image_src);
             if (image_src) {
                 this.example.attr("src", image_src);
-                console.log("Image src set");
             }
         });
+        this.example.attr("src", this.images[0]);
     }
 }
