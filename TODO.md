@@ -6,35 +6,26 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
-- [ ] Need digital downloads:
-  - [ ] Skeleton Crew audiobook
-  - [ ] Small World audiobook
-  - [ ] Fair Trade audiobook
-  - [ ] Reaper's Lottery audiobook
-  - [ ] Executioner's Gambit audiobook
-  - [ ] Long Way Home audiobook
-  - [ ] Tales of Hayven Celestia I audiobook
-- [X] Needs to reload orders after a purchase is made
+- [ ] Cart merge isnt being used
 
 Moderate Urgency
 ----------------
+- [ ] Links for other places an item is available
+- [ ] Some updates should be done last or async so that the screen updates immediately without waiting for AJAX
+- [ ] Ensure all errors thrown by lambda are legible
+
+Basic Features
+--------------
 - [ ] Is everything logged on purchase completion (like fees)?
+- [ ] Check dynamically added HTML for links. They need to be intercepted and handled via TS navigation.
+- [ ] Test narrow and on phone
+
+Low Urgency
+-----------
 - [ ] Bugs found while writing TypeScript tests (each has a `test.fails` test -- drop the `.fails` once fixed):
     - [X] Status bar never reappears after being closed (`show_*()` don't call `.show()`)
     - [X] Cart summary flickers: `.toggle(G_CART.contents.length)` passes a number, which jQuery treats as a duration
     - [ ] Carousel keeps the previous product's image when a product has no images
-- [ ] Cart merge isnt being used
-
-Basic Features
---------------
-- [ ] Check dynamically added HTML for links. They need to be intercepted and handled via TS navigation.
-- [ ] Test narrow and on phone
-- [ ] Links for other places an item is available
-- [ ] Ensure all errors thrown by lambda are legible
-- [ ] Some updates should be done last or async so that the screen updates immediately without waiting for AJAX
-
-Low Urgency
------------
 - [ ] Deactivated accounts
 - [ ] In the dispatch script, I have a check that won't treat "No changes to deploy." as an error. However, if I have to
       re-execute a deploy command because we weren't logged in, then I still treat the "No changes to deploy." status as
@@ -46,6 +37,15 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] Need digital downloads:
+  - [X] Skeleton Crew audiobook
+  - [X] Small World audiobook
+  - [X] Fair Trade audiobook
+  - [X] Reaper's Lottery audiobook
+  - [X] Executioner's Gambit audiobook
+  - [X] Long Way Home audiobook
+  - [X] Tales of Hayven Celestia I audiobook
+- [X] Needs to reload orders after a purchase is made
 - [X] Didn't show digital download after purchase
   - [X] Threw an uncaught-in-promise error in `for (const product of this.order.products) {` in OrderUI:update, products 
         is not iterable
