@@ -51,6 +51,8 @@ interface Events {
     "cart.update": void;
     // Quantity input for a cart entry changed
     "cart.update_qty": { product_index: number; quantity: number };
+    // Fetch orders from the database
+    "orders.fetch": void;
     // Show a section at an ephemeral URL (see UI.bury_url())
     "navigate.bury_url": { section: string; path: string };
     // Route to a path; save pushes it onto the browser history

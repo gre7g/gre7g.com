@@ -61,6 +61,7 @@ export function load_paypal() {
                     G_UI.sections.thank_you.order = response.order;
                     await G_PUBSUB.publish_async("navigate.bury_url", { section: "thank_you", path: "/thank-you" });
                     await G_CART.empty_cart();
+                    G_PUBSUB.publish("orders.fetch", undefined);
                 },
 
                 /**

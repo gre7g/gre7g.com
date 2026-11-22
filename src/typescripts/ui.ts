@@ -422,6 +422,9 @@ class OrdersUI extends ListSection {
         this.note = section.find(".orders-note");
     }
 
+    override init() {
+        G_PUBSUB.subscribe("orders.fetch", this.fetch.bind(this));
+    }
     /**
      * Fetch the user's orders from the API and show the orders page. On error, show no orders.
      */
@@ -434,7 +437,6 @@ class OrdersUI extends ListSection {
         } catch (error) {
             this.orders = [];
         }
-        G_PUBSUB.publish("ui.show_section", { section: "orders" });
     }
 
     override async update() {

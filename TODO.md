@@ -6,9 +6,6 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
-- [ ] Didn't show digital download after purchase
-  - [ ] Threw an uncaught-in-promise error in `for (const product of this.order.products) {` in OrderUI:update, products 
-        is not iterable
 - [ ] Need digital downloads:
   - [ ] Skeleton Crew audiobook
   - [ ] Small World audiobook
@@ -17,6 +14,7 @@ High Urgency
   - [ ] Executioner's Gambit audiobook
   - [ ] Long Way Home audiobook
   - [ ] Tales of Hayven Celestia I audiobook
+- [X] Needs to reload orders after a purchase is made
 
 Moderate Urgency
 ----------------
@@ -48,6 +46,9 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] Didn't show digital download after purchase
+  - [X] Threw an uncaught-in-promise error in `for (const product of this.order.products) {` in OrderUI:update, products 
+        is not iterable
 - [X] Logout spat an invalid request (cognito hosted page)
   - [X] logout_uri sent by AWS Amplify does not match any of the Allowed Sign-out URLs configured on your Amazon Cognito App Client.
 - [X] User doesnt have password-changing privileges

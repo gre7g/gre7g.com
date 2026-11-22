@@ -83,7 +83,8 @@ export class Navigator {
                 G_PUBSUB.publish("ui.show_section", { section: "cart" });
                 break;
             case "/user/orders":
-                await G_UI.sections.orders.fetch();
+                await G_PUBSUB.publish_async("orders.fetch", undefined);
+                G_PUBSUB.publish("ui.show_section", { section: "orders" });
                 break;
             case "/user/password":
                 G_PUBSUB.publish("ui.show_section", { section: "password" });
