@@ -1,6 +1,6 @@
 import { $ } from "jquery";
 
-import{Carousel} from "./carousel";
+import { Carousel } from "./carousel";
 import { G_API, G_CART, G_PRODUCTS, G_PUBSUB, G_UI } from "./main";
 import { Order, has_physical } from "./orders";
 import { check_password, PasswordStatus } from "./password";

@@ -22,8 +22,7 @@ export class Carousel {
     /**
      * One-time setup. Nothing to do yet.
      */
-    init() {
-    }
+    init() {}
 
     /**
      * Rebuild the thumbnails from images and show the first image as the example.
