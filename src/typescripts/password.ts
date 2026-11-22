@@ -34,7 +34,7 @@ export async function check_password(new_password: string, repeat_password: stri
         return {
             strength: 0,
             sufficient: false,
-            message: "No logged in",
+            message: "Not logged in",
         };
     }
 
