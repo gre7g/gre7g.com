@@ -57,12 +57,12 @@ export class Cart {
         if (guest_id) {
             G_API.guest_id = guest_id;
         } else {
-            const response = await G_API.post("/api/v1/guest", {});
+            const response = await G_API.post("/api/v1/guest", {}, true);
             G_API.guest_id = response.auth_token;
             localStorage.setItem("guest_id", response.auth_token);
         }
 
-        const response = await G_API.get("/api/v1/cart");
+        const response = await G_API.get("/api/v1/cart", true);
         this.contents = response.products;
         G_PUBSUB.publish("ui.update", undefined);
     }
@@ -92,7 +92,7 @@ export class Cart {
         G_PUBSUB.publish("navigate.go", { path: "/user/cart", save: true });
 
         // Save the cart
-        await G_API.put("/api/v1/cart", { products: this.contents });
+        await G_API.put("/api/v1/cart", { products: this.contents }, true);
         G_PUBSUB.publish("ui.update", undefined);
     }
 
@@ -101,7 +101,7 @@ export class Cart {
      */
     async empty_cart() {
         this.contents = [];
-        await G_API.put("/api/v1/cart", { products: this.contents });
+        await G_API.put("/api/v1/cart", { products: this.contents }, true);
         G_PUBSUB.publish("ui.update", undefined);
     }
 
@@ -113,7 +113,7 @@ export class Cart {
      */
     async update_qty(product_index: number, quantity: number) {
         this.contents[product_index].quantity = quantity;
-        await G_API.put("/api/v1/cart", { products: this.contents });
+        await G_API.put("/api/v1/cart", { products: this.contents }, true);
     }
 
     /**
@@ -125,7 +125,7 @@ export class Cart {
         this.contents.splice(product_index, 1);
 
         // Save the cart
-        await G_API.put("/api/v1/cart", { products: this.contents });
+        await G_API.put("/api/v1/cart", { products: this.contents }, true);
         G_PUBSUB.publish("cart.update", undefined);
     }
 

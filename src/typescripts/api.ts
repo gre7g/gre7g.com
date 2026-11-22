@@ -203,30 +203,67 @@ export class Api extends AuthLayer {
     }
 
     /**
+     * Make a request to the API, retrying once if the CSRF token was rejected. If the request fails, it publishes an
+     * "ui.show_error" event and then throws an error. Even though it handles the error, we don't want the caller code
+     * to proceed with bad data.
+     *
+     * @param method  HTTP method
+     * @param path    URL path, e.g. "/api/v1/cart"
+     * @param data    Optional body, sent as JSON
+     * @returns       The parsed JSON response
+     * @throws        Error with the API's message if the response is not OK
+     */
+    private async request_with_error(method: string, path: string, data?: Record<string, any>) {
+        try {
+            return await this.request(method, path, data);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            G_PUBSUB.publish("ui.show_error", { message });
+            throw error;
+        }
+    }
+
+    /**
      * GET from the API. See request().
      */
-    async get(path: string) {
-        return await this.request("GET", path);
+    async get(path: string, alert: boolean = false) {
+        if (alert) {
+            return await this.request_with_error("GET", path);
+        } else {
+            return await this.request("GET", path);
+        }
     }
 
     /**
      * POST to the API. See request().
      */
-    async post(path: string, data: Record<string, any>) {
-        return await this.request("POST", path, data);
+    async post(path: string, data: Record<string, any>, alert: boolean = false) {
+        if (alert) {
+            return await this.request_with_error("POST", path, data);
+        } else {
+            return await this.request("POST", path, data);
+        }
     }
 
     /**
      * PUT to the API. See request().
      */
-    async put(path: string, data: Record<string, any>) {
-        return await this.request("PUT", path, data);
+    async put(path: string, data: Record<string, any>, alert: boolean = false) {
+        if (alert) {
+            return await this.request_with_error("PUT", path, data);
+        } else {
+            return await this.request("PUT", path, data);
+        }
     }
 
     /**
      * DELETE from the API. See request().
      */
-    async delete(path: string, data: Record<string, any>) {
-        return await this.request("DELETE", path, data);
+    async delete(path: string, data: Record<string, any>, alert: boolean = false) {
+        if (alert) {
+            return await this.request_with_error("DELETE", path, data);
+        } else {
+            return await this.request("DELETE", path, data);
+        }
     }
 }

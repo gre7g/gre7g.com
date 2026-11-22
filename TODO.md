@@ -14,8 +14,6 @@ High Urgency
   - [ ] Executioner's Gambit audiobook
   - [ ] Long Way Home audiobook
   - [ ] Tales of Hayven Celestia I audiobook
-- [X] Show out of stock message as needed
-- [ ] How do we deal with AJAX errors?
 
 Moderate Urgency
 ----------------
@@ -24,13 +22,13 @@ Moderate Urgency
     - [ ] Status bar never reappears after being closed (`show_*()` don't call `.show()`)
     - [ ] Cart summary flickers: `.toggle(G_CART.contents.length)` passes a number, which jQuery treats as a duration
     - [ ] Carousel keeps the previous product's image when a product has no images
-- [X] Need all the images
 
 Basic Features
 --------------
 - [ ] Check dynamically added HTML for links. They need to be intercepted and handled via TS navigation.
 - [ ] Test narrow and on phone
 - [ ] Links for other places an item is available
+- [ ] Ensure all errors thrown by lambda are legible
 
 Low Urgency
 -----------
@@ -45,6 +43,11 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] Need all the images
+- [X] How do we deal with AJAX errors?
+- [X] Order page needs to handle when the user isn't logged in
+- [X] Adding an item through a "products" key error
+- [X] Show out of stock message as needed
 - [X] Hide thumbnails when there's only one
 - [X] TypeScript unit tests
 - [X] Go through .ts files and add more comments, function headers, etc.

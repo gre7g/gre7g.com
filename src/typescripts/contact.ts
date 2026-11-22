@@ -70,11 +70,8 @@ export class Contact {
                 this.email.val("");
                 this.message.val("");
             } catch (error) {
-                if (error instanceof Error) {
-                    G_PUBSUB.publish("ui.show_error", { message: error.message });
-                } else {
-                    G_PUBSUB.publish("ui.show_error", { message: "Unable to leave comment" });
-                }
+                const message = error instanceof Error ? error.message : "Unable to leave a comment";
+                G_PUBSUB.publish("ui.show_error", { message });
             }
         }
     }

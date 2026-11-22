@@ -266,7 +266,7 @@ export class CheckoutUI extends CartUI {
         update_cost(this.section.find("#subtotal span"), subtotal);
 
         // Get shipping
-        const response = await G_API.post("/api/v1/cart/shipping", {});
+        const response = await G_API.post("/api/v1/cart/shipping", {}, true);
         update_cost(this.section.find("#shipping span"), response?.shipping_cost);
 
         // Calculate total
@@ -339,6 +339,8 @@ class OrderUI extends ListSection {
     }
 
     override async update() {
+        this.section.find(".available").toggle(!!this.order);
+        this.section.find(".order-note").toggle(!this.order);
         if (this.order) {
             this.unordered_list.empty();
             const date: Date = new Date(this.order.timestamp);

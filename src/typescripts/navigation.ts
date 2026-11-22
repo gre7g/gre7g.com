@@ -95,8 +95,13 @@ export class Navigator {
                     const parts = path.split("/");
                     if (parts.length == 4 && parts[1] == "user" && parts[2] == "order") {
                         // URL: /user/order/{order_id}
-                        const order = await G_API.get(`/api/v1/order/${parts[3]}`);
-                        G_UI.sections.order.order = order.order;
+                        try {
+                            const order = await G_API.get(`/api/v1/order/${parts[3]}`);
+                            G_UI.sections.order.order = order.order;
+                        } catch {
+                            G_UI.sections.order.order = null;
+                        }
+                        // The order page has handling logic if the user isn't logged in
                         G_PUBSUB.publish("ui.show_section", { section: "order" });
                     } else {
                         G_PUBSUB.publish("ui.show_section", { section: "shop" });

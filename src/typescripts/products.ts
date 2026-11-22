@@ -38,7 +38,7 @@ export class Products {
      * Fetch all products from the API.
      */
     async load() {
-        const response = await G_API.get("/api/v1/products");
+        const response = await G_API.get("/api/v1/products", true);
         G_PRODUCTS.product_list = Object.fromEntries(
             response.products.map((product: Product) => [product.listing_path, product]),
         );
