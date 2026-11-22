@@ -541,8 +541,10 @@ main > article img {
 
 #carousel {
     display: grid;
-    grid-template-columns: 4.25rem auto;
-    gap: 0.65rem;
+    /* The thumbnail column is sized by #views (width + margin rather than a
+       grid gap), so it collapses to nothing when #views is hidden for
+       single-image products. */
+    grid-template-columns: auto auto;
     float: left;
     width: fit-content;
     max-width: 60%;
@@ -573,9 +575,10 @@ main > article img {
     grid-row: 1;
     flex-direction: column;
     gap: 0.5rem;
+    width: 4.25rem;
     height: 0;
     min-height: 100%;
-    margin: 0;
+    margin: 0 0.65rem 0 0;
     padding: 0;
     overflow-y: auto;
     list-style: none;

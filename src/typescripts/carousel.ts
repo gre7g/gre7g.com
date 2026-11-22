@@ -42,5 +42,6 @@ export class Carousel {
             }
         });
         this.example.attr("src", this.images[0]);
+        this.views.toggle(this.images.length > 1);
     }
 }
