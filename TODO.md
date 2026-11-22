@@ -6,12 +6,19 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
+- [ ] Client controls shipping and the login rule: in place_order.py (and calculate_shipping.py), shipping and the
+      "guests must log in to buy downloads" rule depend on the media values in the cart, which the client can set 
+      freely. A changed value could skip the shipping charge or let a guest buy digital goods.
+- [ ] Add a double-check to ensure delete_audit_objects can't be run on the production audit
+- [ ] test_logged_out_physical sends a logged-in user, so guest checkout of physical items is never tested.
+- [ ] Set the audiobook price
 
-Moderate Urgency
+- [ ] Moderate Urgency
 ----------------
 - [ ] Links for other places an item is available
 - [ ] Some updates should be done last or async so that the screen updates immediately without waiting for AJAX
 - [ ] Ensure all errors thrown by lambda are legible
+- [ ] Update goodreads profile
 
 Basic Features
 --------------
@@ -33,6 +40,9 @@ Low Urgency
 - [ ] Breadcrumbs -- see breadcrumbs-feature branch for visual component, but let's work on adding the data as we go
 - [ ] Show a sitemap
 - [ ] Try out that script experiment in notes/suggested_console.py
+- [ ] Clean out old carts (they may need timestamps)
+- [ ] The JWT signing keys are fetched again on every request.
+- [ ] get_orders and get_products read only one page of DynamoDB results.
 
 Old and Completed
 -----------------
