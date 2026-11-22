@@ -16,6 +16,7 @@ High Urgency
   - [ ] Tales of Hayven Celestia I audiobook
 - [ ] Hide thumbnails when there's only one
 - [ ] Show out of stock message as needed
+- [ ] How do we deal with AJAX errors?
 
 Moderate Urgency
 ----------------
