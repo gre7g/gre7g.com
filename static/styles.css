@@ -462,15 +462,16 @@ main > article img {
     margin-bottom: 1.5rem;
 }
 
-#shop .spotlight > img {
+#shop .spotlight > a > img {
     float: left;
     width: min(50%, 15.5rem);
     height: auto;
     margin: 0 1.25rem 1rem 0;
 }
 
+/* A new block formatting context keeps the heading (and its underline) beside the floated image, not behind it */
 #shop .spotlight > h1 {
-    margin-left: min(calc(50% + 1.25rem), 11.125rem);
+    display: flow-root;
 }
 
 #shop .spotlight p {
@@ -699,18 +700,21 @@ main > article img {
     font-weight: 600;
 }
 
-#order {
+#order,
+#thank-you > ul {
     text-align: left;
 }
 
-#order h2 {
+#order h2,
+#thank-you h2 {
     margin: 0.3rem 0 0;
     color: inherit;
     font: inherit;
     font-weight: 700;
 }
 
-#order h2 + ul {
+#order h2 + ul,
+#thank-you h2 + ul {
     padding-left: 1.8rem;
     margin-top: 0;
 }
@@ -721,7 +725,14 @@ main > article img {
     gap: 0.3rem 1rem;
 }
 
-#order > .available > ul > li > a {
+#thank-you > ul > li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.3rem 1rem;
+}
+
+#order > .available > ul > li > a,
+#thank-you > ul > li > a {
     min-width: 0;
     overflow-wrap: anywhere;
 }
@@ -738,9 +749,16 @@ main > article img {
 }
 
 #cart > .summary,
+#checkout > .summary,
 #order > .available > .summary {
     width: min(50%, 30rem);
     margin-left: auto;
+}
+
+/* Line up with the item amounts, which are inset by the row's padding and border */
+#checkout > .summary {
+    margin-bottom: 2rem;
+    padding-right: calc(1rem + 1px);
 }
 
 #cart > .summary {
@@ -748,6 +766,7 @@ main > article img {
 }
 
 #cart > .summary > p,
+#checkout > .summary > p,
 #order > .available > .summary > p {
     display: flex;
     justify-content: space-between;
@@ -758,6 +777,7 @@ main > article img {
 }
 
 #cart > .summary .amount,
+#checkout > .summary .amount,
 #order > .available > .summary .amount {
     flex: 0 0 auto;
     margin-left: auto;
@@ -774,30 +794,17 @@ main > article img {
     flex: 1 1 12rem;
 }
 
-#subtotal,
-#shipping,
-#total {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    max-width: 28rem;
-    padding: 0.45rem 0;
-    border-bottom: 1px solid var(--line);
-}
-
-#total {
-    margin-bottom: 1rem;
-    border-bottom: 2px solid var(--gold);
-    font-size: 1.15rem;
-    font-weight: 700;
-}
-
 #login_status,
 #checkout-status {
     margin: 1rem 0;
     padding: 1rem;
     border-radius: 0.7rem;
     background: #edf3f5;
+}
+
+#login_status > button {
+    display: block;
+    margin-top: 0.75rem;
 }
 
 button {
@@ -1096,6 +1103,7 @@ footer nav {
     }
 
     #cart > .summary,
+    #checkout > .summary,
     #order > .available > .summary {
         width: min(100%, 30rem);
     }

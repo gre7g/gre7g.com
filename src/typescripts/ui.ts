@@ -263,15 +263,15 @@ export class CheckoutUI extends CartUI {
             subtotal += product.quantity * product.cost_per;
         };
         G_CART.contents.forEach(add_item);
-        update_cost(this.section.find("#subtotal span"), subtotal);
+        update_cost(this.section.find(".subtotal .amount"), subtotal);
 
         // Get shipping
         const response = await G_API.post("/api/v1/cart/shipping", {}, true);
-        update_cost(this.section.find("#shipping span"), response?.shipping_cost);
+        update_cost(this.section.find(".shipping .amount"), response?.shipping_cost);
 
         // Calculate total
         this.total = subtotal + response?.shipping_cost;
-        update_cost(this.section.find("#total span"), this.total);
+        update_cost(this.section.find(".total .amount"), this.total);
 
         // Login status message
         const login_status = $("#login_status");
