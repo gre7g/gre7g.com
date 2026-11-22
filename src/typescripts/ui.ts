@@ -157,7 +157,10 @@ class ProductUI extends InertSection {
     override async update() {
         this.carousel.images = this.product?.images ?? [];
         this.carousel.update();
-        this.section.find("button").toggle(this.product?.child_ids.length == 0);
+        const button = this.section.find("button");
+        button.toggle(this.product?.child_ids.length == 0);
+        button.text(this.product?.quantity ? "Add to Cart" : "Out of Stock");
+        button.prop("disabled", !this.product?.quantity);
         $("#price").text(this.price());
         this.section.find(".product-name").text(this.product?.name!);
         let description: string = this.product?.description!;

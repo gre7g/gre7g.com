@@ -608,6 +608,9 @@ main > article img {
 #product-listing > .product-name {
     margin: 0 0 0.75rem;
     font-size: clamp(1.6rem, 3vw, 2.2rem);
+    /* Don't inherit body's justify; it spreads out short, wrapped titles. */
+    text-align: left;
+    line-height: 1.2;
 }
 
 #price {

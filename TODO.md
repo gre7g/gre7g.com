@@ -14,8 +14,7 @@ High Urgency
   - [ ] Executioner's Gambit audiobook
   - [ ] Long Way Home audiobook
   - [ ] Tales of Hayven Celestia I audiobook
-- [X] Hide thumbnails when there's only one
-- [ ] Show out of stock message as needed
+- [X] Show out of stock message as needed
 - [ ] How do we deal with AJAX errors?
 
 Moderate Urgency
@@ -46,6 +45,7 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] Hide thumbnails when there's only one
 - [X] TypeScript unit tests
 - [X] Go through .ts files and add more comments, function headers, etc.
 - [X] Carousel
