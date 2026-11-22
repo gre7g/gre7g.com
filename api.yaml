@@ -348,7 +348,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/empty"
+                $ref: "#/components/schemas/product_list"
         "400":
           $ref: "#/components/responses/400-bad-request"
         "403":

@@ -43,7 +43,7 @@ class MergeGuest(LambdaBase):
         cart.put(self.carts_table)
         self.carts_table.delete_item(Key={"user_id": self.guest_id})
 
-        return {}
+        return {"products": cart.to_client_dict()["products"]}
 
 
 lambda_handler = MergeGuest.lambda_handler()

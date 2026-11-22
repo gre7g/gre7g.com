@@ -1,4 +1,4 @@
-import { G_API, G_PRODUCTS, G_PUBSUB, G_UI } from "./main";
+import { G_API, G_PRODUCTS, G_PUBSUB, G_UI, G_CART } from "./main";
 
 /**
  * Client-side router: turns a URL path into the UI section to show.
@@ -75,6 +75,10 @@ export class Navigator {
             case "/login": // Bounce from Cognito
                 history.replaceState(null, "", "/login");
                 G_PUBSUB.publish("ui.show_section", { section: "products" });
+                const response = await G_API.put("/api/v1/guest", {});
+                G_CART.contents = response.products;
+                G_PUBSUB.publish("cart.update", undefined);
+                G_PUBSUB.publish("ui.update", undefined);
                 break;
             case "/shop/products":
                 G_PUBSUB.publish("ui.show_section", { section: "products" });

@@ -6,7 +6,6 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
-- [ ] Cart merge isnt being used
 
 Moderate Urgency
 ----------------
@@ -37,6 +36,7 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] Cart merge isnt being used
 - [X] Need digital downloads:
   - [X] Skeleton Crew audiobook
   - [X] Small World audiobook

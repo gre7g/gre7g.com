@@ -51,6 +51,13 @@ class TestCartMerge(BaseTestCase):
                 json={},
             )
             assert response.status_code == HTTPStatus.OK
+            result = response.json()
+            assert len(result) == 1
+            result_cart_dict = result["products"]
+            assert len(result_cart_dict) == 3
+            assert guest_cart_dict["products"][0] in result_cart_dict
+            assert guest_cart_dict["products"][1] in result_cart_dict
+            assert user_cart_dict["products"][0] in result_cart_dict
 
             # Guest cart should be deleted
             result = self.carts_table.get_item(Key={"user_id": "guest1_id"})
