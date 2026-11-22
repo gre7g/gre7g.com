@@ -6,10 +6,25 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
-- [ ] Is everything logged on purchase completion (like fees)?
+- [ ] Need digital downloads:
+  - [ ] Skeleton Crew audiobook
+  - [ ] Small World audiobook
+  - [ ] Fair Trade audiobook
+  - [ ] Reaper's Lottery audiobook
+  - [ ] Executioner's Gambit audiobook
+  - [ ] Long Way Home audiobook
+  - [ ] Tales of Hayven Celestia I audiobook
+- [ ] Hide thumbnails when there's only one
+- [ ] Show out of stock message as needed
 
 Moderate Urgency
 ----------------
+- [ ] Is everything logged on purchase completion (like fees)?
+- [ ] Bugs found while writing TypeScript tests (each has a `test.fails` test -- drop the `.fails` once fixed):
+    - [ ] Status bar never reappears after being closed (`show_*()` don't call `.show()`)
+    - [ ] Cart summary flickers: `.toggle(G_CART.contents.length)` passes a number, which jQuery treats as a duration
+    - [ ] Carousel keeps the previous product's image when a product has no images
+- [X] Need all the images
 
 Basic Features
 --------------
