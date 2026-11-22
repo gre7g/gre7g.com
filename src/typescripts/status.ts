@@ -35,6 +35,14 @@ export class Status {
         });
     }
 
+    private show(message: string, cls: string) {
+        this.section.show();
+        this.section.find("span").text(message);
+        this.section.toggleClass("info", cls === "info");
+        this.section.toggleClass("warning", cls === "warning");
+        this.section.toggleClass("error", cls === "error");
+    }
+
     /**
      * Show an informational message that closes itself after INFO_TIMEOUT.
      *
@@ -47,11 +55,7 @@ export class Status {
         if (this.section.is(":visible") && (this.section.hasClass("error") || this.section.hasClass("warning"))) {
             return;
         }
-
-        this.section.find("span").text(message);
-        this.section.addClass("info");
-        this.section.removeClass("warning");
-        this.section.removeClass("error");
+        this.show(message, "info");
         // Only closes the bar if this message is still the one showing
         setTimeout(() => {
             this.close_status(message);
@@ -68,11 +72,7 @@ export class Status {
         if (this.section.is(":visible") && this.section.hasClass("error")) {
             return;
         }
-
-        this.section.find("span").text(message);
-        this.section.removeClass("info");
-        this.section.addClass("warning");
-        this.section.removeClass("error");
+        this.show(message, "warning");
     }
 
     /**
@@ -81,10 +81,7 @@ export class Status {
      * @param message     Text to display
      */
     show_error(message: string) {
-        this.section.find("span").text(message);
-        this.section.removeClass("info");
-        this.section.removeClass("warning");
-        this.section.addClass("error");
+        this.show(message, "error");
     }
 
     /**

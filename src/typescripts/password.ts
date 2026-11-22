@@ -1,3 +1,5 @@
+import { G_API } from "./main";
+
 // Constants:
 const MIN_LENGTH = 8;
 // Requires a lowercase letter, an uppercase letter, a digit, and a special character, and 8-256 characters with no
@@ -25,11 +27,24 @@ export interface PasswordStatus {
  * @param repeat_password     Password typed into the "repeat" field
  * @returns                   Strength, whether it's acceptable, and a message
  */
-export function check_password(new_password: string, repeat_password: string): PasswordStatus {
+export async function check_password(new_password: string, repeat_password: string): Promise<PasswordStatus> {
     const strength = Math.min(new_password.length, 20);
+    const logged_in = await G_API.logged_in();
+    if (!logged_in) {
+        return {
+            strength: 0,
+            sufficient: false,
+            message: "No logged in",
+        };
+    }
+
     // Nothing typed yet, so don't nag
     if (!new_password && !repeat_password) {
-        return { strength: 0, sufficient: false, message: "" };
+        return {
+            strength: 0,
+            sufficient: false,
+            message: "",
+        };
     }
     if (new_password.length < MIN_LENGTH) {
         return {

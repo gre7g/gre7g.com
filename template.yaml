@@ -74,6 +74,10 @@ Resources:
         - email
       AdminCreateUserConfig:
         AllowAdminCreateUserOnly: false
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
 
   UserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
@@ -99,6 +103,8 @@ Resources:
         - openid
         - email
         - profile
+        # Grants access token permission to call ChangePassword
+        - aws.cognito.signin.user.admin
       AllowedOAuthFlowsUserPoolClient: true
       CallbackURLs:
         - https://%%CLOUDFRONT_DOMAIN%%

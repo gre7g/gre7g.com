@@ -364,6 +364,7 @@ class Dispatch:
 
         # Replace the callback URLs
         client_config["CallbackURLs"] = [f"{outputs.get("website_url")}/login"]
+        client_config["LogoutURLs"] = [outputs.get("website_url")]
 
         # Write the configuration to a temporary file
         with NamedTemporaryFile(mode="wt", delete_on_close=False) as temp_file:

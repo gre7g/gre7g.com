@@ -464,7 +464,7 @@ main > article img {
 
 #shop .spotlight > img {
     float: left;
-    width: min(50%, 9.875rem);
+    width: min(50%, 15.5rem);
     height: auto;
     margin: 0 1.25rem 1rem 0;
 }

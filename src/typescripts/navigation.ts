@@ -85,7 +85,7 @@ export class Navigator {
             case "/user/orders":
                 await G_UI.sections.orders.fetch();
                 break;
-            case "/user/profile":
+            case "/user/password":
                 G_PUBSUB.publish("ui.show_section", { section: "password" });
                 break;
             default:

@@ -58,7 +58,7 @@ export function load_paypal() {
                     // Note: data.orderID is PayPal's order ID and order_id is ours. I suppose I could have used theirs
                     // as ours, but marries the code to theirs.
                     G_UI.sections.thank_you.order = await G_API.put(`/api/v1/order/${data.orderID}`, {});
-                    G_PUBSUB.publish("navigate.bury_url", { section: "thank_you", path: "/thank-you" });
+                    await G_PUBSUB.publish_async("navigate.bury_url", { section: "thank_you", path: "/thank-you" });
                     await G_CART.empty_cart();
                 },
 

@@ -6,6 +6,9 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
+- [ ] Didn't show digital download after purchase
+  - [ ] Threw an uncaught-in-promise error in `for (const product of this.order.products) {` in OrderUI:update, products 
+        is not iterable
 - [ ] Need digital downloads:
   - [ ] Skeleton Crew audiobook
   - [ ] Small World audiobook
@@ -19,9 +22,10 @@ Moderate Urgency
 ----------------
 - [ ] Is everything logged on purchase completion (like fees)?
 - [ ] Bugs found while writing TypeScript tests (each has a `test.fails` test -- drop the `.fails` once fixed):
-    - [ ] Status bar never reappears after being closed (`show_*()` don't call `.show()`)
-    - [ ] Cart summary flickers: `.toggle(G_CART.contents.length)` passes a number, which jQuery treats as a duration
+    - [X] Status bar never reappears after being closed (`show_*()` don't call `.show()`)
+    - [X] Cart summary flickers: `.toggle(G_CART.contents.length)` passes a number, which jQuery treats as a duration
     - [ ] Carousel keeps the previous product's image when a product has no images
+- [ ] Cart merge isnt being used
 
 Basic Features
 --------------
@@ -29,6 +33,7 @@ Basic Features
 - [ ] Test narrow and on phone
 - [ ] Links for other places an item is available
 - [ ] Ensure all errors thrown by lambda are legible
+- [ ] Some updates should be done last or async so that the screen updates immediately without waiting for AJAX
 
 Low Urgency
 -----------
@@ -43,6 +48,12 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] Logout spat an invalid request (cognito hosted page)
+  - [X] logout_uri sent by AWS Amplify does not match any of the Allowed Sign-out URLs configured on your Amazon Cognito App Client.
+- [X] User doesnt have password-changing privileges
+- [X] Changing password didn't spit an error message (needs try/catch)
+- [X] Change user profile to user password url
+- [X] On main page, Sarsuk image is missing
 - [X] Need all the images
 - [X] How do we deal with AJAX errors?
 - [X] Order page needs to handle when the user isn't logged in

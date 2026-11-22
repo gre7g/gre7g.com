@@ -34,7 +34,7 @@ class InertSection {
     }
 
     init() {}
-    update() {}
+    async update() {}
 }
 
 /**
@@ -229,7 +229,7 @@ class CartUI extends ListSection {
             });
             this.unordered_list.append(new_item);
         }
-        this.section.find(".summary").toggle(G_CART.contents.length);
+        this.section.find(".summary").toggle(G_CART.contents.length != 0);
         update_cost(this.section.find(".subtotal .amount"), subtotal);
     }
 }
@@ -469,7 +469,7 @@ class OrdersUI extends ListSection {
  */
 class ThankYou extends OrderUI {
     override async update() {
-        super.update();
+        await super.update();
 
         if (this.order) {
             let message;
@@ -520,27 +520,35 @@ class Password extends InertSection {
         G_PUBSUB.subscribe("navigate.bury_url", () => {
             this.reset();
         });
-        this.new_password.on("input", () => {
-            this.update();
+        this.new_password.on("input", async () => {
+            await this.update();
         });
-        this.repeat_password.on("input", () => {
-            this.update();
+        this.repeat_password.on("input", async () => {
+            await this.update();
         });
         this.section.find("button").on("click", async () => {
-            await G_API.update_password(String(this.old_password.val() ?? ""), String(this.new_password.val() ?? ""));
-            this.reset();
-            this.set_status({ strength: 0, sufficient: false, message: "Password updated" });
+            try {
+                await G_API.update_password(
+                    String(this.old_password.val() ?? ""),
+                    String(this.new_password.val() ?? ""),
+                );
+                this.reset();
+                this.set_status({ strength: 0, sufficient: false, message: "Password updated" });
+            } catch (error) {
+                const message = error instanceof Error ? error.message : "Password update failed";
+                G_PUBSUB.publish("ui.show_error", { message });
+            }
         });
     }
 
     /**
      * Clear all the fields and the status.
      */
-    reset() {
+    async reset() {
         this.old_password.val("");
         this.new_password.val("");
         this.repeat_password.val("");
-        this.update();
+        await this.update();
     }
 
     /**
@@ -557,11 +565,11 @@ class Password extends InertSection {
     /**
      * Check the passwords that have been entered and show the result.
      */
-    override update() {
-        super.update();
+    override async update() {
+        await super.update();
         const new_password = String(this.new_password.val() ?? "");
         const repeat_password = String(this.repeat_password.val() ?? "");
-        this.set_status(check_password(new_password, repeat_password));
+        this.set_status(await check_password(new_password, repeat_password));
     }
 }
 

@@ -68,7 +68,7 @@ class AuthLayer {
                         loginWith: {
                             oauth: {
                                 domain: G_SAM_OUTPUTS.cognito_host_name,
-                                scopes: ["openid"],
+                                scopes: ["openid", "aws.cognito.signin.user.admin"],
                                 // Cognito sends the user back to /login, which Navigator handles
                                 redirectSignIn: [`${G_SAM_OUTPUTS.website_url}/login`],
                                 redirectSignOut: [G_SAM_OUTPUTS.website_url],
