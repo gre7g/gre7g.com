@@ -13,12 +13,12 @@ class TestGetOrders(BaseTestCase):
     """Test fetching order history"""
 
     def test_no_id(self):
-        """Should fail if there's no user ID"""
+        """Should reject fetching order history without logging in"""
         response = self.get("/api/v1/order")
         assert response.status_code == HTTPStatus.FORBIDDEN
 
     def test_user(self) -> None:
-        """Should fetch all orders"""
+        """Should fetch all of the user's orders"""
         orders, order_dict = self.order_data()
         with self.create_records([(self.orders_table, orders[0]), (self.orders_table, orders[1])]):
             response = self.get(
@@ -29,6 +29,7 @@ class TestGetOrders(BaseTestCase):
             result = response.json()
             assert len(result) == 1
             orders = result["orders"]
+            # Order of results isn't guaranteed, so check membership rather than comparing lists
             assert len(orders) == 2
             assert order_dict["orders"][0] in orders
             assert order_dict["orders"][1] in orders

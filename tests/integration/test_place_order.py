@@ -1,4 +1,11 @@
-"""Test order submission"""
+"""
+Test order submission
+
+POST /api/v1/order turns the user's cart into a PayPal OrderRequest and returns PayPal's response so the client can send
+the buyer off to approve payment. The PayPal SDK is replaced with lightweight fakes: each SDK model class becomes a
+MockObject that records its constructor arguments as a dict, so the order request the handler builds (and audit logs)
+can be compared against a plain nested dictionary.
+"""
 
 from dataclasses import dataclass, field
 from http import HTTPStatus
@@ -12,6 +19,7 @@ from src.api import place_order
 
 # Constants:
 LOG = logging.getLogger(__name__)
+# What the fake PayPal client returns from create_order(); the handler should pass it straight back to the client
 CREATED_ORDER = {
     "id": "1234",
     "links": [{"href": "url", "method": "GET", "rel": "verify"}],
@@ -21,21 +29,38 @@ CREATED_ORDER = {
 
 @dataclass
 class MockObject:
+    """
+    Stand-in for a PayPal SDK model class
+
+    Calling it (i.e. "constructing" the model) returns a dict of the class name and arguments instead of a real object.
+    """
+
     name: str
     args: tuple = field(default_factory=tuple)
     kwargs: dict = field(default_factory=dict)
 
     def __call__(self, *args, **kwargs):
+        """Return a description of the "constructed" object"""
         return {"name": self.name, "args": args, "kwargs": kwargs}
 
 
 class MockSdkClient(MockObject):
+    """
+    Stand-in for PaypalServersdkClient
+
+    Constructing it returns a client whose "orders" controller is this instance, so client.orders.create_order() lands
+    in create_order() below.
+    """
+
     def __call__(self, *args, **kwargs):
+        """Return a fake client wired to this instance's orders controller"""
         obj = MockSdkClient("MockSdkClient", args, kwargs)
-        obj.orders = self
+        obj.orders = self  # noqa
         return obj
 
-    def create_order(self, params):
+    @staticmethod
+    def create_order(*_args):
+        """Pretend PayPal accepted the order"""
         return Mock(body=CREATED_ORDER)
 
 
@@ -46,6 +71,7 @@ class TestPlaceOrder(BaseTestCase):
     @patch("lambda_base.PaypalServersdkClient")
     def test_logged_out_download(self, paypal_serversdk_client) -> None:
         """Should not be able to order digital downloads when logged out"""
+        # The guest cart contains an audiobook, so the handler should refuse before ever reaching PayPal
         cart, cart_dict = self.guest_cart_data()
         with self.create_records([(self.carts_table, cart)]):
             response = self.post(
@@ -55,6 +81,7 @@ class TestPlaceOrder(BaseTestCase):
             )
             assert response.status_code == HTTPStatus.UNAUTHORIZED
 
+    # Test locally. Can't patch functions in the cloud.
     @NO_CLOUD
     @patch("src.api.place_order.APIHelper", to_dictionary=lambda x: x)
     @patch("src.api.place_order.AmountBreakdown")
@@ -73,6 +100,9 @@ class TestPlaceOrder(BaseTestCase):
     @patch("src.api.place_order.send_email_home")
     def test_stock_problem(self, send_email_home, *_args) -> None:
         """Should email us when a stock issue occurs"""
+        # Swap the patched SDK classes for MockObjects so the order request is captured as plain data (the @patch
+        # decorators restore the real classes after the test). APIHelper.to_dictionary is patched to the identity
+        # function, so what gets audit logged is exactly what the MockObjects returned.
         place_order.AmountBreakdown = MockObject("AmountBreakdown")
         place_order.AmountWithBreakdown = MockObject("AmountWithBreakdown")
         place_order.Item = MockObject("Item")
@@ -89,6 +119,7 @@ class TestPlaceOrder(BaseTestCase):
         with self.create_records(
             [(self.carts_table, cart), (self.products_table, self.OUT_OF_STOCK1), (self.products_table, self.PRODUCT2)]
         ):
+            # p1 is out of stock, but the order should still go to PayPal; we just get warned
             response = self.post(
                 "/api/v1/order",
                 auth_user=self.regular_user,
@@ -180,6 +211,7 @@ class TestPlaceOrder(BaseTestCase):
         finally:
             self.delete_audit_objects(objects)
 
+    # Test locally. Can't patch functions in the cloud.
     @NO_CLOUD
     @patch("src.api.place_order.APIHelper", to_dictionary=lambda x: x)
     @patch("src.api.place_order.AmountBreakdown")
@@ -197,6 +229,7 @@ class TestPlaceOrder(BaseTestCase):
     @patch("lambda_base.PaypalServersdkClient")
     def test_logged_out_physical(self, *_args) -> None:
         """Should be able to order physical items when logged out"""
+        # Same SDK fakes as test_stock_problem
         place_order.AmountBreakdown = MockObject("AmountBreakdown")
         place_order.AmountWithBreakdown = MockObject("AmountWithBreakdown")
         place_order.Item = MockObject("Item")
@@ -286,6 +319,7 @@ class TestPlaceOrder(BaseTestCase):
         finally:
             self.delete_audit_objects(objects)
 
+    # Test locally. Can't patch functions in the cloud.
     @NO_CLOUD
     @patch("src.api.place_order.APIHelper", to_dictionary=lambda x: x)
     @patch("src.api.place_order.AmountBreakdown")
@@ -303,6 +337,7 @@ class TestPlaceOrder(BaseTestCase):
     @patch("lambda_base.PaypalServersdkClient")
     def test_logged_in(self, *_args) -> None:
         """Should be able to order digital items when logged in"""
+        # Same SDK fakes as test_stock_problem
         place_order.AmountBreakdown = MockObject("AmountBreakdown")
         place_order.AmountWithBreakdown = MockObject("AmountWithBreakdown")
         place_order.Item = MockObject("Item")
@@ -330,6 +365,8 @@ class TestPlaceOrder(BaseTestCase):
         # Check audit log too
         objects = self.get_all_audit_objects()
         try:
+            # The audiobook is categorized as DIGITAL_GOODS; shipping is still charged because of the paperback. The
+            # item total is $15.99 + 2 x $18.49 = $52.97.
             needle = {
                 "event": "place_order",
                 "user_id": self.regular_user.user_id,

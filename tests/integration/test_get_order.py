@@ -14,12 +14,12 @@ class TestGetOrder(BaseTestCase):
     """Test fetching an order"""
 
     def test_no_id(self):
-        """Should fail if there's no user ID"""
+        """Should reject fetching an order without logging in"""
         response = self.get("/api/v1/order/order1_id")
         assert response.status_code == HTTPStatus.FORBIDDEN
 
     def test_user(self) -> None:
-        """Should fetch an order"""
+        """Should fetch a single order with its download links signed"""
         orders, order_dict = self.order_data()
 
         # PRODUCT3 has a digital download, so the signing process will modify the object in place. We don't want to mess
@@ -40,7 +40,8 @@ class TestGetOrder(BaseTestCase):
             assert response.status_code == HTTPStatus.OK
             result = response.json()
 
-            # Should be signed now
+            # Should be signed now. The URL contents vary (the simulation returns a fixed fake URL, the cloud a real
+            # presigned one), so just check that it looks like a URL and then fold it into the expected result.
             signed = result["order"]["products"][0]["downloads"]["test.zip"]
             assert signed.startswith("https://")
             order_dict["orders"][1]["products"][0]["downloads"]["test.zip"] = signed

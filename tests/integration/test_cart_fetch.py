@@ -13,12 +13,14 @@ class TestCartFetch(BaseTestCase):
     """Test viewing the shopping cart"""
 
     def test_no_id(self):
-        """Should fail if there's no user ID and no guest ID"""
+        """Should reject a request with neither a user ID nor a guest ID"""
         response = self.get("/api/v1/cart")
         assert response.status_code == HTTPStatus.FORBIDDEN
 
     def test_guest(self):
-        """Should use the guest ID"""
+        """Should look up the cart by guest ID when not logged in"""
+        # Carts are keyed by a single ID, so storing the cart under the regular user's ID and passing that same value
+        # as the guest ID proves the guest header is used for the lookup
         cart, cart_dict = self.cart_data()
         with self.create_records([(self.carts_table, cart)]):
             response = self.get(
@@ -29,7 +31,8 @@ class TestCartFetch(BaseTestCase):
             assert response.json() == cart_dict
 
     def test_user(self) -> None:
-        """Should use the user ID"""
+        """Should prefer the user ID over the guest ID when both are given"""
+        # The cart is stored under the user ID; the guest ID has no cart, so getting the cart back means the user ID won
         cart, cart_dict = self.cart_data()
         with self.create_records([(self.carts_table, cart)]):
             response = self.get(
@@ -41,7 +44,7 @@ class TestCartFetch(BaseTestCase):
             assert response.json() == cart_dict
 
     def test_empty_cart(self) -> None:
-        """Should return an empty cart"""
+        """Should return an empty cart when none has been saved"""
         response = self.get(
             "/api/v1/cart",
             guest_user="some-guest-id",

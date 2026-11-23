@@ -1,4 +1,9 @@
-"""Test adding an audit event"""
+"""
+Test adding an audit event
+
+The audit log writes to S3 on a background thread. In the local simulation that thread is replaced with MockThread so
+the write happens synchronously and can be checked immediately.
+"""
 
 from dataclasses import dataclass, field
 from http import HTTPStatus
@@ -16,7 +21,7 @@ LOG = logging.getLogger(__name__)
 
 @dataclass
 class MockThread:
-    """Mock thread"""
+    """Stand-in for threading.Thread that runs the target synchronously when started"""
 
     target: Callable
     args: tuple = ()
@@ -36,6 +41,7 @@ class TestLogAudit(BaseTestCase):
     """Test adding an audit event"""
 
     def add_audit_event(self):
+        """Register a click ID and verify that a matching audit object was written to S3"""
         response = self.post(
             "/api/v1/click_id",
             auth_user=self.regular_user,
@@ -44,6 +50,8 @@ class TestLogAudit(BaseTestCase):
         )
         assert response.status_code == HTTPStatus.CREATED
 
+        # Match on the fields we sent (plus the caller's identity); remove the objects afterward so they don't leak into
+        # other tests' searches
         objects = self.get_all_audit_objects()
         try:
             needle = {
@@ -56,14 +64,17 @@ class TestLogAudit(BaseTestCase):
         finally:
             self.delete_audit_objects(objects)
 
+    # Test locally. Can't patch functions in the cloud.
     @NO_CLOUD
     @patch("audit_log.Thread")
     def test_simulation(self, *_args) -> None:
-        """Test adding an audit event in simulation"""
+        """Should write a click ID audit event in the local simulation"""
+        # The patch decorator restores audit_log.Thread after the test; replace the patched value with MockThread so
+        # the audit write runs inline
         audit_log.Thread = MockThread
         self.add_audit_event()
 
     @CLOUD_ONLY
     def test_cloud(self) -> None:
-        """Test adding an audit event in the cloud"""
+        """Should write a click ID audit event in the cloud"""
         self.add_audit_event()

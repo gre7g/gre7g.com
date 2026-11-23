@@ -1,4 +1,9 @@
-"""Should merge guest cart into a user account's"""
+"""
+Test merging a guest cart into a user's cart
+
+When a guest logs in, the client calls PUT /api/v1/guest with both the guest ID and the user's credentials so the
+guest's cart is folded into the user's cart and the guest cart is deleted.
+"""
 
 from http import HTTPStatus
 import logging
@@ -11,16 +16,18 @@ LOG = logging.getLogger(__name__)
 
 
 class TestCartMerge(BaseTestCase):
-    """Should merge guest cart into a user account's"""
+    """Test merging a guest cart into a user's cart"""
 
     def test_missing_id(self):
         """Should fail when guest or user ID is missing"""
+        # User ID only
         response = self.put(
             "/api/v1/guest",
             auth_user=self.regular_user,
             json={},
         )
         assert response.status_code == HTTPStatus.FORBIDDEN
+        # Guest ID only
         response = self.put(
             "/api/v1/guest",
             guest_user=self.regular_user.user_id,
@@ -30,6 +37,7 @@ class TestCartMerge(BaseTestCase):
 
     def test_bad_id(self):
         """Should fail when guest and user ID are identical"""
+        # Merging a cart into itself would delete it, so the handler rejects this
         response = self.put(
             "/api/v1/guest",
             auth_user=self.regular_user,
@@ -40,7 +48,9 @@ class TestCartMerge(BaseTestCase):
 
     def test_happy_path(self):
         """Should merge guest cart into a user account's"""
-        user_id = UserId(self.regular_user.user_id)
+        # User cart holds PRODUCT1 (p1) and PRODUCT2 (p2); guest cart holds PRODUCT3 (p3) and PRODUCT4 (p2). PRODUCT4
+        # should replace PRODUCT2 since they share a product ID, leaving three items.
+        user_id = UserId(self.regular_user.user_id)  # noqa
         user_cart, user_cart_dict = self.cart_data()
         guest_cart, guest_cart_dict = self.guest_cart_data()
         with self.create_records([(self.carts_table, user_cart), (self.carts_table, guest_cart)]):

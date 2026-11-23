@@ -1,4 +1,10 @@
-"""Test order confirmation"""
+"""
+Test order confirmation
+
+After the buyer approves payment on PayPal, the client calls PUT /api/v1/order/{transaction_id}. The handler captures
+the PayPal order, records it in the orders table, signs any download links, empties the cart, and warns the owner about
+inventory shortfalls.
+"""
 
 from copy import deepcopy
 from decimal import Decimal
@@ -19,6 +25,7 @@ LOG = logging.getLogger(__name__)
 class TestConfirmOrder(BaseTestCase):
     """Test order confirmation"""
 
+    # Test locally. Can't patch functions in the cloud.
     @NO_CLOUD
     @patch("lambda_base.LambdaBase.get_paypal_controller")
     @patch("src.api.confirm_order.send_email_home")
@@ -27,7 +34,8 @@ class TestConfirmOrder(BaseTestCase):
     @freeze_time("2026-11-13T12:47:52.959734+00:00")
     def test_happy_path(self, api_helper, *_args) -> None:
         """Should confirm an order placed with PayPal"""
-        # Track calls we care about
+        # Track calls we care about. Attaching all three to one parent Mock lets assert_has_calls() check the order in
+        # which they happened, not just that they happened. The @patch decorators still restore the originals.
         mock = Mock()
         lambda_base.LambdaBase.audit_log = mock.audit_log
         confirm_order.send_email_home = mock.send_email_home
@@ -37,7 +45,9 @@ class TestConfirmOrder(BaseTestCase):
         # up other tests, so make a copy of it.
         product3 = deepcopy(self.PRODUCT3)
 
-        # Inject test order
+        # Inject test order. This stands in for the PayPal capture response (APIHelper.to_dictionary converts the SDK
+        # object to a dict). PRODUCT3 is in stock, but OUT_OF_STOCK4 has quantity 0, which should trigger an inventory
+        # warning e-mail without blocking the order, since the buyer has already paid.
         api_helper.to_dictionary.return_value = {
             "status": "COMPLETED",
             "links": {},
@@ -140,7 +150,8 @@ class TestConfirmOrder(BaseTestCase):
                     }
                 }
 
-                # Verify calls happened
+                # Verify calls happened. The audit log entry is the PayPal response with the empty "links", "payee",
+                # "payment_source", and "seller_protection" fields stripped out.
                 mock.assert_has_calls(
                     [
                         call.get_paypal_controller(),
@@ -192,7 +203,8 @@ class TestConfirmOrder(BaseTestCase):
                 result = self.carts_table.get_item(Key={"user_id": self.regular_user.user_id})
                 assert "Item" not in result
 
-                # Verify order was created
+                # Verify order was created. DynamoDB returns numbers as Decimal and the stored record includes the
+                # user_id and version fields that aren't sent to the client.
                 result = self.orders_table.get_item(Key={"user_id": self.regular_user.user_id, "order_id": "123-456"})
                 assert result["Item"] == {
                     "discount": Decimal("0.00"),

@@ -1,4 +1,9 @@
-"""Test contact form"""
+"""
+Test contact form
+
+These tests only run in the local simulation (NO_CLOUD) because send_email_home is patched out; in the cloud it would
+send a real e-mail.
+"""
 
 from http import HTTPStatus
 import logging
@@ -14,9 +19,11 @@ LOG = logging.getLogger(__name__)
 class TestContactOwner(BaseTestCase):
     """Test contact form"""
 
+    # Test locally. Can't patch functions in the cloud.
     @NO_CLOUD
     @patch("src.api.contact_owner.send_email_home")
     def test_logged_out(self, send_email_home) -> None:
+        """Should send an e-mail to the site owner identifying the guest"""
         response = self.post(
             "/api/v1/contact",
             guest_user="some-guest-id",
@@ -26,6 +33,7 @@ class TestContactOwner(BaseTestCase):
         assert response.json() == {}
         send_email_home.assert_called_once_with(
             "Contact from gre7g.com",
+            # A guest has no user ID and no Cognito e-mail, so only the guest ID is filled in
             """
 User: None
 Guest: 'some-guest-id'
@@ -37,10 +45,11 @@ Message:
 Howdy""",
         )
 
+    # Test locally. Can't patch functions in the cloud.
     @NO_CLOUD
     @patch("src.api.contact_owner.send_email_home")
     def test_logged_in(self, send_email_home) -> None:
-        """Should send an e-mail to the site owner"""
+        """Should send an e-mail to the site owner including the user's account e-mail"""
         response = self.post(
             "/api/v1/contact",
             auth_user=self.regular_user,
@@ -50,6 +59,8 @@ Howdy""",
         assert response.json() == {}
         send_email_home.assert_called_once_with(
             "Contact from gre7g.com",
+            # The "official" e-mail comes from the Cognito user attributes, which the local simulation fakes as
+            # address@example.com
             f"""
 User: '{self.regular_user.user_id}'
 Guest: None
