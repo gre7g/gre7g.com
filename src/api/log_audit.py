@@ -1,6 +1,9 @@
 """
 Log a click_id
 
+POST /api/v1/click_id. Records an ad/referral click ID from the client in the audit log, along with whatever user and
+guest identity accompanied the request. No authentication is required.
+
 REQUIRES: AuditRW
 """
 
@@ -21,8 +24,14 @@ class LogAudit(LambdaBase):
     """Log a click_id"""
 
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
-        """Log a click_id"""
+        """Log a click_id
+
+        Request body: {"click_id": "<id>"}
+        Response: {}
+
+        Raises KeyError (400) if click_id is missing."""
         click_id = self.body["click_id"]
+        # The audit log write runs in a background thread; LambdaBase joins it before returning the response
         self.audit_log(AuditLogEvent.REGISTER_CLICK, click_id=click_id)
 
         return {}

@@ -1,6 +1,8 @@
 """
 Get orders
 
+GET /api/v1/order. Lists all of the logged-in user's orders.
+
 REQUIRES: OrdersRead
 """
 
@@ -24,10 +26,15 @@ class GetOrders(LambdaBase):
     AUTH_REQUIRED = AuthenticationRequired.USER
 
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
-        """Get orders"""
+        """Get orders
+
+        Request: requires a logged-in user (guests cannot view orders).
+        Response: {"orders": [<client order dict>, ...]}. Download links are NOT signed here; fetch an individual order
+        via get_order to get usable download URLs."""
         assert self.orders_table
         assert self.user_id
 
+        # user_id is the partition key. A single (unpaginated) query is assumed to return all of a user's orders.
         response = self.orders_table.query(KeyConditionExpression=Key("user_id").eq(self.user_id))
 
         orders = [Order.from_dict(item).to_client_dict() for item in response["Items"]]

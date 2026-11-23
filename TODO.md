@@ -9,6 +9,7 @@ High Urgency
 - [ ] Client controls shipping and the login rule: in place_order.py (and calculate_shipping.py), shipping and the
       "guests must log in to buy downloads" rule depend on the media values in the cart, which the client can set 
       freely. A changed value could skip the shipping charge or let a guest buy digital goods.
+- [ ] Inventory must be updated in confirm order not place!
 
 Moderate Urgency
 ----------------

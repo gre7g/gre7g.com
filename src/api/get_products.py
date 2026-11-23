@@ -1,6 +1,8 @@
 """
 View wares
 
+GET /api/v1/products. Public product catalog; no authentication required.
+
 REQUIRES: ProductsRead
 """
 
@@ -21,9 +23,13 @@ class GetProducts(LambdaBase):
     """View wares"""
 
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
-        """View wares"""
+        """View wares
+
+        Request: no inputs.
+        Response: {"products": [<client product dict>, ...]} for every row in the products table."""
         assert self.products_table
 
+        # Full table scan. The catalog is small, so a single (unpaginated) scan is expected to return everything.
         response = self.products_table.scan()
         products = [Product.from_dict(product).to_client_dict() for product in response["Items"]]
 
