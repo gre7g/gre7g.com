@@ -10,4 +10,5 @@ class TestPipAudit(TestCase):
     def test_pip_audit(self):
         """Check if there are any known vulnerabilities in the installed packages"""
 
+        # Audits the currently active environment; a non-zero exit (vulnerability found) fails the test
         check_call(["pip-audit"])

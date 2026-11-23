@@ -49,6 +49,18 @@ class Function:
             path = path / part
         return path
 
+    def check_timeout(self, timeout: int):
+        """Assert the function's configured timeout is at least "timeout" seconds"""
+        assert (self.timeout or 0) >= timeout, f"{self.name} must have a timeout of {timeout}"
+
+    def check_env_var(self, var_name: str):
+        """Assert the function is given the environment variable "var_name"."""
+        assert var_name in self.env_vars, f"{self.name} must have access to {var_name}"
+
+    def check_policy(self, policy_name: str, resource_name: str):
+        """Assert the function has the IAM policy "policy_name" applied to "resource_name"."""
+        assert (policy_name, resource_name) in self.policies, f"{self.name} must have {policy_name} on {resource_name}"
+
 
 @dataclass
 class Template:

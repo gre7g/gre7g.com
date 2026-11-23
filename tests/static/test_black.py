@@ -13,9 +13,11 @@ class TestBlack(TestCase):
     def test_code_is_blackened(self):
         """Check if all source files have been properly formatted"""
 
+        # Run from the repo root so black picks up [tool.black] settings from pyproject.toml
         root_path = Path(__file__).resolve().parents[2]
         os.chdir(str(root_path))
 
+        # check_call raises CalledProcessError (failing the test) if any file would be reformatted
         for path in [
             root_path / "scripts",
             root_path / "src",
