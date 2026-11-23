@@ -3,6 +3,7 @@
 import boto3
 from datetime import datetime, UTC
 import json
+import os
 from typing import Any
 
 from database import Cart, UserId, Product, ProductId, Order, OrderId, Timestamp, Filename
@@ -199,5 +200,9 @@ class BaseTestCase(integration_base.BaseTestCase):
         return False
 
     def delete_audit_objects(self, objects: dict[str, AuditObj]) -> None:
+        """Delete the given audit log objects so later tests start from a clean log"""
+        # NEVER CLEAR THE PRODUCTION AUDIT LOG!
+        assert not os.getenv("STACK-NAME", "gre7g-com-PROD").endswith("-PROD")
+
         s3 = boto3.client("s3")
         s3.delete_objects(Bucket=self.audit_log, Delete={"Objects": [{"Key": key} for key in objects]})

@@ -18,74 +18,6 @@ CREATED_ORDER = {
     "status": "processing",
 }
 
-EXPECTED_PHYSICAL_RESPONSE = {
-    "name": "OrderRequest",
-    "args": [
-        "CAPTURE",
-        [
-            {
-                "args": [
-                    {
-                        "args": [
-                            "USD",
-                            "38.47",
-                            {
-                                "args": [
-                                    {"args": ["USD", "32.48"], "kwargs": {}, "name": "Money"},
-                                    {"args": ["USD", "5.99"], "kwargs": {}, "name": "Money"},
-                                ],
-                                "kwargs": {},
-                                "name": "AmountBreakdown",
-                            },
-                        ],
-                        "kwargs": {},
-                        "name": "AmountWithBreakdown",
-                    },
-                    "123-456",
-                ],
-                "kwargs": {
-                    "items": [
-                        {
-                            "args": [],
-                            "kwargs": {
-                                "category": "PHYSICAL_GOODS",
-                                "description": "--",
-                                "name": "Skeleton Crew",
-                                "quantity": "1",
-                                "sku": "p1",
-                                "unit_amount": {
-                                    "args": ["USD", "13.99"],
-                                    "kwargs": {},
-                                    "name": "Money",
-                                },
-                            },
-                            "name": "Item",
-                        },
-                        {
-                            "args": [],
-                            "kwargs": {
-                                "category": "PHYSICAL_GOODS",
-                                "description": "--",
-                                "name": "Long Way Home",
-                                "quantity": "1",
-                                "sku": "p2",
-                                "unit_amount": {
-                                    "args": ["USD", "18.49"],
-                                    "kwargs": {},
-                                    "name": "Money",
-                                },
-                            },
-                            "name": "Item",
-                        },
-                    ]
-                },
-                "name": "PurchaseUnitRequest",
-            }
-        ],
-    ],
-    "kwargs": {},
-}
-
 
 @dataclass
 class MockObject:
@@ -174,7 +106,75 @@ class TestPlaceOrder(BaseTestCase):
                 "event": "place_order",
                 "user_id": self.regular_user.user_id,
                 "guest_id": None,
-                "order_request": EXPECTED_PHYSICAL_RESPONSE,
+                # The OrderRequest, as rendered by MockObject, for a cart holding PRODUCT1 and PRODUCT2: $32.48 of items
+                # plus $5.99 shipping, with "123-456" as the reference ID (from the patched uuid1)
+                "order_request": {
+                    "name": "OrderRequest",
+                    "args": [
+                        "CAPTURE",
+                        [
+                            {
+                                "args": [
+                                    {
+                                        "args": [
+                                            "USD",
+                                            "38.47",
+                                            {
+                                                "args": [
+                                                    {"args": ["USD", "32.48"], "kwargs": {}, "name": "Money"},
+                                                    {"args": ["USD", "5.99"], "kwargs": {}, "name": "Money"},
+                                                ],
+                                                "kwargs": {},
+                                                "name": "AmountBreakdown",
+                                            },
+                                        ],
+                                        "kwargs": {},
+                                        "name": "AmountWithBreakdown",
+                                    },
+                                    "123-456",
+                                ],
+                                "kwargs": {
+                                    "items": [
+                                        {
+                                            "args": [],
+                                            "kwargs": {
+                                                "category": "PHYSICAL_GOODS",
+                                                "description": "--",
+                                                "name": "Skeleton Crew",
+                                                "quantity": "1",
+                                                "sku": "p1",
+                                                "unit_amount": {
+                                                    "args": ["USD", "13.99"],
+                                                    "kwargs": {},
+                                                    "name": "Money",
+                                                },
+                                            },
+                                            "name": "Item",
+                                        },
+                                        {
+                                            "args": [],
+                                            "kwargs": {
+                                                "category": "PHYSICAL_GOODS",
+                                                "description": "--",
+                                                "name": "Long Way Home",
+                                                "quantity": "1",
+                                                "sku": "p2",
+                                                "unit_amount": {
+                                                    "args": ["USD", "18.49"],
+                                                    "kwargs": {},
+                                                    "name": "Money",
+                                                },
+                                            },
+                                            "name": "Item",
+                                        },
+                                    ]
+                                },
+                                "name": "PurchaseUnitRequest",
+                            }
+                        ],
+                    ],
+                    "kwargs": {},
+                },
             }
             assert self.obj_in_audit_objects(needle, objects)
         finally:
@@ -209,13 +209,13 @@ class TestPlaceOrder(BaseTestCase):
         lambda_base.RequestLoggingConfiguration = MockObject("RequestLoggingConfiguration")
         lambda_base.ResponseLoggingConfiguration = MockObject("ResponseLoggingConfiguration")
         lambda_base.PaypalServersdkClient = MockSdkClient("MockSdkClient")
-        cart, cart_dict = self.cart_data()
+        cart, cart_dict = self.guest_cart_no_downloads()
         with self.create_records(
             [(self.carts_table, cart), (self.products_table, self.PRODUCT1), (self.products_table, self.PRODUCT2)]
         ):
             response = self.post(
                 "/api/v1/order",
-                auth_user=self.regular_user,
+                guest_user="guest1_id",
                 json={},
             )
             assert response.status_code == HTTPStatus.CREATED
@@ -226,9 +226,61 @@ class TestPlaceOrder(BaseTestCase):
         try:
             needle = {
                 "event": "place_order",
-                "user_id": self.regular_user.user_id,
-                "guest_id": None,
-                "order_request": EXPECTED_PHYSICAL_RESPONSE,
+                "user_id": None,
+                "guest_id": "guest1_id",
+                # The OrderRequest, as rendered by MockObject, for a cart holding PRODUCT4: $36.98 of items plus $5.99
+                # shipping, with "123-456" as the reference ID (from the patched uuid1)
+                "order_request": {
+                    "args": [
+                        "CAPTURE",
+                        [
+                            {
+                                "args": [
+                                    {
+                                        "args": [
+                                            "USD",
+                                            "42.97",
+                                            {
+                                                "args": [
+                                                    {"args": ["USD", "36.98"], "kwargs": {}, "name": "Money"},
+                                                    {"args": ["USD", "5.99"], "kwargs": {}, "name": "Money"},
+                                                ],
+                                                "kwargs": {},
+                                                "name": "AmountBreakdown",
+                                            },
+                                        ],
+                                        "kwargs": {},
+                                        "name": "AmountWithBreakdown",
+                                    },
+                                    "123-456",
+                                ],
+                                "kwargs": {
+                                    "items": [
+                                        {
+                                            "args": [],
+                                            "kwargs": {
+                                                "category": "PHYSICAL_GOODS",
+                                                "description": "--",
+                                                "name": "Long Way Home",
+                                                "quantity": "2",
+                                                "sku": "p2",
+                                                "unit_amount": {
+                                                    "args": ["USD", "18.49"],
+                                                    "kwargs": {},
+                                                    "name": "Money",
+                                                },
+                                            },
+                                            "name": "Item",
+                                        }
+                                    ]
+                                },
+                                "name": "PurchaseUnitRequest",
+                            }
+                        ],
+                    ],
+                    "kwargs": {},
+                    "name": "OrderRequest",
+                },
             }
             assert self.obj_in_audit_objects(needle, objects)
         finally:

@@ -353,14 +353,14 @@ PRODUCTS = [
         "Nobody Left Behind − audiobook",
         "Kanti Cycle 3.5: Nobody Left Behind (audiobook, action/adventure sci-fi novel)",
         """
-            <p>? hours, ? minutes</p>
+            <p>6 hours, 50 minutes</p>
             <p>Voiced by the amazing Piers Ryman</p>
             <p>Digital download is a .zip of DRM-free .mp3 files</p>
             """,
         "/shop/books/nobody-left-behind/audiobook",
         ProductId("kc3.5-audiobook"),
         -1,
-        99.99,
+        16.11,
         ["/static/images/products/nobody-left-behind-4.jpg"],
         {Filename("KC3.5NobodyLeftBehind.zip"): None},
         "audiobook",

@@ -9,9 +9,6 @@ High Urgency
 - [ ] Client controls shipping and the login rule: in place_order.py (and calculate_shipping.py), shipping and the
       "guests must log in to buy downloads" rule depend on the media values in the cart, which the client can set 
       freely. A changed value could skip the shipping charge or let a guest buy digital goods.
-- [ ] Add a double-check to ensure delete_audit_objects can't be run on the production audit
-- [ ] test_logged_out_physical sends a logged-in user, so guest checkout of physical items is never tested.
-- [ ] Set the audiobook price
 
 Moderate Urgency
 ----------------
@@ -50,6 +47,9 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] Add a double-check to ensure delete_audit_objects can't be run on the production audit
+- [X] test_logged_out_physical sends a logged-in user, so guest checkout of physical items is never tested.
+- [X] Set the audiobook price
 - [X] Cart merge isnt being used
 - [X] Need digital downloads:
   - [X] Skeleton Crew audiobook
