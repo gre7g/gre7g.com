@@ -37,6 +37,16 @@ class CalculateShipping(LambdaBase):
         cart = Cart.get(self.carts_table, user_id)
         mix = self.get_cart_mix(cart)
 
+        # Note: The shopping cart is user-provided, so it could theoretically be tampered with. The user could say that
+        # their paperback are digital downloads, so this script will report that they don't have to pay any shipping.
+        # They could say that their digital downloads are paperbacks so they don't need to log in to buy them.
+        #
+        # I GUESS?!
+        #
+        # Though they could do this, it would only change how things are listed on their check-out page. They would,
+        # essentially, just be fooling themselves. When the actual purchase is made, we make these determinations based
+        # on data they cannot modify.
+
         # Shipping is a flat rate charged once if anything in the cart is a physical item; digital-only carts ship free
         shipping_cost = PHYSICAL_SHIPPING if mix in [ProductMix.ALL_PHYSICAL, ProductMix.MIX_OF_TYPES] else 0.00
         if self.user_id:
