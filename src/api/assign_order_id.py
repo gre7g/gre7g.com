@@ -1,6 +1,9 @@
 """
 Assign order_id
 
+POST /api/v1/cart. Hands the client a fresh, time-based UUID it can use as an order identifier. Nothing is stored and no
+authentication is required.
+
 REQUIRES: none
 """
 
@@ -18,10 +21,15 @@ LOG = Logger(__name__) if os.getenv("AWS_LAMBDA_FUNCTION_NAME") else logging.get
 
 
 class AssignOrderId(LambdaBase):
-    """Assign order_id"""
+    """Assign order_id
+
+    Stateless: the ID is not reserved or persisted anywhere."""
 
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
-        """Assign order_id"""
+        """Assign order_id
+
+        Request: no inputs.
+        Response: {"order_id": "<uuid1>"}"""
 
         return {"order_id": str(uuid1())}
 

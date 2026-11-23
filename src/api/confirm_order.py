@@ -1,6 +1,11 @@
 """
 Confirm order
 
+PUT /api/v1/order/{transaction_id}. Step two of the PayPal checkout flow (see place_order): once the shopper approves
+the payment, capture it with PayPal, decrement inventory for physical goods, record the order in our orders table, and
+clear the cart. The order contents are taken from PayPal's capture response rather than our cart, so we record exactly
+what was paid for.
+
 REQUIRES: AuditRW, CartsRW, ProductsRW, OrdersRW, Gmail
 """
 
@@ -30,7 +35,10 @@ class ConfirmOrder(LambdaBase):
     @staticmethod
     def flush_chaff_from_paypal_response(result: dict[str, Any]) -> None:
         """The result dictionary holds a bunch of stuff we don't really care about. No big deal, but it seems like a
-        waste to log it all, so delete it."""
+        waste to log it all, so delete it.
+
+        Modifies "result" in place. Also asserts that every capture is COMPLETED, so a partially failed capture aborts
+        the confirmation (as a 500) before anything is recorded."""
         result.pop("links", None)
         result.pop("payment_source", None)
         purchase_unit: dict[str, Any]
@@ -45,7 +53,13 @@ class ConfirmOrder(LambdaBase):
     def process_purchase_units(
         self, user_id: UserId, transaction_id: str, purchase_units: list[dict[str, Any]]
     ) -> Order:
-        """Process purchase units from PayPal"""
+        """Process purchase units from PayPal
+
+        Builds and stores an Order from PayPal's captured purchase units: totals and per-item prices/quantities come
+        from PayPal, while the rest of each product record comes from the products table. Physical items are
+        decremented from inventory as a side effect.
+
+        Returns the stored Order."""
         assert self.products_table
         assert self.orders_table
 
@@ -61,6 +75,7 @@ class ConfirmOrder(LambdaBase):
         subtotal = 0.00
         shipping = 0.00
         total = 0.00
+        # Fallback order ID; normally overwritten by the reference_id that place_order assigned to the purchase unit
         order_id = OrderId(str(uuid1()))
         for purchase_unit in purchase_units:
             total_money = purchase_unit["amount"]
@@ -87,6 +102,9 @@ class ConfirmOrder(LambdaBase):
                 assert unit_amount["currency_code"] == CURRENCY
 
                 if item["category"] == ItemCategory.PHYSICAL_GOODS:
+                    # Atomically decrement stock, but only if there is enough. The payment has already been captured at
+                    # this point, so a shortfall does not fail the order; it is logged and the owner is e-mailed to
+                    # sort it out (restock or refund) by hand.
                     try:
                         self.products_table.update_item(
                             Key={"product_id": product_id},
@@ -108,6 +126,7 @@ class ConfirmOrder(LambdaBase):
                             "Inventory Error", f'Insufficient stock of "{item["name"]}" to fulfill order {order_id}'
                         )
 
+                # Reuse the listing as the order line item: quantity now means "quantity purchased", not stock level
                 product_listing.quantity = quantity
                 product_listing.cost_per = float(unit_amount["value"])
                 products.append(product_listing)
@@ -128,7 +147,14 @@ class ConfirmOrder(LambdaBase):
         return order
 
     def handler(self, event: dict[str, Any], context: LambdaContext) -> dict[str, Any]:
-        """Confirm order"""
+        """Confirm order
+
+        Request: "transaction_id" path parameter (PayPal's order ID returned by place_order) plus Authorization bearer
+        token and/or "x-guest-id" header.
+        Response: {"order": <client order dict>} with presigned download URLs for any digital goods.
+
+        Any failed assertion on PayPal's response (status not COMPLETED, unexpected currency) surfaces as a 500."""
+        # A logged-in identity takes precedence over the guest ID
         user_id = self.user_id or self.guest_id
         transaction_id = self.path_parameters["transaction_id"]  # PayPal's transaction ID, not our ID!
 
@@ -136,13 +162,14 @@ class ConfirmOrder(LambdaBase):
         assert transaction_id
         assert self.carts_table
 
-        # Fetch order from PayPal
+        # Capture the payment the shopper approved. "return=representation" asks PayPal to return the full order
+        # (purchase units, items, amounts) so we don't need a separate lookup.
         response = self.get_paypal_controller().capture_order({"id": transaction_id, "prefer": "return=representation"})
         result: dict[str, Any] = APIHelper.to_dictionary(response.body)
         assert result["status"] == "COMPLETED"
         self.flush_chaff_from_paypal_response(result)
 
-        # Log what we've received
+        # Log what we've received before processing, so there is a record of the payment even if processing fails
         self.audit_log(AuditLogEvent.CONFIRM_ORDER, order=result)
 
         order = self.process_purchase_units(user_id, transaction_id, result.get("purchase_units", []))

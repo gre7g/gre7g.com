@@ -13,12 +13,16 @@ High Urgency
 - [ ] test_logged_out_physical sends a logged-in user, so guest checkout of physical items is never tested.
 - [ ] Set the audiobook price
 
-- [ ] Moderate Urgency
+Moderate Urgency
 ----------------
 - [ ] Links for other places an item is available
 - [ ] Some updates should be done last or async so that the screen updates immediately without waiting for AJAX
 - [ ] Ensure all errors thrown by lambda are legible
 - [ ] Update goodreads profile
+- [ ] Organize products instead of arbitrary
+- [ ] "books in this series" link
+- [ ] What happens if the user pays in another currency? Can that happen?
+- [ ] When the user adds an order, do we reload? Is the list resorted?
 
 Basic Features
 --------------
