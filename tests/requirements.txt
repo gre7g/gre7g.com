@@ -1,9 +1,9 @@
-awscrt==0.38.0
-aws_lambda_powertools==3.38.0
+awscrt==0.38.2
+aws_lambda_powertools==3.41.0
 black==26.10.1
-boto3==1.43.123
-botocore-stubs==1.43.123
-coverage==7.17.3
+boto3==1.44.9
+botocore-stubs==1.43.126
+coverage==7.17.5
 cryptography==50.0.2
 freezegun==1.5.5
 mypy==2.4.1
@@ -12,7 +12,7 @@ paypal-server-sdk==2.4.0
 pip_audit==2.10.1
 pip-requirements-parser @ git+https://github.com/gre7g/pip-requirements-parser.git
 PyJWT==2.15.1
-PyYAML==6.0.3
+PyYAML==6.0.4
 requests==2.34.2
-types-boto3-dynamodb==1.43.116
-types-PyYAML==6.0.12.20261030
+types-boto3-dynamodb==1.44.0
+types-PyYAML==6.0.12.20261122

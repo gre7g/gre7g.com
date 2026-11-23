@@ -42,9 +42,7 @@ class TestRequirements(TestCase):
         # What is actually installed in the current environment, in the same format as the requirement files
         pip = which("pip")
         assert pip
-        pip_requirements = self.requirement_obj(
-            RequirementsFile.from_string(check_output([pip, "freeze"], text=True))
-        )
+        pip_requirements = self.requirement_obj(RequirementsFile.from_string(check_output([pip, "freeze"], text=True)))
         root_requirements = self.requirement_path(ROOT_REQUIREMENTS)
         src_api_requirements = self.requirement_path(SRC_API_REQUIREMENTS)
         lib_requirements = self.requirement_path(LIB_REQUIREMENTS)
