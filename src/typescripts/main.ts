@@ -21,7 +21,6 @@ interface SamOutputs {
     audit_log: string;
     carts_table_name: string;
     cognito_host_name: string;
-    cognito_login_url: string;
     orders_table_name: string;
     paypal_client_id: string;
     products_table_name: string;

@@ -656,10 +656,6 @@ Outputs:
     Description: Used by the HTML script & integration tests
     Value: !Sub "${AWS::StackName}-auth.auth.${AWS::Region}.amazoncognito.com"
 
-  CognitoLoginURL:
-    Description: Used by the HTML script
-    Value: !Sub "https://${AWS::StackName}-auth.auth.${AWS::Region}.amazoncognito.com/login?client_id=${UserPoolClient}&response_type=code&scope=openid&redirect_uri=https://${WebDistribution.DomainName}/login"
-
   OrdersTableName:
     Description: Used by integration tests
     Value: !Ref OrdersTable

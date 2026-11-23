@@ -65,7 +65,6 @@ class BaseTestCase(TestCase):
     audit_log: ClassVar[str]
     carts_table_name: ClassVar[str]
     cognito_host_name: ClassVar[str]
-    cognito_login_url: ClassVar[str]
     orders_table_name: ClassVar[str]
     paypal_client_id: ClassVar[str]
     products_table_name: ClassVar[str]
