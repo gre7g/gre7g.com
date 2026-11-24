@@ -222,7 +222,7 @@ class CartUI extends ListSection {
                     quantity.hide();
                 }
                 quantity.val(product.quantity);
-                quantity.on("input", function() {
+                quantity.on("input", function () {
                     const input = $(this);
                     const product_index = input.closest("li").data("product_index");
                     G_PUBSUB.publish("cart.update_qty", { product_index, quantity: parseInt(input.val() ?? "0", 10) });
@@ -230,7 +230,7 @@ class CartUI extends ListSection {
                 const item_cost = product.cost_per * product.quantity;
                 subtotal += item_cost;
                 update_cost(new_item.find(".ext-cost"), item_cost);
-                new_item.find("button").on("click", function() {
+                new_item.find("button").on("click", function () {
                     const product_index = $(this).closest("li").data("product_index");
                     G_PUBSUB.publish("cart.delete", { product_index });
                 });
