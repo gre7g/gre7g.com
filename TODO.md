@@ -6,12 +6,12 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
-- [ ] Client controls shipping and the login rule: in place_order.py (and calculate_shipping.py), shipping and the
+- [X] Client controls shipping and the login rule: in place_order.py (and calculate_shipping.py), shipping and the
       "guests must log in to buy downloads" rule depend on the media values in the cart, which the client can set 
       freely. A changed value could skip the shipping charge or let a guest buy digital goods.
   - [X] recheck calculate shipping
-  - [ ] recheck place order
-- [ ] Inventory must be updated in confirm order not place!
+  - [X] recheck place order
+- [X] Inventory must be updated in confirm order not place!
 
 Moderate Urgency
 ----------------
@@ -47,6 +47,7 @@ Low Urgency
 - [ ] Clean out old carts (they may need timestamps)
 - [ ] The JWT signing keys are fetched again on every request.
 - [ ] get_orders and get_products read only one page of DynamoDB results.
+- [ ] would be nice if test_requirements also errored if we provide an unneeded resource to a function
 
 Old and Completed
 -----------------

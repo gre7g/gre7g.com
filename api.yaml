@@ -155,6 +155,13 @@ components:
           schema:
             $ref: "#/components/schemas/error-message"
 
+    "422-unprocessable-entity":
+      description: Request was well-formed but server cannot complete transaction.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error-message"
+
     "500-internal-server-error":
       description: One of the application's scripts threw an uncaught error.
       content:
@@ -456,6 +463,8 @@ paths:
                   - status
         "401":
           $ref: "#/components/responses/401-unauthorized"
+        "422":
+          $ref: "#/components/responses/422-unprocessable-entity"
         "500":
           $ref: "#/components/responses/500-internal-server-error"
 

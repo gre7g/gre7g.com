@@ -137,4 +137,17 @@ export class Cart {
         this.empty.toggle(empty);
         this.button.prop("disabled", empty);
     }
+
+    /**
+     * Mark cart items as out of stock.
+     *
+     * @param product_ids   List of product IDs that are out of stock.
+     */
+    out_of_stock(product_ids: string[]) {
+        for (const product_id of product_ids) {
+            // TODO find items and mark out of stock
+            console.log("out of stock", product_id);
+        }
+        G_PUBSUB.publish("ui.show_section", { section: "cart" });
+    }
 }

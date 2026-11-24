@@ -2,10 +2,14 @@ import { $ } from "jquery";
 import { loadScript, PayPalNamespace, OnApproveActions, OnApproveData } from "@paypal/paypal-js";
 
 import { G_API, G_UI, G_SAM_OUTPUTS, G_CART, G_PUBSUB } from "./main";
+import { StatusMessage } from "./api";
+
+// Constants:
+const UNPROCESSABLE_ENTITY = 422;
 
 // createOrder() can't return an error through PayPal, so it saves the message here for onError() to show instead of
 // PayPal's generic one
-let G_SAVED_ERR_MSG = "";
+let G_SAVED_ERR: StatusMessage | null = null;
 
 /**
  * Load the PayPal SDK and render its payment buttons into #place_order in the checkout section.
@@ -36,7 +40,7 @@ export function load_paypal() {
                         const order_data = await G_API.post("/api/v1/order", {});
                         return order_data.id;
                     } catch (error) {
-                        G_SAVED_ERR_MSG = error instanceof Error ? error.message : JSON.stringify(error);
+                        G_SAVED_ERR = error as StatusMessage;
                         return null;
                     }
                 },
@@ -79,10 +83,24 @@ export function load_paypal() {
                     let message: string;
                     if (error instanceof Error) {
                         // PayPal reports this when createOrder() returned null, so show the reason we saved
-                        message =
-                            error.message == "Expected an order id to be passed" ? G_SAVED_ERR_MSG : error.message;
+                        if (
+                            error.message == "Expected an order id to be passed" &&
+                            G_SAVED_ERR instanceof StatusMessage
+                        ) {
+                            if (G_SAVED_ERR.status == UNPROCESSABLE_ENTITY) {
+                                // Out of stock error
+                                G_CART.out_of_stock(G_SAVED_ERR.message.split(","));
+                                return;
+                            }
+                            // Error returned from the server
+                            message = G_SAVED_ERR.message;
+                        } else {
+                            // An Error object
+                            message = error.message;
+                        }
                     } else {
-                        message = JSON.stringify(error);
+                        // Something else
+                        message = String(error);
                     }
                     const status = $("#checkout-status");
                     status.text(message);

@@ -7,6 +7,22 @@ import { G_PUBSUB, G_SAM_OUTPUTS } from "./main";
 const PAGE_EXPIRED = 419;
 
 /**
+ * An error result returned by the API.
+ *
+ * @param status HTTP status code
+ * @param message Error message
+ */
+export class StatusMessage {
+    message: string;
+    status: number;
+
+    constructor(message: string, status: number = 0) {
+        this.message = message;
+        this.status = status;
+    }
+}
+
+/**
  * Stand-in for an Amplify AuthSession when dummy authentication is enabled (local testing).
  *
  * Both the access token and the user sub are set to the ?auth= value from the page URL.
@@ -198,7 +214,7 @@ export class Api extends AuthLayer {
         if (response.ok) {
             return result;
         } else {
-            throw new Error(result.message);
+            throw new StatusMessage(result?.message ?? response.statusText, response.status);
         }
     }
 
@@ -217,8 +233,13 @@ export class Api extends AuthLayer {
         try {
             return await this.request(method, path, data);
         } catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
-            G_PUBSUB.publish("ui.show_error", { message });
+            let status_message;
+            if (error instanceof StatusMessage) {
+                status_message = error;
+            } else {
+                status_message = new StatusMessage(error instanceof Error ? error.message : String(error));
+            }
+            G_PUBSUB.publish("ui.show_error", { message: status_message.message });
             throw error;
         }
     }

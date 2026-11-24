@@ -434,7 +434,7 @@ class OrdersUI extends ListSection {
             orders = await G_API.get("/api/v1/order");
             orders.orders.sort((a: Order, b: Order) => b.timestamp.localeCompare(a.timestamp));
             this.orders = orders.orders;
-        } catch (error) {
+        } catch {
             this.orders = [];
         }
     }

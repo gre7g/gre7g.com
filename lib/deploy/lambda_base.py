@@ -60,6 +60,10 @@ class CSRFException(Exception):
     """CSRF expired or could not be authenticated (mapped to the 419 PAGE_EXPIRED status)"""
 
 
+class OutOfStockException(Exception):
+    """Low stock error thrown with a comma-delimited list of product IDs"""
+
+
 class AuthenticationRequired(StrEnum):
     """Authentication required at the lambda level
 
@@ -264,6 +268,11 @@ class LambdaBase(ABC):
             LOG.error("CSRF error")
             status = PAGE_EXPIRED  # type: ignore [assignment]
             body = {"message": "CSRF error"}
+
+        except OutOfStockException as error:
+            LOG.error("Out of stock", extra={"products": error.args[0]})
+            status = HTTPStatus.UNPROCESSABLE_ENTITY
+            body = {"message": error.args[0]}
 
         except Exception as error:  # pragma: no cover
             LOG.exception("Unhandled exception")
