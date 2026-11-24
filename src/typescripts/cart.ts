@@ -1,5 +1,5 @@
 import { Product } from "./products";
-import { G_API, G_PUBSUB } from "./main";
+import { G_API, G_CART, G_PUBSUB } from "./main";
 
 /**
  * The shopping cart contents and the parts of the cart page that depend on whether it's empty.
@@ -145,9 +145,21 @@ export class Cart {
      */
     out_of_stock(product_ids: string[]) {
         for (const product_id of product_ids) {
-            // TODO find items and mark out of stock
-            console.log("out of stock", product_id);
+            this.contents.some((item) => {
+                if (item.product_id == product_id) {
+                    item.quantity = 0;
+                    return true;
+                }
+                return false;
+            });
         }
-        G_PUBSUB.publish("ui.show_section", { section: "cart" });
+
+        // Return to the cart page, show an error, update the cart, and reload the inventory
+        G_PUBSUB.publish("navigate.go", { path: "/user/cart", save: true });
+        G_PUBSUB.publish("ui.show_error", {
+            message: "Sadly, your order had to be aborted. One or more items in your cart are no longer available.",
+        });
+        void G_API.put("/api/v1/cart", { products: this.contents });
+        void G_CART.load();
     }
 }

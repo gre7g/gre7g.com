@@ -1,7 +1,7 @@
 import { $ } from "jquery";
 import { loadScript, PayPalNamespace, OnApproveActions, OnApproveData } from "@paypal/paypal-js";
 
-import { G_API, G_UI, G_SAM_OUTPUTS, G_CART, G_PUBSUB } from "./main";
+import { G_API, G_UI, G_SAM_OUTPUTS, G_CART, G_PUBSUB, G_PRODUCTS } from "./main";
 import { StatusMessage } from "./api";
 
 // Constants:
@@ -65,7 +65,10 @@ export function load_paypal() {
                     G_UI.sections.thank_you.order = response.order;
                     await G_PUBSUB.publish_async("navigate.bury_url", { section: "thank_you", path: "/thank-you" });
                     await G_CART.empty_cart();
+
+                    // Update our list of orders and reload the inventory
                     G_PUBSUB.publish("orders.fetch", undefined);
+                    void G_PRODUCTS.load();
                 },
 
                 /**

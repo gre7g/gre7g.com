@@ -659,9 +659,18 @@ main > article img {
     --cart-remove-width: 5rem;
 }
 
-#cart > ul > li {
+/* Columns live on the list and each row is a subgrid, so the "auto" cost column is sized to the
+   widest amount across every row and the quantity spinners stay aligned. */
+#cart > ul {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 5.5rem auto var(--cart-remove-width);
+    column-gap: var(--cart-row-gap);
+}
+
+#cart > ul > li {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
     column-gap: var(--cart-row-gap);
     padding: var(--cart-row-padding);
 }
@@ -675,9 +684,29 @@ main > article img {
     margin-right: 0;
 }
 
+/* Shown in place of the quantity spinner, so it occupies the same grid column */
+#cart .sold-out {
+    grid-column: 2;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.35rem 0.3rem;
+    border: 2px solid #5f1f19;
+    border-radius: 0.5rem;
+    color: #fff;
+    background: #8e352d;
+    box-shadow: 0 0.15rem 0.45rem rgb(142 53 45 / 35%);
+    font-size: 0.8rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: 0.03em;
+    text-align: center;
+    text-transform: uppercase;
+}
+
 #cart .ext-cost {
     text-align: right;
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
 }
 
 #cart > ul > li > button {
@@ -1059,12 +1088,18 @@ footer nav {
         --cart-remove-width: 4rem;
     }
 
-    #cart > ul > li {
+    #cart > ul {
         grid-template-columns: minmax(0, 1fr) 4.25rem auto var(--cart-remove-width);
     }
 
     #cart .quantity {
         width: 4.25rem;
+    }
+
+    #cart .sold-out {
+        padding-inline: 0.15rem;
+        font-size: 0.7rem;
+        letter-spacing: 0;
     }
 
     #cart > ul > li > button {

@@ -183,6 +183,8 @@ class ProductUI extends InertSection {
  * Subscribes to "cart.update_qty" and "cart.update".
  */
 class CartUI extends ListSection {
+    show_sold_out = true;
+
     override init() {
         G_PUBSUB.subscribe("cart.update_qty", async (params) => {
             this.update_qty(params.product_index, params.quantity);
@@ -207,27 +209,33 @@ class CartUI extends ListSection {
         this.unordered_list.empty();
         let subtotal = 0.0;
         for (const [index, product] of G_CART.contents.entries()) {
-            const new_item = this.list_item.clone();
-            // Each <li> remembers its index so its input and button handlers know which entry they're for
-            new_item.data("product_index", index);
-            const name = new_item.find(".product-name");
-            name.text(product.name);
-            name.attr("href", product.listing_path);
-            const quantity = new_item.find("input");
-            quantity.val(product.quantity);
-            quantity.on("input", function () {
-                const input = $(this);
-                const product_index = input.closest("li").data("product_index");
-                G_PUBSUB.publish("cart.update_qty", { product_index, quantity: parseInt(input.val() ?? "0", 10) });
-            });
-            const item_cost = product.cost_per * product.quantity;
-            subtotal += item_cost;
-            update_cost(new_item.find(".ext-cost"), item_cost);
-            new_item.find("button").on("click", function () {
-                const product_index = $(this).closest("li").data("product_index");
-                G_PUBSUB.publish("cart.delete", { product_index });
-            });
-            this.unordered_list.append(new_item);
+            if (product.quantity || this.show_sold_out) {
+                const new_item = this.list_item.clone();
+                // Each <li> remembers its index so its input and button handlers know which entry they're for
+                new_item.data("product_index", index);
+                const name = new_item.find(".product-name");
+                name.text(product.name);
+                name.attr("href", product.listing_path);
+                const quantity = new_item.find("input");
+                if (product.quantity == 0) {
+                    new_item.find(".sold-out").show();
+                    quantity.hide();
+                }
+                quantity.val(product.quantity);
+                quantity.on("input", function() {
+                    const input = $(this);
+                    const product_index = input.closest("li").data("product_index");
+                    G_PUBSUB.publish("cart.update_qty", { product_index, quantity: parseInt(input.val() ?? "0", 10) });
+                });
+                const item_cost = product.cost_per * product.quantity;
+                subtotal += item_cost;
+                update_cost(new_item.find(".ext-cost"), item_cost);
+                new_item.find("button").on("click", function() {
+                    const product_index = $(this).closest("li").data("product_index");
+                    G_PUBSUB.publish("cart.delete", { product_index });
+                });
+                this.unordered_list.append(new_item);
+            }
         }
         this.section.find(".summary").toggle(G_CART.contents.length != 0);
         update_cost(this.section.find(".subtotal .amount"), subtotal);
@@ -248,6 +256,7 @@ export class CheckoutUI extends CartUI {
      * Hook up the login button. (Doesn't subscribe to the cart events like CartUI does.)
      */
     override init() {
+        this.show_sold_out = false;
         this.section.find("button.login").on("click", async () => {
             G_PUBSUB.publish("user.login", undefined);
         });

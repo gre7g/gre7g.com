@@ -69,27 +69,28 @@ class PlaceOrder(LambdaBase):
         out_of_stock = []
         subtotal_cost = 0.00
         for product in cart.products:
-            # WARNING: ITEM COSTS MUST BE LOOKED UP FROM THE PRODUCT DIRECTORY! The user writes the cart data, so these
-            # prices would be easy to alter.
-            product_listing = Product.get(self.products_table, product.product_id)
-            physical_goods = self.physical_item(product_listing.media)
+            if product.quantity:
+                # WARNING: ITEM COSTS MUST BE LOOKED UP FROM THE PRODUCT DIRECTORY! The user writes the cart data, so
+                # these prices would be easy to alter.
+                product_listing = Product.get(self.products_table, product.product_id)
+                physical_goods = self.physical_item(product_listing.media)
 
-            # Low stock does block the order, but we continue looping in case there are other items that are low too
-            if physical_goods and (product_listing.quantity < product.quantity):
-                out_of_stock.append(product.product_id)
-            product_listing.quantity = product.quantity
-            products_from_db.append(product_listing)
+                # Low stock does block the order, but we continue looping in case there are other items that are low too
+                if physical_goods and (product_listing.quantity < product.quantity):
+                    out_of_stock.append(product.product_id)
+                product_listing.quantity = product.quantity
+                products_from_db.append(product_listing)
 
-            item = Item(
-                name=product_listing.name,
-                unit_amount=Money(CURRENCY, "%0.2f" % product_listing.cost_per),
-                quantity=str(product.quantity),
-                description=product_listing.short_desc,
-                sku=product_listing.product_id,
-                category=ItemCategory.PHYSICAL_GOODS if physical_goods else ItemCategory.DIGITAL_GOODS,
-            )
-            item_list.append(item)
-            subtotal_cost += product_listing.cost_per * product.quantity
+                item = Item(
+                    name=product_listing.name,
+                    unit_amount=Money(CURRENCY, "%0.2f" % product_listing.cost_per),
+                    quantity=str(product.quantity),
+                    description=product_listing.short_desc,
+                    sku=product_listing.product_id,
+                    category=ItemCategory.PHYSICAL_GOODS if physical_goods else ItemCategory.DIGITAL_GOODS,
+                )
+                item_list.append(item)
+                subtotal_cost += product_listing.cost_per * product.quantity
 
         if out_of_stock:
             raise OutOfStockException(",".join(out_of_stock))

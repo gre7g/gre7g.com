@@ -6,12 +6,6 @@ for tracking tasks, subtasks, and anything else that's more project-oriented.
 
 High Urgency
 ------------
-- [X] Client controls shipping and the login rule: in place_order.py (and calculate_shipping.py), shipping and the
-      "guests must log in to buy downloads" rule depend on the media values in the cart, which the client can set 
-      freely. A changed value could skip the shipping charge or let a guest buy digital goods.
-  - [X] recheck calculate shipping
-  - [X] recheck place order
-- [X] Inventory must be updated in confirm order not place!
 
 Moderate Urgency
 ----------------
@@ -51,6 +45,12 @@ Low Urgency
 
 Old and Completed
 -----------------
+- [X] Client controls shipping and the login rule: in place_order.py (and calculate_shipping.py), shipping and the
+      "guests must log in to buy downloads" rule depend on the media values in the cart, which the client can set 
+      freely. A changed value could skip the shipping charge or let a guest buy digital goods.
+  - [X] recheck calculate shipping
+  - [X] recheck place order
+- [X] Inventory must be updated in confirm order not place!
 - [X] Add a double-check to ensure delete_audit_objects can't be run on the production audit
 - [X] test_logged_out_physical sends a logged-in user, so guest checkout of physical items is never tested.
 - [X] Set the audiobook price
