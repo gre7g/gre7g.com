@@ -35,7 +35,7 @@ from types_boto3_dynamodb.service_resource import Table as DynamoDBTable
 from typing import Any, Callable
 
 from audit_log import AuditLogEvent, audit_log
-from database import UserId, Cart, Order
+from database import UserId, Cart, Order, Product
 
 # Constants:
 # Use the Powertools structured logger when running inside Lambda, plain stdlib logging otherwise (tests, local runs).
@@ -325,14 +325,14 @@ class LambdaBase(ABC):
         """Return True if the media type is a physical item"""
         return media in ["paperback", "jewelry"]
 
-    def get_cart_mix(self, cart: Cart) -> ProductMix:
+    def get_product_mix(self, products: list[Product]) -> ProductMix:
         """Return what mix of items we have
 
         Starts at NONE and moves to ALL_PHYSICAL/ALL_DIGITAL on the first product, then to MIX_OF_TYPES (which is
         sticky) as soon as a product of the other kind appears.
         """
         mix = ProductMix.NONE
-        for product in cart.products:
+        for product in products:
             if self.physical_item(product.media):
                 mix = (
                     ProductMix.ALL_PHYSICAL

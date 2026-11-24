@@ -73,7 +73,9 @@ class TestPlaceOrder(BaseTestCase):
         """Should not be able to order digital downloads when logged out"""
         # The guest cart contains an audiobook, so the handler should refuse before ever reaching PayPal
         cart, cart_dict = self.guest_cart_data()
-        with self.create_records([(self.carts_table, cart)]):
+        with self.create_records(
+            [(self.carts_table, cart), (self.products_table, self.PRODUCT3), (self.products_table, self.PRODUCT4)]
+        ):
             response = self.post(
                 "/api/v1/order",
                 guest_user="guest1_id",
@@ -81,40 +83,8 @@ class TestPlaceOrder(BaseTestCase):
             )
             assert response.status_code == HTTPStatus.UNAUTHORIZED
 
-    # Test locally. Can't patch functions in the cloud.
-    @NO_CLOUD
-    @patch("src.api.place_order.APIHelper", to_dictionary=lambda x: x)
-    @patch("src.api.place_order.AmountBreakdown")
-    @patch("src.api.place_order.AmountWithBreakdown")
-    @patch("src.api.place_order.Item")
-    @patch("src.api.place_order.Money")
-    @patch("src.api.place_order.OrderRequest")
-    @patch("src.api.place_order.PurchaseUnitRequest")
-    @patch("lambda_base.ClientCredentialsAuthCredentials")
-    @patch("lambda_base.Environment")
-    @patch("lambda_base.LoggingConfiguration")
-    @patch("lambda_base.RequestLoggingConfiguration")
-    @patch("lambda_base.ResponseLoggingConfiguration")
-    @patch("src.api.place_order.uuid1", return_value="123-456")
-    @patch("lambda_base.PaypalServersdkClient")
-    @patch("src.api.place_order.send_email_home")
-    def test_stock_problem(self, send_email_home, *_args) -> None:
-        """Should email us when a stock issue occurs"""
-        # Swap the patched SDK classes for MockObjects so the order request is captured as plain data (the @patch
-        # decorators restore the real classes after the test). APIHelper.to_dictionary is patched to the identity
-        # function, so what gets audit logged is exactly what the MockObjects returned.
-        place_order.AmountBreakdown = MockObject("AmountBreakdown")
-        place_order.AmountWithBreakdown = MockObject("AmountWithBreakdown")
-        place_order.Item = MockObject("Item")
-        place_order.Money = MockObject("Money")
-        place_order.OrderRequest = MockObject("OrderRequest")
-        place_order.PurchaseUnitRequest = MockObject("PurchaseUnitRequest")
-        lambda_base.ClientCredentialsAuthCredentials = MockObject("ClientCredentialsAuthCredentials")
-        lambda_base.Environment = Mock(SANDBOX="SANDBOX", PRODUCTION="PRODUCTION")
-        lambda_base.LoggingConfiguration = MockObject("LoggingConfiguration")
-        lambda_base.RequestLoggingConfiguration = MockObject("RequestLoggingConfiguration")
-        lambda_base.ResponseLoggingConfiguration = MockObject("ResponseLoggingConfiguration")
-        lambda_base.PaypalServersdkClient = MockSdkClient("MockSdkClient")
+    def test_stock_problem(self) -> None:
+        """Should raise a 422 (unprocessable) when a stock issue occurs"""
         cart, cart_dict = self.cart_data()
         with self.create_records(
             [(self.carts_table, cart), (self.products_table, self.OUT_OF_STOCK1), (self.products_table, self.PRODUCT2)]
@@ -125,91 +95,8 @@ class TestPlaceOrder(BaseTestCase):
                 auth_user=self.regular_user,
                 json={},
             )
-            assert response.status_code == HTTPStatus.CREATED
-            assert response.json() == CREATED_ORDER
-
-        send_email_home.assert_called_once_with("Cannot fulfill purchase warning", "Items: p1")
-
-        # Check audit log too
-        objects = self.get_all_audit_objects()
-        try:
-            needle = {
-                "event": "place_order",
-                "user_id": self.regular_user.user_id,
-                "guest_id": None,
-                # The OrderRequest, as rendered by MockObject, for a cart holding PRODUCT1 and PRODUCT2: $32.48 of items
-                # plus $5.99 shipping, with "123-456" as the reference ID (from the patched uuid1)
-                "order_request": {
-                    "name": "OrderRequest",
-                    "args": [
-                        "CAPTURE",
-                        [
-                            {
-                                "args": [
-                                    {
-                                        "args": [
-                                            "USD",
-                                            "38.47",
-                                            {
-                                                "args": [
-                                                    {"args": ["USD", "32.48"], "kwargs": {}, "name": "Money"},
-                                                    {"args": ["USD", "5.99"], "kwargs": {}, "name": "Money"},
-                                                ],
-                                                "kwargs": {},
-                                                "name": "AmountBreakdown",
-                                            },
-                                        ],
-                                        "kwargs": {},
-                                        "name": "AmountWithBreakdown",
-                                    },
-                                    "123-456",
-                                ],
-                                "kwargs": {
-                                    "items": [
-                                        {
-                                            "args": [],
-                                            "kwargs": {
-                                                "category": "PHYSICAL_GOODS",
-                                                "description": "--",
-                                                "name": "Skeleton Crew",
-                                                "quantity": "1",
-                                                "sku": "p1",
-                                                "unit_amount": {
-                                                    "args": ["USD", "13.99"],
-                                                    "kwargs": {},
-                                                    "name": "Money",
-                                                },
-                                            },
-                                            "name": "Item",
-                                        },
-                                        {
-                                            "args": [],
-                                            "kwargs": {
-                                                "category": "PHYSICAL_GOODS",
-                                                "description": "--",
-                                                "name": "Long Way Home",
-                                                "quantity": "1",
-                                                "sku": "p2",
-                                                "unit_amount": {
-                                                    "args": ["USD", "18.49"],
-                                                    "kwargs": {},
-                                                    "name": "Money",
-                                                },
-                                            },
-                                            "name": "Item",
-                                        },
-                                    ]
-                                },
-                                "name": "PurchaseUnitRequest",
-                            }
-                        ],
-                    ],
-                    "kwargs": {},
-                },
-            }
-            assert self.obj_in_audit_objects(needle, objects)
-        finally:
-            self.delete_audit_objects(objects)
+            assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+            assert response.json() == {"message": "p1"}
 
     # Test locally. Can't patch functions in the cloud.
     @NO_CLOUD
@@ -229,7 +116,9 @@ class TestPlaceOrder(BaseTestCase):
     @patch("lambda_base.PaypalServersdkClient")
     def test_logged_out_physical(self, *_args) -> None:
         """Should be able to order physical items when logged out"""
-        # Same SDK fakes as test_stock_problem
+        # Swap the patched SDK classes for MockObjects so the order request is captured as plain data (the @patch
+        # decorators restore the real classes after the test). APIHelper.to_dictionary is patched to the identity
+        # function, so what gets audit logged is exactly what the MockObjects returned.
         place_order.AmountBreakdown = MockObject("AmountBreakdown")
         place_order.AmountWithBreakdown = MockObject("AmountWithBreakdown")
         place_order.Item = MockObject("Item")
@@ -243,9 +132,7 @@ class TestPlaceOrder(BaseTestCase):
         lambda_base.ResponseLoggingConfiguration = MockObject("ResponseLoggingConfiguration")
         lambda_base.PaypalServersdkClient = MockSdkClient("MockSdkClient")
         cart, cart_dict = self.guest_cart_no_downloads()
-        with self.create_records(
-            [(self.carts_table, cart), (self.products_table, self.PRODUCT1), (self.products_table, self.PRODUCT2)]
-        ):
+        with self.create_records([(self.carts_table, cart), (self.products_table, self.PRODUCT4)]):
             response = self.post(
                 "/api/v1/order",
                 guest_user="guest1_id",

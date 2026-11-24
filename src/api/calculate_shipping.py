@@ -35,7 +35,7 @@ class CalculateShipping(LambdaBase):
         assert self.carts_table
 
         cart = Cart.get(self.carts_table, user_id)
-        mix = self.get_cart_mix(cart)
+        mix = self.get_product_mix(cart.products)
 
         # Note: The shopping cart is user-provided, so it could theoretically be tampered with. The user could say that
         # their paperback are digital downloads, so this script will report that they don't have to pay any shipping.
